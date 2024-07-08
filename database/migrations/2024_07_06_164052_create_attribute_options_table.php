@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('attribute_options', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->unsignedBigInteger('attribute_type_id');
+            $table->unsignedBigInteger('attribute_type_id')->nullable();
             $table->foreign('attribute_type_id')->references('id')->on('attribute_types')->onDelete('set null');
             $table->timestamps();
         });

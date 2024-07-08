@@ -18,7 +18,7 @@ return new class extends Migration
             $table->unsignedBigInteger('parent_category_id')->nullable(); // Nullable for root categories
             $table->unsignedBigInteger('size_category_id')->nullable(); // Nullable if not applicable
 
-            $table->foreign('parent_category_id')->references('id')->on('product_categories')->onDelete('set null') ;
+            $table->foreign('parent_category_id')->references('id')->on('product_categories')->onDelete('set null');
             $table->foreign('size_category_id')->references('id')->on('size_categories')->onDelete('set null'); // Adjust onDelete behavior as needed
 
             $table->timestamps();
@@ -30,6 +30,11 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::table('product_categories', function (Blueprint $table) {
+            $table->dropForeign(['parent_category_id']);
+            $table->dropForeign(['size_category_id']);
+        });
+
         Schema::dropIfExists('product_categories');
     }
 };

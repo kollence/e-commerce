@@ -14,11 +14,13 @@ return new class extends Migration
         Schema::create('product_variations', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('product_item_id');
-            $table->foreign('product_item_id')->references('id')->on('product_items')->onDelete('cascade');
-            $table->unsignedBigInteger('size_id');
-            $table->foreign('size_id')->references('id')->on('size_options')->onDelete('set null');
+            $table->unsignedBigInteger('size_id')->nullable();
             $table->string('sku');
             $table->integer('qty_stock');
+
+            $table->foreign('product_item_id')->references('id')->on('product_items')->onDelete('cascade');
+            $table->foreign('size_id')->references('id')->on('size_options')->onDelete('set null');
+            
             $table->timestamps();
         });
     }
@@ -28,6 +30,10 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::table('product_variations', function (Blueprint $table) {
+            $table->dropForeign(['product_item_id']);
+            $table->dropForeign(['size_id']);
+        });
         Schema::dropIfExists('product_variations');
     }
 };

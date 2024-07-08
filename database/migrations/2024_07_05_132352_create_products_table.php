@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('about');
 
             $table->unsignedBigInteger('brand_id')->nullable(); // Allow null values for brand_id
-            $table->unsignedBigInteger('product_category_id');
+            $table->unsignedBigInteger('product_category_id')->nullable();
 
             $table->foreign('product_category_id')->references('id')->on('product_categories')->onDelete('set null'); // Set foreign key constraint and onDelete behavior
             $table->foreign('brand_id')->references('id')->on('brands')->onDelete('set null'); // Set foreign key constraint and onDelete behavior
