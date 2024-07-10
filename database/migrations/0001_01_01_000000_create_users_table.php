@@ -16,8 +16,6 @@ return new class extends Migration
             $table->string('first_name');
             $table->string('last_name');
             $table->string('usertype')->default(0);
-            $table->unsignedBigInteger('address_id')->nullable();
-            // $table->foreign('address_id')->references('id')->on('addresses')->onDelete('set null');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');

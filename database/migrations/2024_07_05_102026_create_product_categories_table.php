@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('name')->unique();
             $table->string('slug')->unique();
+            $table->boolean('is_active')->default(true);
+            
             $table->unsignedBigInteger('parent_category_id')->nullable(); // Nullable for root categories
             $table->unsignedBigInteger('size_category_id')->nullable(); // Nullable if not applicable
 

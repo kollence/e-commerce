@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('product_variations', function (Blueprint $table) {
+        Schema::create('product_item_size_option', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('product_item_id');
+            $table->unsignedBigInteger('product_item_id')->nullable();
             $table->unsignedBigInteger('size_id')->nullable();
             $table->string('sku');
             $table->integer('qty_stock');
@@ -30,7 +30,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('product_variations', function (Blueprint $table) {
+        Schema::table('product_item_size_option', function (Blueprint $table) {
             $table->dropForeign(['product_item_id']);
             $table->dropForeign(['size_id']);
         });

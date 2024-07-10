@@ -18,6 +18,7 @@ return new class extends Migration
             $table->text('description');
             $table->string('care_instructions');
             $table->string('about');
+            $table->boolean('is_active')->default(true);
 
             $table->unsignedBigInteger('brand_id')->nullable(); // Allow null values for brand_id
             $table->unsignedBigInteger('product_category_id')->nullable();
