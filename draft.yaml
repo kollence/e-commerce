@@ -1,0 +1,123 @@
+
+models:
+  Image:
+    filename: string
+    url: string
+    is_active: boolean default:true
+    sort_order: integer default:1
+    main: boolean default:false
+    imageable_id: integer
+    imageable_type: string
+    indexes:
+      - unique: imageable_id, imageable_type
+  Product:
+    name: string unique
+    slug: string unique
+    description: text nullable
+    care_instructions: text nullable
+    about: text nullable
+    is_active: boolean default:true
+    brand_id: id foreign:brands nullable
+    relationships:
+      belongsToMany: Category
+      belongsTo: Brand
+      hasMany: OrderItem, ProductItem
+  ProductItem:
+    product_id: id foreign:products
+    color_id: id foreign:colors nullable
+    product_code: string
+    original_price: integer
+    sale_price: integer nullable
+    relationships:
+      belongsTo: Product, Color
+      belongsToMany: SizeOption
+  Category:
+    name: string unique
+    slug: string unique
+    is_active: boolean default:true
+    parent_category_id: id foreign:categories nullable
+    size_category_id: id foreign:size_categories nullable
+    relationships:
+      belongsToMany: Product
+      belongsTo: SizeCategory
+  Color:
+    name: string unique
+    hex: string unique nullable
+    relationships:
+      hasMany: ProductItem
+  SizeOption:
+    name: string unique
+    size_description: string nullable
+    sort_order: integer default:1
+    size_category_id: id foreign:size_categories
+    relationships:
+      belongsTo: SizeCategory
+      belongsToMany: ProductItem
+  SizeCategory:
+    name: string unique
+    slug: string unique
+    relationships:
+      hasMany: Category, SizeOption
+  Brand:
+    name: string unique
+    slug: string unique
+    description: text nullable
+    is_active: boolean default:true
+    relationships:
+      hasMany: Product
+  Order:
+    user_id: id foreign:users
+    status: enum:pending,processing,completed,cancelled default:pending
+    total_price: integer
+    shipping_price: integer
+    shipping_method: string
+    payment_method: string
+    payment_status: string
+    billing_address: text
+    shipping_address: text
+    currency: string
+    notes: text nullable
+    relationships:
+      belongsTo: User
+      hasMany: OrderItem 
+  OrderItem:
+    product_id: id foreign:products
+    order_id: id foreign:orders
+    quantity: integer default:1
+    unit_amount: integer
+    total_amount: integer
+    price: integer
+    total: integer
+    relationships:
+      belongsTo: Product, Order
+  Address:
+    user_id: id foreign:users nullable
+    order_id: id foreign:orders nullable
+    address_line_1: string
+    address_line_2: string nullable
+    city: string
+    state_province: string nullable
+    country: string
+    zip_code: string
+    phone_1: string nullable
+    phone_2: string nullable
+    default: boolean default:false
+    relationships:
+      belongsTo: User, Order
+controllers:
+  Category:
+    resource
+  Brand:
+    resource
+  Product:
+    resource
+  Color:
+    resource
+  SizeCategory:
+    resource
+  SizeOption:
+    resource
+  Order:
+    resource
+  User:
+    resource
