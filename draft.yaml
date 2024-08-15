@@ -72,7 +72,7 @@ models:
     shipping_price: integer
     shipping_method: string
     payment_method: string
-    payment_status: string
+    payment_status: enum:pending,paid,refunded,failed,cancelled
     billing_address: text
     shipping_address: text
     currency: string
