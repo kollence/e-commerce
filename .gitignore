@@ -19,5 +19,5 @@ yarn-error.log
 /.idea
 /.vscode
 composer.lock
-# /draft.yaml
+/draft.yaml
 /.blueprint
