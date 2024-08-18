@@ -14,7 +14,6 @@ const logout = () => {
 
 const page = usePage();
 const authUser = page.props.auth.user;
-console.log(authUser)
 </script>
 
 <template>
