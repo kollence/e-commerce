@@ -11,7 +11,9 @@ class WelcomeController extends Controller
      */
     public function index()
     {
-        return inertia('Welcome');
+        return inertia('Welcome', [
+            'parent_categories' => \App\Models\Category::where('parent_category_id', null)->get('name', 'slug'),
+        ]);
     }
 
     /**

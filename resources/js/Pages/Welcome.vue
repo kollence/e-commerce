@@ -1,6 +1,9 @@
 <script setup>
 import { Head, Link } from '@inertiajs/vue3';
 
+defineProps({
+    parent_categories: Array
+})
 
 </script>
 
@@ -12,9 +15,8 @@ import { Head, Link } from '@inertiajs/vue3';
 
                 <span class="text-white text-xl">Lorem ipsums's a dolar sit Them emet.</span>
                 <div class="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4">
-                    <button class="px-4 py-2 bg-gray-700 text-white border border-transparent rounded-md">Man</button>
-                    <button class="px-4 py-2 bg-gray-700 text-white border border-transparent rounded-md">Woman</button>
-                    <button class="px-4 py-2 bg-gray-700 text-white border border-transparent rounded-md">Kids</button>
+
+                    <button class="px-4 py-2 bg-gray-700 text-white border border-transparent rounded-md" v-for="(category, index) in parent_categories" :key="index">{{ category.name }}</button>
                 </div>
             </div>
         </div>
