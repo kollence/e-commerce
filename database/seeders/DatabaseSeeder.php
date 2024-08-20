@@ -72,10 +72,14 @@ class DatabaseSeeder extends Seeder
             ->each(function ($product, $indexPr) use ($categories) {
 
                 $repeat1to5 = $categories[$indexPr % $categories->count()];
+                
+                $product->update([
+                    'is_featured' => fake()->boolean,
+                ]);
 
                 $product->categories()->attach($repeat1to5);
                 // Create and attach one image to the product
-                $nameOverPicture = $product->slug . $indexPr;
+                $nameOverPicture = $product->slug . (string) $indexPr;
                 $product->images()->create([
                     'filename' => 'product-'. $nameOverPicture, 'url' => fake()->imageUrl(800, 600, $nameOverPicture)
                 ]);
