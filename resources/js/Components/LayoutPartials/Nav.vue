@@ -1,10 +1,8 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { Link, router, usePage } from '@inertiajs/vue3';
 import NavLink from '@/Components/NavLink.vue';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
-
-
 
 const showingNavigationDropdown = ref(false);
 
@@ -12,8 +10,8 @@ const logout = () => {
     router.post(route('logout'));
 };
 
-const page = usePage();
-const authUser = page.props.auth.user;
+const page = usePage()
+const authUser = computed(() => page.props.auth.user)
 </script>
 
 <template>
@@ -52,8 +50,8 @@ const authUser = page.props.auth.user;
                                 Dashboard
                                 </Link> <!-- Authentication -->
                                 <form method="POST" @submit.prevent="logout">
-                                    <button type="button" class="hover:text-yellow-500 transition">
-                                        Log Out
+                                    <button type="submit" class="hover:text-yellow-500 transition">
+                                        Logout
                                     </button>
                                 </form>
                             </template>
@@ -154,7 +152,7 @@ const authUser = page.props.auth.user;
                     <!-- Authentication -->
                     <form method="POST" @submit.prevent="logout">
                         <ResponsiveNavLink as="button">
-                            Log Out
+                            Logout
                         </ResponsiveNavLink>
                     </form>
 
