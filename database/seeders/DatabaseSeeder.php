@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
         User::factory()->create([
             'name' => 'Test User',
             'email' => 'test@mail.com',
+            'password' => '123123123'
         ]);
 
         // $sizeCategoryNames = ['shirt sizes', 'display sizes', 'voltages', 'liters', 'cup sizes'];
@@ -48,12 +49,18 @@ class DatabaseSeeder extends Seeder
             return $sizeCategory->id;
         });
 
+        $parentCategories = [
+            'Man' => Category::factory()->create(['name' => 'Man', 'slug' => 'man']),
+            'Women' => Category::factory()->create(['name' => 'Women', 'slug' => 'women']),
+            'Kids' => Category::factory()->create(['name' => 'Kids', 'slug' => 'kids']),
+        ];
+
         // create product categories and add them size_category_id
         $categories = Category::factory()
             ->count(5)
             ->create()
-            ->each(function ($category, $index) use ($sizeCategoryIds) {
-                // logger()->error("index :" . $index);
+            ->each(function ($category, $index) use ($sizeCategoryIds, $parentCategories) {
+                $category->parent_category_id = $parentCategories[array_rand($parentCategories)]->id;
                 $randomIndex = rand(1, $sizeCategoryIds->count());
                 $category->update(['size_category_id' => $randomIndex]);
             });
