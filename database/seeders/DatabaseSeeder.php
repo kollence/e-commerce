@@ -94,7 +94,7 @@ class DatabaseSeeder extends Seeder
                     ->create()
                     ->each(function ($productItem, $index) use ($sizeOptions, $indexPr) { // attached 3 random size options to it
                         // $indexPr to string
-                        $uniqueImg = $productItem->slug . (string) $indexPr . (string) $index;
+                        $uniqueImg = (string) $indexPr . (string) $index;
                         $productItem->sizeOptions()->attach($sizeOptions->random(3)->pluck('id'));
 
                         // Create and attach 3 images to the ProductItem
