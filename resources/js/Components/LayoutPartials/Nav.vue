@@ -23,7 +23,7 @@ const authUser = computed(() => page.props.auth.user)
                     <!-- Logo -->
                     <div class="shrink-0 flex items-center">
                         <Link :href="route('welcome')">
-                            E-shop
+                            <Icon name="logo"></Icon>
                         </Link>
                     </div>
 
@@ -74,7 +74,7 @@ const authUser = computed(() => page.props.auth.user)
                                 3
                             </span>
 
-                            Cart
+                            <Icon class="w-4 h-4 fill-current" name="cart"></Icon>
 
                             </Link>
 
@@ -131,7 +131,7 @@ const authUser = computed(() => page.props.auth.user)
             <div class="pt-2 pb-3 space-y-1">
                 <Link href="#" class="flex items-center pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:text-red-600 hover:border-red-700 focus:outline-none focus:text-gray-800 focus:bg-gray-50 focus:border-gray-300 transition">
                     
-                    Cart
+                    <Icon class="w-4 h-4 fill-current" name="cart"></Icon>
                     
                     <span class="ml-2">
                         3 items in cart
