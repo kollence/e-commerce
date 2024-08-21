@@ -1,6 +1,7 @@
 <script setup>
 import { Head } from '@inertiajs/vue3';
 import Nav from '@/Components/LayoutPartials/Nav.vue';
+import Footer from '@/Components/LayoutPartials/Footer.vue';
 
 defineProps({
     title: String,
@@ -15,6 +16,7 @@ defineProps({
         <Head :title="title" />
 
         <div class="min-h-screen bg-gray-100">
+            <!-- Components/LayoutPartials -->
             <Nav />
 
             <!-- Page Heading -->
@@ -30,14 +32,8 @@ defineProps({
             </main>
 
             <!-- Page Footer -->
-            <footer class="text-center text-white bg-black px-4 py-4">
-                <div>
-                    <p>Layout footer </p>
-                    <p>
-                        Lorem ipsum dolor, sit amet consectetur adipisicing elit. Dolorum ratione tenetur totam, nostrum consectetur asperiores excepturi aspernatur, modi sunt minima, rerum odit ipsam optio alias? Esse commodi cupiditate suscipit cum.
-                    </p>
-                </div>
-            </footer>
+            <!-- Components/LayoutPartials -->
+            <Footer />
         </div>
     </div>
 </template>
