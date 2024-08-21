@@ -30,6 +30,7 @@ class ProductFactory extends Factory
             'care_instructions' => fake()->sentence(),
             'about' => fake()->sentence(),
             // 'is_active' => fake()->boolean(true),
+            // 'is_featured' => fake()->boolean(true),
             // 'product_category_id' => ProductCategory::factory()->create()->id,
             'brand_id' =>  Brand::factory(),
         ];

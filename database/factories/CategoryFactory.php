@@ -21,10 +21,12 @@ class CategoryFactory extends Factory
      */
     public function definition(): array
     {
+        $name = fake()->words(1, true);
+        $slug = Str::slug($name);
         return [
-            'name' => fake()->name(),
-            'slug' => fake()->slug(),
-            'is_active' => fake()->boolean(),
+            'name' => $name,
+            'slug' => $slug,
+            // 'is_active' => fake()->boolean(),
             'parent_category_id' => null,
             'size_category_id' => null,
         ];

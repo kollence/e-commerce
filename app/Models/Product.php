@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Product extends Model
 {
@@ -25,6 +26,7 @@ class Product extends Model
         'care_instructions',
         'about',
         'is_active',
+        'is_featured',
         'brand_id',
     ];
 
@@ -35,6 +37,7 @@ class Product extends Model
      */
     protected $casts = [
         'is_active' => 'boolean',
+        'is_featured' => 'boolean',
         'created_at' => 'datetime',
     ];
 
