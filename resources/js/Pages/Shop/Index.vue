@@ -30,9 +30,9 @@ function hideNavigation() {
             </div>
         </div>
     </header>
-    <div class="flex flex-col md:flex-row">
+    <div class="flex flex-col lg:flex-row">
         <!-- Sidebar/Slide Menu -->
-        <div class="-me-2 flex items-center sm:hidden">
+        <div class="-me-2 flex items-center lg:hidden">
             <button
                 class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500 transition duration-150 ease-in-out"
                 @click="showingNavigationDropdown = !showingNavigationDropdown">
@@ -47,7 +47,7 @@ function hideNavigation() {
         </div>
         <!-- Responsive Navigation Menu -->
         <div :class="{ 'translate-x-0': showingNavigationDropdown, '-translate-x-full': !showingNavigationDropdown }"
-            class="fixed top-0 left-0 h-full w-64 bg-white z-50 transform transition-transform duration-300 ease-in-out sm:hidden">
+            class="fixed top-0 left-0 h-full w-64 bg-white z-50 transform transition-transform duration-300 ease-in-out lg:hidden">
             <div class="pt-2 pb-3 space-y-1">
                 <div>
                     <div class="text-black text-center bg-gray-200 py-4">
@@ -67,7 +67,7 @@ function hideNavigation() {
   <div
     v-if="showingNavigationDropdown"
     @click="hideNavigation"
-    class="fixed inset-0 bg-black opacity-50 z-40 sm:hidden"
+    class="fixed inset-0 bg-black opacity-50 z-40 lg:hidden"
   ></div>
         <!-- Responsive Navigation Menu -->
         <!-- <div :class="{ 'block': showingNavigationDropdown, 'hidden': !showingNavigationDropdown }" class="sm:hidden">
