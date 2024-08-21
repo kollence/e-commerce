@@ -122,11 +122,11 @@ const authUser = computed(() => page.props.auth.user)
                     </ResponsiveNavLink>
                 </div>
             </template>
-            <div class="pt-2 pb-3 space-y-1">
-                <ResponsiveNavLink href="#">
-                    Shop
-                </ResponsiveNavLink>
-            </div>
+                <div class="pt-2 pb-3 space-y-1">
+                    <ResponsiveNavLink :href="route('shop.index')" :active="route().current('shop.index')">
+                        Shop
+                    </ResponsiveNavLink>
+                </div>
             <div class="pt-2 pb-3 space-y-1">
                 <Link href="#" class="flex items-center pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:text-red-600 hover:border-red-700 focus:outline-none focus:text-gray-800 focus:bg-gray-50 focus:border-gray-300 transition">
                     
