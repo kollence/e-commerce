@@ -41,7 +41,7 @@ defineProps({
         </div>
         <div class="border-l w-4/5 mx-auto">
             <div class="container flex flex-wrap">
-                <Link href="#" class="flex flex-col w-full p-4 rounded sm:w-1/2 md:w-1/4"
+                <Link href="#" class="flex flex-col w-full p-4 rounded sm:w-1/2 md:w-1/3  lg:w-1/4"
                     v-for="(product, index) in products" :key="index">
                 <img v-if="product.images.length > 0" :src="product.images[0].url" :alt="product.name"
                     class="h-72 object-cover md:w-72 lg:w-96">
