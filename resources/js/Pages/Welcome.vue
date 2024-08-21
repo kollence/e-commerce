@@ -39,9 +39,10 @@ const props = defineProps({
                     class="h-72 object-cover md:w-72 lg:w-96">
                 <img v-else :src="'/storage/images/defaults/default.jpg'" alt="" class="h-72 object-cover md:w-72 lg:w-96">
             </Link>
-            <div class="w-full h-full mb-4 text-center text-white bg-gray-700 py-2">categories:
+            <div class="w-full h-full mb-4 text-center text-white bg-gray-700 py-2">
+                <span v-html="product.categories.length > 1 ? 'categories: ' : 'category: '"></span>
                 <span v-for="(cat, index) in product.categories" :key="index">
-                    {{ cat.name }}
+                    {{ cat.name + ' ' }}
                 </span>
             </div>
         </div>
