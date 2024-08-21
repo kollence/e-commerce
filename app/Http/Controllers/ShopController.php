@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\Request;
 
@@ -13,7 +14,8 @@ class ShopController extends Controller
     public function index()
     {
         return inertia('Shop/Index', [
-            'products' => Product::all()
+            'products' => \App\Models\Product::with('images')->get(),
+            'categories' => Category::all()
         ]);
     }
 

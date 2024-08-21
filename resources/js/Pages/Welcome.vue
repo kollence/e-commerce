@@ -35,7 +35,7 @@ const props = defineProps({
                         {{ product.name }}
                     </span>
                 </div>
-                <img v-if="product.images.length > 0" :src="product.images[0].url" :alt="product.images[0].filename"
+                <img v-if="product.images.length > 0" :src="product.images[0].url" :alt="product.name"
                     class="h-72 object-cover md:w-72 lg:w-96">
                 <img v-else :src="'/storage/images/defaults/default.jpg'" alt="" class="h-72 object-cover md:w-72 lg:w-96">
             </Link>
