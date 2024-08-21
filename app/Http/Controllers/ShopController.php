@@ -14,7 +14,7 @@ class ShopController extends Controller
     public function index()
     {
         return inertia('Shop/Index', [
-            'products' => \App\Models\Product::with('images')->get(),
+            'products' => Product::with('images')->get(),
             'categories' => Category::all()
         ]);
     }
