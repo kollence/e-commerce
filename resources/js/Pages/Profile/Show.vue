@@ -1,4 +1,5 @@
 <script setup>
+import { Head } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import DeleteUserForm from '@/Pages/Profile/Partials/DeleteUserForm.vue';
 import LogoutOtherBrowserSessionsForm from '@/Pages/Profile/Partials/LogoutOtherBrowserSessionsForm.vue';
@@ -14,8 +15,8 @@ defineProps({
 </script>
 
 <template>
-    <AppLayout title="Profile">
-        <template #header>
+        <Head title="Profile" />
+        <template>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 Profile
             </h2>
@@ -53,5 +54,4 @@ defineProps({
                 </template>
             </div>
         </div>
-    </AppLayout>
 </template>
