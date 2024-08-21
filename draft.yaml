@@ -17,6 +17,7 @@ models:
     care_instructions: text nullable
     about: text nullable
     is_active: boolean default:true
+    is_featured: boolean default:false
     brand_id: id foreign:brands nullable
     relationships:
       belongsToMany: Category
@@ -121,3 +122,6 @@ controllers:
     resource
   User:
     resource
+  Shop:
+    resource:
+      model: Product
