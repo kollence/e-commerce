@@ -45,8 +45,7 @@ const authUser = computed(() => page.props.auth.user)
                         <div class="flex items-center space-x-3">
                             <!-- <Link :href="route('dashboard')" class="hover:text-yellow-500 transition">Dashboard</Link> -->
                             <template v-if="authUser">
-                                <Link :href="route('dashboard')" class="hover:text-yellow-500 transition"
-                                    :active="route().current('dashboard')">
+                                <Link :href="route('dashboard')" class="hover:text-yellow-500 transition" :active="route().current('dashboard')">
                                 Dashboard
                                 </Link> <!-- Authentication -->
                                 <form method="POST" @submit.prevent="logout">
@@ -57,16 +56,16 @@ const authUser = computed(() => page.props.auth.user)
                             </template>
 
                             <template v-else>
-                                <Link :href="route('register')" class="hover:text-yellow-500 transition"
-                                    :active="route().current('register')">
+                                <Link :href="route('register')" class="hover:text-yellow-500 transition" :active="route().current('register')">
                                 Register
                                 </Link>
-                                <Link :href="route('login')" class="hover:text-yellow-500 transition"
-                                    :active="route().current('login')">
+                                <Link :href="route('login')" class="hover:text-yellow-500 transition" :active="route().current('login')">
                                 Login
                                 </Link>
                             </template>
-                            <Link href="#" class="hover:text-yellow-500 transition">Shop</Link>
+                            <Link :href="route('shop.index')" class="hover:text-yellow-500 transition" :active="route().current('shop.index')">
+                                Shop
+                                </Link>
 
                             <Link href="#" class="hover:text-red-700 transition">
                             <span class="bg-red-600 text-white text-xs rounded-full px-1 absolute"

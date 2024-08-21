@@ -12,7 +12,9 @@ class ShopController extends Controller
      */
     public function index()
     {
-        //
+        return inertia('Shop/Index', [
+            'products' => Product::all()
+        ]);
     }
 
     /**
