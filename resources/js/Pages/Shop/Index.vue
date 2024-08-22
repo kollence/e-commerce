@@ -26,19 +26,7 @@ defineProps({
     </header>
     <div class="flex flex-col lg:flex-row">
         <NavCategories :categories="categories" />
-        <div class="border-r w-1/5 lg:block hidden">
-            <div>
-                <div class="text-black text-center bg-gray-200 py-4">
-                    <p>Categories:</p>
-                </div>
-                <div class="flex flex-col divide-y">
-                    <Link href="#" v-for="(category, index) in categories" :key="index"
-                        class="py-2 px-4 hover:bg-gray-200">
-                    {{ category.name }}
-                    </Link>
-                </div>
-            </div>
-        </div>
+
         <div class="border-l w-4/5 mx-auto">
             <div class="container flex flex-wrap">
                 <Link href="#" class="flex flex-col w-full p-4 rounded sm:w-1/2 md:w-1/3  lg:w-1/4"
