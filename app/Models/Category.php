@@ -43,9 +43,23 @@ class Category extends Model
     {
         return $this->belongsTo(SizeCategory::class);
     }
-
-    public function parentCategory(): BelongsTo
+    
+    // Parents < > children relationships
+    public function children()
     {
-        return $this->belongsTo(Category::class);
+        return $this->hasMany(Category::class, 'parent_category_id');
     }
+    public function parent()
+    {
+        return $this->belongsTo(Category::class, 'parent_category_id');
+    }
+    public function allChildren()
+    {
+        return $this->children()->with('allChildren');
+    }
+    public function allParents()
+    {
+        return $this->parent()->with('allParents');
+    }
+
 }
