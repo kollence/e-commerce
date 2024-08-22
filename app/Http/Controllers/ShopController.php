@@ -15,7 +15,7 @@ class ShopController extends Controller
     {
         return inertia('Shop/Index', [
             'products' => Product::with('images')->get(),
-            'categories' => Category::all()
+            'categories' => Category::where('parent_category_id', null)->with('children')->get(),
         ]);
     }
 
