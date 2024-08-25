@@ -2,8 +2,8 @@
 import { Head, Link } from '@inertiajs/vue3';
 
 const props = defineProps({
-    parent_categories: Array,
-    featured_products: Array
+    parent_categories: Object,
+    featured_products: Object
 })
 
 </script>
