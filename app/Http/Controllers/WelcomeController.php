@@ -12,7 +12,7 @@ class WelcomeController extends Controller
     public function index()
     {
         return inertia('Welcome', [
-            'parent_categories' => \App\Models\Category::where('parent_category_id', null)->get('name', 'slug'),
+            'parent_categories' => \App\Models\Category::where('parent_category_id', null)->get(['name', 'slug']),
             'featured_products' => \App\Models\Product::where('is_featured', true)
             ->with(['images', 'categories' => function ($query) {
                 $query->select('id', 'name', 'slug'); // Select only necessary columns
