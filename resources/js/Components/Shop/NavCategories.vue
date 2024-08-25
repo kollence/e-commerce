@@ -52,7 +52,7 @@ function toggleSubcategories(index) {
         <div class="flex flex-col divide-y">
           <div v-for="(category, index) in categories" :key="index">
             <div class="flex justify-between">
-              <Link href="#" class="py-2 px-4 hover:bg-gray-200">
+              <Link :href="route('shop.index', { category: category.slug })" class="py-2 px-4 hover:bg-gray-200">
               {{ category.name }}
               </Link>
               <div class="flex justify-end">
@@ -69,9 +69,9 @@ function toggleSubcategories(index) {
             </div>
 
             <!-- Subcategories -->
-            <div v-if="expandedCategories.includes(index)" class="pl-6">
+            <div v-if="expandedCategories.includes(index)" class="pl-3">
               <div v-for="subcategory in category.children" :key="subcategory.name">
-                <Link href="#" class="py-2 px-4 hover:bg-gray-200 block">
+                <Link :href="route('shop.index', { category:  subcategory.slug})" class="py-2 px-4 hover:bg-gray-200 block">
                 {{ subcategory.name }}
                 </Link>
               </div>
@@ -90,7 +90,7 @@ function toggleSubcategories(index) {
       </div>
       <div v-for="(category, index) in categories" :key="index">
         <div class="flex justify-between">
-          <Link href="#" class="py-2 px-4 hover:bg-gray-200">
+          <Link :href="route('shop.index', { category: category.slug })" class="py-2 px-4 hover:bg-gray-200">
           {{ category.name }}
           </Link>
           <div class="flex justify-end">
@@ -108,7 +108,7 @@ function toggleSubcategories(index) {
         <!-- Subcategories -->
         <div v-if="expandedCategories.includes(index)" class="pl-6">
           <div v-for="subcategory in category.children" :key="subcategory.name">
-            <Link href="#" class="py-2 px-4 hover:bg-gray-200 block">
+            <Link :href="route('shop.index', { category:  subcategory.slug })" class="py-2 px-4 hover:bg-gray-200 block">
             {{ subcategory.name }}
             </Link>
           </div>
