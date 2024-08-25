@@ -19,8 +19,7 @@ const props = defineProps({
             <span class="text-white text-xl">Lorem ipsums's a dolar sit Them emet.</span>
             <div class="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4">
 
-                <button class="px-4 py-2 bg-gray-700 text-white border border-transparent rounded-md"
-                    v-for="(category, index) in parent_categories" :key="index">{{ category.name }}</button>
+                <Link :href="route('shop.index', {category: category.slug})" class="px-4 py-2 bg-gray-700 text-white border border-transparent rounded-md" v-for="(category, index) in parent_categories" :key="index">{{ category.name }}</Link>
             </div>
         </div>
     </div>
