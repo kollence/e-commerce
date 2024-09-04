@@ -60,4 +60,11 @@ class Product extends Model
     {
         return $this->hasMany(ProductItem::class);
     }
+
+    public function lowestSalePriceProductItem()
+    {
+        return $this->hasOne(ProductItem::class)
+            ->orderBy('sale_price', 'asc')
+            ->select('product_items.*');
+    }
 }

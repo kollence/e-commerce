@@ -27,13 +27,20 @@ class ShopController extends Controller
         $products = Product::whereHas('categories', function($query) use ($categoryIds) {
             $query->whereIn('categories.id', $categoryIds);
         })
-        ->with('images')
+        ->with(['images', 'lowestSalePriceProductItem'])
         ->get();
 
         } else {
             $selectedCategory = 'All';
-            $products = Product::with('images')->get();
+            $products = Product::with(['images', 'lowestSalePriceProductItem'])
+            ->get();
         }
+        // dd($products);
+        return inertia('Shop/Index', [
+            'products' => $products,
+            'categories' => $categories,
+            'selectedCategory' => $selectedCategory,
+        ]);
         return inertia('Shop/Index', [
             'products' => $products,
             'categories' => $categories,

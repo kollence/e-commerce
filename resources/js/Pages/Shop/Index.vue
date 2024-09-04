@@ -2,14 +2,14 @@
 import NavigationHeader from '@/Components/NavigationHeader.vue';
 import NavCategories from '@/Components/Shop/NavCategories.vue';
 import { Link, Head } from '@inertiajs/vue3';
+import { onMounted } from 'vue';
 
 defineProps({
     products: Object,
     categories: Object,
     selectedCategory: String
 
-})
-
+});
 
 </script>
 
@@ -35,10 +35,14 @@ defineProps({
                     class="h-72 object-cover md:w-72 lg:w-96">
                 <div class="flex justify-around bg-gray-200 py-2">
                     <span>
-                        {{ product.name }}
+                        {{ product.lowest_sale_price_product_item.original_price }}
                     </span>
-                    <span>
-                        123 din
+                    <span v-if="product.lowest_sale_price_product_item" class="text-red-500 font-bold">
+                        ON SAIL! {{product.lowest_sale_price_product_item.sale_price}}
+
+                    </span>
+                    <span v-else class="line-through text-gray-500">
+                        Not on sail
                     </span>
                 </div>
                 </Link>
