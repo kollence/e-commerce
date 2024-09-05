@@ -69,7 +69,9 @@ class ShopController extends Controller
      */
     public function show(Product $product)
     {
-        //
+        return inertia('Shop/Show',[
+            'product' => $product->with(['images', 'lowestSalePriceProductItem'])->first(),
+        ]);
     }
 
     /**
