@@ -2,24 +2,23 @@
 import NavigationHeader from '@/Components/NavigationHeader.vue';
 import NavCategories from '@/Components/Shop/NavCategories.vue';
 import { Link, Head } from '@inertiajs/vue3';
-import { onMounted } from 'vue';
+import { computed, onMounted } from 'vue';
 
 defineProps({
     product: Object,
-    selectedCategory: String
 });
+
+
 
 </script>
 
 <template>
 
-    <Head :title="selectedCategory" />
+    <Head :title="product.name" />
     <NavigationHeader>
         <template #breadcrumbs>
             <span class="mx-2">/</span>
-            <Link v-if="selectedCategory !== 'All'" :href="route('shop.index', { category: selectedCategory })">Shop
-            {{ '- ' + selectedCategory }}</Link>
-            <Link v-else :href="route('shop.index')">Shop</Link>
+            <Link :href="route('shop.index')">Shop</Link>
             <span class="mx-2">/</span>
             <span>{{ product.name }}</span>
         </template>
