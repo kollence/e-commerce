@@ -25,7 +25,8 @@ class ProductItemFactory extends Factory
         return [
             'product_code' => fake()->unique()->regexify('[A-Z0-9]{10}'),
             'original_price' => fake()->numberBetween(1000, 5000),
-            'sale_price' => fake()->numberBetween(500, 2000),
+            // optional i would like to have fewer sale prices,
+            'sale_price' => fake()->optional($weight = 0.6, $default = null)->numberBetween(500, 2000),
             'product_id' => Product::factory(),
             'color_id' => Color::factory(),
         ];

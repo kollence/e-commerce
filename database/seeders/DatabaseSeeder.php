@@ -60,7 +60,7 @@ class DatabaseSeeder extends Seeder
             ->count(5)
             ->create()
             ->each(function ($category, $index) use ($sizeCategoryIds, $parentCategories) {
-                $category->parent_category_id = $parentCategories[array_rand($parentCategories)]->id;
+                $category->parent_category_id = rand(1, count($parentCategories));
                 $randomIndex = rand(1, $sizeCategoryIds->count());
                 $category->update(['size_category_id' => $randomIndex]);
             });
