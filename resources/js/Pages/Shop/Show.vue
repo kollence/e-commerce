@@ -24,17 +24,17 @@ defineProps({
         </template>
     </NavigationHeader>
 
-    <div class="flex flex-col lg:flex-row">
+    <div class="flex flex-col lg:flex-row bg-gradient-to-r">
 
         <div class="container mx-auto px-4 py-8 justify-end">
             <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
                 <div class="md:col-span-9">
                     <img :src="product.images[0].url" :alt="product.name" class="object-cover rounded-lg">
                     <span>
-                        {{ currencyFormat(product.lowest_sale_price_product_item.original_price) }}
+                        {{ currencyFormat(product.lowest_priced_item.original_price) }}
                     </span>
-                    <span v-if="product.lowest_sale_price_product_item" class="text-red-500 font-bold">
-                        ON SAIL! {{ currencyFormat(product.lowest_sale_price_product_item.sale_price) }}
+                    <span v-if="product.lowest_priced_item" class="text-red-500 font-bold">
+                        ON SAIL! {{ currencyFormat(product.lowest_priced_item.sale_price) }}
 
                     </span>
                     <span v-else class="line-through text-gray-500">
@@ -67,9 +67,14 @@ defineProps({
                     </div>
                 </div>
             </div>
+            Product Variants
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 border border-red-900 p-4 rounded-lg mt-4">
-                PRODUCT ITEMS CARDS
+                
                 <!-- product item variants -->
+                 <div v-for="variant in product.product_items" :key="variant.id" class="card rounded-lg p-4 shadow-md items-center justify-center">
+                    <img :src="product.images[0].url" :alt="product.name" class="w-32 h-32 object-cover rounded-lg mb-2">
+                    <h2 class="text-lg font-bold mb-1">{{ variant.name }}</h2>
+                 </div>
             </div>
         </div>
     </div>
