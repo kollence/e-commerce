@@ -34,10 +34,10 @@ defineProps({
                     class="object-cover">
                 <div class="flex justify-around bg-gray-200 py-2">
                     <span>
-                        {{ currencyFormat(product.lowest_sale_price_product_item.original_price) }}
+                        {{ currencyFormat(product.lowest_priced_item.original_price) }}
                     </span>
-                    <span v-if="product.lowest_sale_price_product_item" class="text-red-500 font-bold">
-                        ON SAIL! {{currencyFormat(product.lowest_sale_price_product_item.sale_price)}}
+                    <span v-if="product.lowest_priced_item && product.lowest_priced_item.sale_price > 0" class="text-red-500 font-bold">
+                        ON SAIL! {{currencyFormat(product.lowest_priced_item.sale_price)}}
 
                     </span>
                     <span v-else class="line-through text-gray-500">

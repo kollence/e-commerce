@@ -27,12 +27,12 @@ class ShopController extends Controller
         $products = Product::whereHas('categories', function($query) use ($categoryIds) {
             $query->whereIn('categories.id', $categoryIds);
         })
-        ->with(['images', 'lowestSalePriceProductItem'])
+        ->with(['images', 'lowestPricedItem'])
         ->get();
 
         } else {
             $selectedCategory = 'All';
-            $products = Product::with(['images', 'lowestSalePriceProductItem'])
+            $products = Product::with(['images', 'lowestPricedItem'])
             ->get();
         }
         // dd($products);
@@ -70,7 +70,7 @@ class ShopController extends Controller
     public function show(Product $product)
     {
         return inertia('Shop/Show',[
-            'product' => $product->with(['images', 'lowestSalePriceProductItem'])->first(),
+            'product' => $product->with(['images', 'lowestPricedItem', 'productItems'])->first(),           
         ]);
     }
 

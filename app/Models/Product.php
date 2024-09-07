@@ -61,10 +61,16 @@ class Product extends Model
         return $this->hasMany(ProductItem::class);
     }
 
-    public function lowestSalePriceProductItem()
+    public function lowestPricedItem()
     {
         return $this->hasOne(ProductItem::class)
-            ->orderBy('sale_price', 'asc')
-            ->select('product_items.*');
+        ->where('is_active', true)
+        ->orderByRaw('
+            CASE 
+                WHEN sale_price > 0 THEN sale_price
+                ELSE original_price
+            END ASC
+        ');
     }
+
 }
