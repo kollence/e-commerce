@@ -28,6 +28,7 @@ models:
     color_id: id foreign:colors nullable
     product_code: string
     original_price: integer
+    is_active: boolean default:true
     sale_price: integer nullable
     relationships:
       belongsTo: Product, Color

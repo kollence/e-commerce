@@ -5,3 +5,7 @@
 [x-cloak] {
     display: none;
 }
+
+.bg-gradient-to-r {
+    background: linear-gradient(to right, #a6d7e7, #c6dae0);
+}
