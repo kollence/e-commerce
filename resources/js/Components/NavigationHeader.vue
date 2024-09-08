@@ -12,7 +12,7 @@ import { Link } from '@inertiajs/vue3'
                 <slot name="breadcrumbs"></slot>
             </div>
             <div class="w-1/2">
-                <input type="search" name="search" placeholder="Search" class="w-full p-2 rounded-lg border border-gray-300 focus:border-yellow-700 focus:ring-2 focus:ring-yellow-700"d="">
+                <slot name="search"></slot>
             </div>
         </div>
     </header>
