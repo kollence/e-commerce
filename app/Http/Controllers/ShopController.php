@@ -70,7 +70,7 @@ class ShopController extends Controller
     public function show(Product $product)
     {
         return inertia('Shop/Show',[
-            'product' => $product->with(['images', 'lowestPricedItem', 'productItems.color'])->first(),           
+            'product' => $product->load(['images', 'lowestPricedItem.images', 'lowestPricedItem.sizeOptions', 'productItems.color', 'productItems.sizeOptions', 'brand'])     
         ]);
     }
 
