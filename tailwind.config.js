@@ -17,6 +17,21 @@ export default {
             fontFamily: {
                 sans: ['Figtree', ...defaultTheme.fontFamily.sans],
             },
+            keyframes: {
+                'gradient-xy': {
+                  '0%, 100%': {
+                    backgroundSize: '200% 200%',
+                    backgroundPosition: 'left top',
+                  },
+                  '50%': {
+                    backgroundSize: '200% 200%',
+                    backgroundPosition: 'right bottom',
+                  },
+                },
+              },
+              animation: {
+                'gradient-xy': 'gradient-xy 5s ease infinite',
+              },
         },
     },
 

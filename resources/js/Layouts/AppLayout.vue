@@ -11,7 +11,7 @@ defineProps({
 </script>
 
 <template>
-    <div>
+    <div class="">
 
         <Head :title="title" />
 
@@ -20,7 +20,7 @@ defineProps({
             <Nav />
 
             <!-- Page Heading -->
-            <header class="bg-gray-700 shadow">
+            <header class=" shadow bg-gradient-to-r from-emerald-300 via-teal-600 to-cyan-950 animate-gradient-xy">
                 <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
                     <h3 class="text-white text-center leading-tight">Layout header</h3>
                 </div>
