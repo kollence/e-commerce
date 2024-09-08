@@ -40,7 +40,7 @@ class DatabaseSeeder extends Seeder
             $sizeCategory = SizeCategory::factory()->create(['name' => $name, 'slug' => str($name)->slug()]);
             $sortOrder = 1;
             foreach ($options as $value) {
-                
+
                 SizeOption::factory()
                     ->for($sizeCategory)
                     ->create(['name' => $value, 'sort_order' => $sortOrder++]);
@@ -72,7 +72,7 @@ class DatabaseSeeder extends Seeder
             ->each(function ($product, $indexPr) use ($categories) {
 
                 $repeat1to5 = $categories[$indexPr % $categories->count()];
-                
+
                 $product->update([
                     'is_featured' => fake()->boolean,
                 ]);
@@ -81,30 +81,43 @@ class DatabaseSeeder extends Seeder
                 // Create and attach one image to the product
                 $nameOverPicture = $product->slug . (string) $indexPr;
                 $product->images()->create([
-                    'filename' => 'product-'. $nameOverPicture, 'url' => fake()->imageUrl(800, 600, $nameOverPicture)
+                    'filename' => 'product-' . $nameOverPicture,
+                    'url' => fake()->imageUrl(800, 600, $nameOverPicture)
                 ]);
 
                 if ($product->categories->count() > 0) {
- 
+
                     $sizeOptions = SizeOption::where('size_category_id', $repeat1to5->size_category_id)->get();
                 } else {
                     // Handle case where there are no product categories
                     logger()->error("Product {$product->id} has no product categories");
                 }
-                
+
                 ProductItem::factory()
                     ->count(3)
                     ->for($product)
                     ->create()
                     ->each(function ($productItem, $index) use ($sizeOptions, $indexPr) { // attached 3 random size options to it
                         // $indexPr to string
-                        $uniqueImg = (string) $indexPr . (string) $index;
-                        $productItem->sizeOptions()->attach($sizeOptions->random(3)->pluck('id'));
+                        $selectedSizeOptions = $sizeOptions->random(3);
+                        $pivotData = [];
+                        foreach ($selectedSizeOptions as $sizeOption) {
+                            $pivotData[$sizeOption->id] = [
+                                'sku' => 'SKU-' . strtoupper(str()->random(5)), // Example SKU
+                                'in_stock' => rand(0, 100), // Random stock value
+                            ];
+                        }
+                        $productItem->sizeOptions()->attach($pivotData);
 
+                        // $uniqueImg = (string) $indexPr . (string) $index;
                         // Create and attach 3 images to the ProductItem
-                        $productItem->images()->create([
-                            'filename' => 'product-item-'.$uniqueImg, 'url' => fake()->imageUrl(800, 600, $uniqueImg),
-                        ]);
+                        foreach (range(1, 3) as $i) {
+                            $uniqueImg = $productItem->id . '-' . $i; // Create a unique identifier for each image
+                            $productItem->images()->create([
+                                'filename' => 'product-item-' . $uniqueImg,
+                                'url' => fake()->imageUrl(800, 600, $uniqueImg),
+                            ]);
+                        }
                     });
             });
     }
