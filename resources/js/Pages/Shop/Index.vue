@@ -20,6 +20,9 @@ defineProps({
             <span class="mx-2">/</span>
             <span>Shop {{ selectedCategory ? '- '+selectedCategory : ''}}</span>
         </template>
+        <template #search>
+            <input type="search" name="search" placeholder="Search" class="w-full p-2 rounded-lg border border-gray-300 focus:border-yellow-700 focus:ring-2 focus:ring-yellow-700"d="">
+        </template>
     </NavigationHeader>
 
     <div class="flex flex-col lg:flex-row">
