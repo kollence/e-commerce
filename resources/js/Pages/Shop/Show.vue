@@ -9,12 +9,29 @@ const props = defineProps({
 });
 const selectedSizeOptionId = ref(props.product.lowest_priced_item.size_options[0].id);
 const selectedSizeOption = ref(props.product.lowest_priced_item.size_options[0]);
+const quantity = ref(1);
+
+const priceXquantity = computed(() => {
+    if(props.product.lowest_priced_item.sale_price && props.product.lowest_priced_item.sale_price > 0) {
+        return props.product.lowest_priced_item.sale_price * quantity.value;
+    } else {
+        return props.product.lowest_priced_item.original_price * quantity.value;
+    }
+});
 
 function updateSelectedSizeOption() {
     selectedSizeOption.value = props.product.lowest_priced_item.size_options.find(
     size_option => size_option.id === parseInt(selectedSizeOptionId.value)
     );
 }
+function decrementQuantity() {
+      if (quantity.value > 1) {
+        quantity.value--;
+      }
+    }
+function incrementQuantity() {
+      quantity.value++;
+    }
 
 </script>
 
@@ -81,12 +98,24 @@ function updateSelectedSizeOption() {
                         <p><strong>In Stock:</strong> {{ selectedSizeOption.pivot.in_stock }}</p>
                         <!-- <p class="mt-1" v-if="selectedSizeOption.size_description"><strong>Description:</strong> {{ selectedSizeOption.size_description }}</p> -->
                     </div>
+                    <div class="flex items-center justify-between font-bold p-4">
+                        <div class="flex text-black items-center ">
+                            <button class="p-1 bg-stone-200 rounded-l text-2xl" @click="decrementQuantity">-</button>
+                            <input v-model="quantity" type="number" min="1" max="599" class="appearance-none-arrow border rounded-none px-4 py-2 w-20 text-center">
+                            <button class="p-1 bg-stone-200 rounded-r text-2xl" @click="incrementQuantity">+</button>
+                        </div>
+                            
+                        <div>
+                            price per quantity: {{ currencyFormat(priceXquantity) }}
+                        </div>
+                    </div>
+
 
                     <div class="flex justify-between items-center mt-5 mb-1 border font-bold text-stone-200 text-lg p-4">
                         <span>
                             {{ currencyFormat(product.lowest_priced_item.original_price) }}
                         </span>
-                        <span v-if="product.lowest_priced_item && product.lowest_priced_item.sale_price < 0"
+                        <span v-if="product.lowest_priced_item.sale_price"
                             class="text-red-500 font-bold text-lg">
                             ON SAIL! {{ currencyFormat(product.lowest_priced_item.sale_price) }}
                         </span>
@@ -119,18 +148,13 @@ function updateSelectedSizeOption() {
                     <div class="flex flex-row justify-between items-center mb-2">
                         <div class="md:col-span-3">
                             <div class="border-2 absolute left-1 top-2 rounded-full" :key="variant.product_code">
-                                <span class="w-half h-full rounded-full p-2 inline-block"
-                                    :style="{ backgroundColor: variant.color.hex }">{{ variant.color.name }}</span>
+                                <span class="w-half h-full rounded-full p-2 inline-block" :style="{ backgroundColor: variant.color.hex }">{{ variant.color.name }}</span>
                             </div>
                         </div>
                         <div class="md:col-span-4">
-                            <img :src="product.images[0].url" :alt="variant.product_code"
-                                class="w-40 h-40 object-cover rounded-lg mb-2">
-
+                            <img :src="product.images[0].url" :alt="variant.product_code" class="w-40 h-40 object-cover rounded-lg mb-2"> 
                         </div>
                     </div>
-
-
 
                     <div class="md:col">
                         <h2 class="text-lg text-green-900 font-bold mb-1">{{ variant.is_active ? 'Active' : 'Not Active'}}
@@ -161,4 +185,12 @@ function updateSelectedSizeOption() {
     </div>
 </template>
 
-<style></style>
+<style scoped>
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    margin: 0; 
+}
+</style>
