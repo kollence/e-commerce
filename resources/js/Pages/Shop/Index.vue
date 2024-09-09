@@ -21,7 +21,7 @@ defineProps({
             <span>Shop {{ selectedCategory ? '- '+selectedCategory : ''}}</span>
         </template>
         <template #search>
-            <input type="search" name="search" placeholder="Search" class="w-full p-2 rounded-lg border border-gray-300 focus:border-yellow-700 focus:ring-2 focus:ring-yellow-700"d="">
+            <input type="search" class="w-full bg-gray-200 rounded-lg py-2 px-4 focus:outline-none focus:bg-white" placeholder="Search for products">
         </template>
     </NavigationHeader>
 
