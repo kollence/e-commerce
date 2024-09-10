@@ -1,8 +1,8 @@
 <script setup>
 import NavigationHeader from '@/Components/NavigationHeader.vue';
 import NavCategories from '@/Components/Shop/NavCategories.vue';
-import { Link, Head } from '@inertiajs/vue3';
-import { computed, onMounted, ref } from 'vue';
+import { Link, Head, useForm } from '@inertiajs/vue3';
+import { computed, onMounted, ref, watch } from 'vue';
 
 const props = defineProps({
     product: Object,
@@ -20,6 +20,8 @@ const priceXquantity = computed(() => {
 });
 
 function selectSizeOption(sizeOptionId) {
+    //reset quantity on change
+    quantity.value = 1;
     selectedSizeOptionId.value = sizeOptionId;
 
     selectedSizeOption.value = props.product.lowest_priced_item.size_options.find(
@@ -33,11 +35,48 @@ function decrementQuantity() {
     }
 }
 function incrementQuantity() {
-    if (quantity.value < 99) {
+    if (quantity.value < selectedSizeOption.value.pivot.in_stock) {
         quantity.value++;
     }else{
-        quantity.value = 99;
+        quantity.value = selectedSizeOption.value.pivot.in_stock;
     }
+}
+
+// Initialize the form with the product data
+const form = useForm({
+    id: props.product.id,
+    name: props.product.name,
+    size_option: selectedSizeOption.value.name,
+    sku: selectedSizeOption.value.pivot.sku,
+    product_code: props.product.lowest_priced_item.product_code,
+    original_price: props.product.lowest_priced_item.original_price,
+    sale_price: props.product.lowest_priced_item.sale_price,
+    images: props.product.lowest_priced_item.images,
+    in_stock: selectedSizeOption.value.pivot.in_stock - quantity.value,
+    quantity: quantity.value,
+    submitted_pxq: priceXquantity.value,
+});
+// Watchers to update form fields when values change
+watch([selectedSizeOption, quantity], () => {
+    form.in_stock = selectedSizeOption.value.pivot.in_stock - quantity.value;
+    form.quantity = quantity.value;
+    form.submitted_pxq = props.product.lowest_priced_item.sale_price * quantity.value;
+});
+// On submit, add additional fields and send the form data to the server
+function addToCart() {
+    console.log('send to cart ', form);
+    
+
+}
+function orderNow(){
+    console.log('order now ', form);
+        // form.post(route('cart.store'), {
+    //     preserveScroll: true,
+    //     onSuccess: () => {
+    //         // Reset the form after successful submission
+    //         form.reset();
+    //     },
+    // });
 }
 
 </script>
@@ -66,7 +105,7 @@ function incrementQuantity() {
                     <img class="mb-3 shadow-md" v-for="(image, i) in product.lowest_priced_item.images" :key="i" :src="image.url" :alt="product.name"/> 
                 </div>
                 <div class="md:col-span-6 px-4">
-                    <img :src="product.images[0].url" :alt="product.name" class="shadow-md object-cover border border-gray-700 rounded-lg">
+                    <img :src="product.lowest_priced_item.images[0].url" :alt="product.name" class="shadow-md object-cover border border-gray-700 rounded-lg">
                 </div>
                 <div class="md:col-span-4">
                     <h1 class="text-3xl font-bold mb-4">{{ product.name }}</h1>
@@ -86,9 +125,9 @@ function incrementQuantity() {
                     </div>
 
                     <div >
-                        <label for="size_options" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                            Select size option
-                        </label>
+                        <div class="block mb-2 text-sm font-medium ">
+                            options:
+                        </div>
                         <button
                             v-for="size_option in product.lowest_priced_item.size_options"
                             :key="size_option.id"
@@ -101,19 +140,14 @@ function incrementQuantity() {
                         >
                             {{ size_option.name }}
                         </button>
-                        <!-- <select id="size_options" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            v-model="selectedSizeOptionId"
-                            @change="updateSelectedSizeOption"    
-                        >
-                            <option v-for="size_options in product.lowest_priced_item.size_options" :key="size_options.id" :value="size_options.id">{{ size_options.name }}</option>
-                        </select> -->
                     </div>
-                    <div v-if="selectedSizeOption" class="ml-1 mt-1">
+                    <div v-if="selectedSizeOption" class="ml-1">
                         <p><strong>SKU:</strong> {{ selectedSizeOption.pivot.sku }}</p>
-                        <p><strong>In Stock:</strong> {{ selectedSizeOption.pivot.in_stock }}</p>
+                        <p v-if="selectedSizeOption.pivot.in_stock - quantity < 1"><strong class="text-red-600">Sold out</strong></p>
+                        <p v-else><strong>In Stock:</strong> {{ selectedSizeOption.pivot.in_stock  - quantity}}</p>
                         <!-- <p class="mt-1" v-if="selectedSizeOption.size_description"><strong>Description:</strong> {{ selectedSizeOption.size_description }}</p> -->
                     </div>
-                    <div class="flex items-center justify-between font-bold p-4">
+                    <div class="flex items-center justify-between font-bold py-1 ">
                         <div class="flex text-black items-center ">
                             <button class="border-l border-gray-700 border-y px-3 bg-stone-200 rounded-l text-2xl" @click="decrementQuantity">-</button>
                             <input v-model="quantity" type="number" min="1" max="599" class="appearance-none-arrow border rounded-none px-4 py-1 w-17 text-center">
@@ -123,6 +157,21 @@ function incrementQuantity() {
                         <div>
                             price per quantity: {{ currencyFormat(priceXquantity) }}
                         </div>
+                    </div>
+
+                    <div class="flex justify-between items-center mt-5 mb-1 border font-bold text-lg p-4">
+                        <button
+                            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                            @click="addToCart"
+                        >
+                            Add to Cart
+                        </button>
+                        <button
+                            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                            @click="orderNow"
+                        >
+                            Order Now
+                        </button>
                     </div>
 
 
