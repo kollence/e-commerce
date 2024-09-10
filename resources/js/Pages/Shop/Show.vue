@@ -19,19 +19,26 @@ const priceXquantity = computed(() => {
     }
 });
 
-function updateSelectedSizeOption() {
+function selectSizeOption(sizeOptionId) {
+    selectedSizeOptionId.value = sizeOptionId;
+
     selectedSizeOption.value = props.product.lowest_priced_item.size_options.find(
-    size_option => size_option.id === parseInt(selectedSizeOptionId.value)
+        size_option => size_option.id === parseInt(sizeOptionId)
     );
 }
+
 function decrementQuantity() {
-      if (quantity.value > 1) {
-        quantity.value--;
-      }
+    if (quantity.value > 1) {
+    quantity.value--;
     }
+}
 function incrementQuantity() {
-      quantity.value++;
+    if (quantity.value < 99) {
+        quantity.value++;
+    }else{
+        quantity.value = 99;
     }
+}
 
 </script>
 
@@ -50,31 +57,27 @@ function incrementQuantity() {
         </template>
     </NavigationHeader>
 
-    <div class="flex flex-col lg:flex-row bg-gradient-to-r from-emerald-400 via-teal-600 to-cyan-950">
+    <div class="flex flex-col lg:flex-row bg-gray-300">
 
-        <div class="container text-stone-100 mx-auto px-4 py-8 justify-end">
+        <div class="container mx-auto px-4 py-8 justify-end">
             <div class="grid grid-cols-1 md:grid-cols-12 gap-2 mb-5">
-                <div class="md:col-span-2">
+                <div class="md:col-span-2 px-3">
                     <!-- <small>Product item images</small> -->
-                    <img v-for="(image, i) in product.lowest_priced_item.images" :key="i" :src="image.url" :alt="product.name"/> 
+                    <img class="mb-3 shadow-md" v-for="(image, i) in product.lowest_priced_item.images" :key="i" :src="image.url" :alt="product.name"/> 
                 </div>
-                <div class="md:col-span-6 ">
-                    <img :src="product.images[0].url" :alt="product.name" class="object-cover border border-gray-700 rounded-lg">
+                <div class="md:col-span-6 px-4">
+                    <img :src="product.images[0].url" :alt="product.name" class="shadow-md object-cover border border-gray-700 rounded-lg">
                 </div>
                 <div class="md:col-span-4">
                     <h1 class="text-3xl font-bold mb-4">{{ product.name }}</h1>
                     <div class="flex items-end mb-4  pb-2">
-
                         <span class="  mr-2">Brand:</span>
                         <p class="text-lg">{{ product.brand.name }}</p>
                     </div>
                     <div class="flex justify-start items-center mb-1 pb-1 border-b border-gray-300">
                         <div class="flex items-center mb-1  pb-1">
                             <span class=" mr-2">Is Featured:</span>
-                            <span :class="product.is_featured ? 'text-green-100' : 'text-red-600'">{{
-                                product.is_featured ?
-                                    '&#x2714;'
-                                : ' &#x2716;' }}</span>
+                            <span :class="product.is_featured ? 'text-green-100' : 'text-red-600'">{{ product.is_featured ? '&#x2714;' : ' &#x2716;' }}</span>
                         </div>
                         <div class="flex items-center mb-1  pb-1 ml-5">
                             <span class=" mr-2">Product code:</span>
@@ -86,12 +89,24 @@ function incrementQuantity() {
                         <label for="size_options" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                             Select size option
                         </label>
-                        <select id="size_options" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        <button
+                            v-for="size_option in product.lowest_priced_item.size_options"
+                            :key="size_option.id"
+                            :class="{
+                                'bg-blue-500 text-white': selectedSizeOptionId === size_option.id,
+                                'bg-gray-50 text-gray-900': selectedSizeOptionId !== size_option.id,
+                                'border border-gray-300 text-sm rounded-lg p-2.5 mr-2 mb-2 focus:outline-none': true
+                            }"
+                            @click="selectSizeOption(size_option.id)"
+                        >
+                            {{ size_option.name }}
+                        </button>
+                        <!-- <select id="size_options" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                             v-model="selectedSizeOptionId"
                             @change="updateSelectedSizeOption"    
                         >
                             <option v-for="size_options in product.lowest_priced_item.size_options" :key="size_options.id" :value="size_options.id">{{ size_options.name }}</option>
-                        </select>
+                        </select> -->
                     </div>
                     <div v-if="selectedSizeOption" class="ml-1 mt-1">
                         <p><strong>SKU:</strong> {{ selectedSizeOption.pivot.sku }}</p>
@@ -100,9 +115,9 @@ function incrementQuantity() {
                     </div>
                     <div class="flex items-center justify-between font-bold p-4">
                         <div class="flex text-black items-center ">
-                            <button class="p-1 bg-stone-200 rounded-l text-2xl" @click="decrementQuantity">-</button>
-                            <input v-model="quantity" type="number" min="1" max="599" class="appearance-none-arrow border rounded-none px-4 py-2 w-20 text-center">
-                            <button class="p-1 bg-stone-200 rounded-r text-2xl" @click="incrementQuantity">+</button>
+                            <button class="border-l border-gray-700 border-y px-3 bg-stone-200 rounded-l text-2xl" @click="decrementQuantity">-</button>
+                            <input v-model="quantity" type="number" min="1" max="599" class="appearance-none-arrow border rounded-none px-4 py-1 w-17 text-center">
+                            <button class="border-r border-gray-700 border-y px-3 bg-stone-200 rounded-r text-2xl" @click="incrementQuantity">+</button>
                         </div>
                             
                         <div>
@@ -111,7 +126,7 @@ function incrementQuantity() {
                     </div>
 
 
-                    <div class="flex justify-between items-center mt-5 mb-1 border font-bold text-stone-200 text-lg p-4">
+                    <div class="flex justify-between items-center mt-5 mb-1 border font-bold text-lg p-4">
                         <span>
                             {{ currencyFormat(product.lowest_priced_item.original_price) }}
                         </span>
@@ -140,11 +155,9 @@ function incrementQuantity() {
                 </div>
             </div>
             <h2 class="text-xl text-cyan-950 font-semibold m-2 mt-3">Product Variants</h2>
-            <div
-                class="grid grid-cols-1 md:grid-cols-3  gap-4 border-1 border bg-gradient-to-t from-emerald-500 via-teal-600 to-cyan-700 p-2 rounded-lg mt-5  ">
+            <div class="grid grid-cols-1 md:grid-cols-3  gap-4 p-2 rounded-lg mt-5  ">
                 <!-- product item variants -->
-                <div v-for="variant in product.product_items" :key="variant.product_code"
-                    class="card rounded-lg p-4 shadow-md align-self-end relative bg-gradient-to-r from-emerald-500 via-teal-600 to-cyan-700">
+                <div v-for="variant in product.product_items" :key="variant.product_code" class="card rounded-lg p-4 shadow-md align-self-end relative border border-gray-700  border-1">
                     <div class="flex flex-row justify-between items-center mb-2">
                         <div class="md:col-span-3">
                             <div class="border-2 absolute left-1 top-2 rounded-full" :key="variant.product_code">
@@ -165,8 +178,8 @@ function incrementQuantity() {
                         <div class="flex items-center justify-between mb-4 border-t border-b">
                             <span class="text-black-700 mr-2 font-bold">Price: {{ currencyFormat(variant.original_price)
                                 }}</span>
-                            <span class="text-lime-200  font-bold">{{ variant.sale_price ? "On sale: " +
-                                currencyFormat(variant.sale_price) : 'Not on sail' }}</span>
+                            <span class="text-red-500  font-bold">{{ variant.sale_price ? "On sale: " +
+                                currencyFormat(variant.sale_price) : '' }}</span>
                         </div>
 
                         <div class="flex justify-around">
