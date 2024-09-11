@@ -18,7 +18,6 @@ const priceXquantity = computed(() => {
         return props.product.lowest_priced_item.original_price * quantity.value;
     }
 });
-
 function selectSizeOption(sizeOptionId) {
     //reset quantity on change
     quantity.value = 1;
@@ -28,7 +27,6 @@ function selectSizeOption(sizeOptionId) {
         size_option => size_option.id === parseInt(sizeOptionId)
     );
 }
-
 function decrementQuantity() {
     if (quantity.value > 1) {
     quantity.value--;
@@ -41,7 +39,6 @@ function incrementQuantity() {
         quantity.value = selectedSizeOption.value.pivot.in_stock;
     }
 }
-
 // Initialize the form with the product data
 const form = useForm({
     id: props.product.id,
@@ -65,8 +62,6 @@ watch([selectedSizeOption, quantity], () => {
 // On submit, add additional fields and send the form data to the server
 function addToCart() {
     console.log('send to cart ', form);
-    
-
 }
 function orderNow(){
     console.log('order now ', form);
@@ -78,11 +73,9 @@ function orderNow(){
     //     },
     // });
 }
-
 </script>
 
 <template>
-
     <Head :title="product.name" />
     <NavigationHeader>
         <template #breadcrumbs>
@@ -95,9 +88,7 @@ function orderNow(){
             <input type="text" class="w-full bg-gray-200 rounded-lg py-2 px-4 focus:outline-none focus:bg-white" placeholder="Search for products">
         </template>
     </NavigationHeader>
-
     <div class="flex flex-col lg:flex-row bg-gray-300">
-
         <div class="container mx-auto px-4 py-8 justify-end">
             <div class="grid grid-cols-1 md:grid-cols-12 gap-2 mb-5">
                 <div class="md:col-span-2 px-3">
@@ -123,13 +114,11 @@ function orderNow(){
                             <span>{{product.lowest_priced_item.product_code}}</span>
                         </div>
                     </div>
-
                     <div >
                         <div class="block mb-2 text-sm font-medium ">
                             options:
                         </div>
-                        <button
-                            v-for="size_option in product.lowest_priced_item.size_options"
+                        <button v-for="size_option in product.lowest_priced_item.size_options"
                             :key="size_option.id"
                             :class="{
                                 'bg-blue-500 text-white': selectedSizeOptionId === size_option.id,
@@ -153,28 +142,22 @@ function orderNow(){
                             <input v-model="quantity" type="number" min="1" max="599" class="appearance-none-arrow border rounded-none px-4 py-1 w-17 text-center">
                             <button class="border-r border-gray-700 border-y px-3 bg-stone-200 rounded-r text-2xl" @click="incrementQuantity">+</button>
                         </div>
-                            
                         <div>
                             price per quantity: {{ currencyFormat(priceXquantity) }}
                         </div>
                     </div>
-
                     <div class="flex justify-between items-center mt-5 mb-1 border font-bold text-lg p-4">
-                        <button
-                            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                             @click="addToCart"
                         >
                             Add to Cart
                         </button>
-                        <button
-                            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                             @click="orderNow"
                         >
                             Order Now
                         </button>
                     </div>
-
-
                     <div class="flex justify-between items-center mt-5 mb-1 border font-bold text-lg p-4">
                         <span>
                             {{ currencyFormat(product.lowest_priced_item.original_price) }}
@@ -194,13 +177,11 @@ function orderNow(){
                     <div class="items-center mb-2 border-b border-gray-300">
                         <span class=" mr-2">Care Instructions:</span>
                         <p class=" mb-4">{{ product.care_instructions }}</p>
-
                     </div>
                     <div class="items-center mb-4 border-b border-gray-300">
                         <span class=" mr-2">About:</span>
                         <p>{{ product.about }}</p>
                     </div>
-
                 </div>
             </div>
             <h2 class="text-xl text-cyan-950 font-semibold m-2 mt-3">Product Variants</h2>
@@ -217,7 +198,6 @@ function orderNow(){
                             <img :src="product.images[0].url" :alt="variant.product_code" class="w-40 h-40 object-cover rounded-lg mb-2"> 
                         </div>
                     </div>
-
                     <div class="md:col">
                         <h2 class="text-lg text-green-900 font-bold mb-1">{{ variant.is_active ? 'Active' : 'Not Active'}}
                         </h2>
@@ -230,7 +210,6 @@ function orderNow(){
                             <span class="text-red-500  font-bold">{{ variant.sale_price ? "On sale: " +
                                 currencyFormat(variant.sale_price) : '' }}</span>
                         </div>
-
                         <div class="flex justify-around">
                             <button
                                 class="text-black hover:text-white bg-gradient-to-r from-teal-200 via-teal-500 to-teal-800 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-teal-500 dark:focus:ring-teal-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2">Add
@@ -240,7 +219,6 @@ function orderNow(){
                                 to Cart</button>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
