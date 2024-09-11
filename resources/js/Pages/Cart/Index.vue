@@ -1,11 +1,21 @@
 <script setup>
 import NavigationHeader from '@/Components/NavigationHeader.vue';
 import { Head, Link } from '@inertiajs/vue3';
+import { ref } from 'vue';
 
-
+const quantity = ref(1);
+function decrementQuantity(item) {
+    //   if (item.quantity > 1) {
+    //     item.quantity--;
+    //   }
+}
+function incrementQuantity(item) {
+    //   item.quantity++;
+}
 </script>
 
 <template>
+
     <Head title="Cart" />
     <NavigationHeader>
         <template #breadcrumbs>
@@ -15,14 +25,115 @@ import { Head, Link } from '@inertiajs/vue3';
             <span>Cart</span>
         </template>
         <template #search>
-            <input type="search" class="w-full bg-gray-200 rounded-lg py-2 px-4 focus:outline-none focus:bg-white" placeholder="Search for products">
+            <input type="search" class="w-full bg-gray-200 rounded-lg py-2 px-4 focus:outline-none focus:bg-white"
+                placeholder="Search for products">
         </template>
     </NavigationHeader>
-    <div>
-        Cart items
-    </div>
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold text-center mb-8">Your Shopping Cart</h1>
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+            <div class="md:col-span-9">
+                <table class="table table-auto w-full">
+                    <thead>
+                        <tr>
+                            <th class="px-4 py-2">Product</th>
+                            <th class="px-4 py-2">Image</th>
+                            <th class="px-4 py-2">Quantity</th>
+                            <th class="px-4 py-2">Price</th>
+                            <th class="px-4 py-2">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="px-4 py-2 text-center">Product Name</td>
+                            <td class="px-4 py-2 flex justify-center">
+                                <img src="https://via.placeholder.com/800x600.png/007700?text=velit-dignissimos0+itaque"  alt="Product Image" class="w-24 h-24 object-cover">
+                            </td>
+                            <td class="px-4 py-2 text-center">
+                                <div class="flex text-black items-center justify-center">
+                                    <button class="border-l border-gray-700 border-y px-3 bg-stone-200 rounded-l text-2xl" @click="decrementQuantity">-</button>
+                                    <input v-model="quantity" type="number" min="1" max="599" class="appearance-none-arrow border rounded-none px-4 py-1 w-17 text-center">
+                                    <button class="border-r border-gray-700 border-y px-3 bg-stone-200 rounded-r text-2xl" @click="incrementQuantity">+</button>
+                                </div>
+                            </td>
+                            <td class="px-4 py-2 text-center">$19.99</td>
+                            <td class="px-4 py-2 text-center">
+                                <button type="button" class="text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-full text-sm p-2.5 text-center inline-flex items-center me-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800">
+                                    <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 17.94 6M18 18 6.06 6"/>
+                                    </svg>
+                                    <span class="sr-only">Remove</span>
+                                </button>
+                                <button type="button" class="text-white bg-yellow-700 hover:bg-yellow-800 focus:ring-4 focus:outline-none focus:ring-yellow-300 font-medium rounded-full text-sm p-2.5 text-center inline-flex items-center me-2 dark:bg-yellow-600 dark:hover:bg-yellow-700 dark:focus:ring-yellow-800">
+                                    <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                                        <path fill-rule="evenodd" d="M5 3a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7.414A2 2 0 0 0 20.414 6L18 3.586A2 2 0 0 0 16.586 3H5Zm10 11a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM8 7V5h8v2a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1Z" clip-rule="evenodd"/>
+                                    </svg>
+
+                                    <span class="sr-only">Save</span>
+                                </button>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td class="px-4 py-2 text-center">Product Name</td>
+                            <td class="px-4 py-2 flex justify-center">
+                                <img src="https://via.placeholder.com/800x600.png/007700?text=velit-dignissimos0+itaque"  alt="Product Image" class="w-24 h-24 object-cover">
+                            </td>
+                            <td class="px-4 py-2 text-center">
+                                <div class="flex text-black items-center justify-center">
+                                    <button class="border-l border-gray-700 border-y px-3 bg-stone-200 rounded-l text-2xl" @click="decrementQuantity">-</button>
+                                    <input v-model="quantity" type="number" min="1" max="599" class="appearance-none-arrow border rounded-none px-4 py-1 w-17 text-center">
+                                    <button class="border-r border-gray-700 border-y px-3 bg-stone-200 rounded-r text-2xl" @click="incrementQuantity">+</button>
+                                </div>
+                            </td>
+                            <td class="px-4 py-2 text-center">$19.99</td>
+                            <td class="px-4 py-2 text-center">
+                                <button type="button" class="text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-full text-sm p-2.5 text-center inline-flex items-center me-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800">
+                                    <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 17.94 6M18 18 6.06 6"/>
+                                    </svg>
+                                    <span class="sr-only">Remove</span>
+                                </button>
+                                <button type="button" class="text-white bg-yellow-700 hover:bg-yellow-800 focus:ring-4 focus:outline-none focus:ring-yellow-300 font-medium rounded-full text-sm p-2.5 text-center inline-flex items-center me-2 dark:bg-yellow-600 dark:hover:bg-yellow-700 dark:focus:ring-yellow-800">
+                                    <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                                        <path fill-rule="evenodd" d="M5 3a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7.414A2 2 0 0 0 20.414 6L18 3.586A2 2 0 0 0 16.586 3H5Zm10 11a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM8 7V5h8v2a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1Z" clip-rule="evenodd"/>
+                                    </svg>
+
+                                    <span class="sr-only">Save</span>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="md:col-span-3">
+              <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-lg font-medium mb-4">Order Summary</h2>
+                <div class="flex justify-between mb-2">
+                  <span>Subtotal:</span>
+                  <span>$99</span>
+                </div>
+                <div class="flex justify-between mb-2">
+                  <span>Tax:</span>
+                  <span>$99</span>
+                </div>
+                <div class="flex justify-between mb-4">
+                  <span>Total:</span>
+                  <span>$99</span>
+                </div>
+                <button class="btn btn-primary w-full">Checkout</button>
+              </div>
+            </div>
+          </div>
+        </div>
 </template>
 
 <style scoped>
-
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    margin: 0; 
+}
 </style>
