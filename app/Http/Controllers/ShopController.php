@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\ProductItem;
 use Illuminate\Http\Request;
 
 class ShopController extends Controller
@@ -14,26 +15,24 @@ class ShopController extends Controller
     public function index()
     {
         $categories = Category::where('parent_category_id', null)->with('children')->get();
-        
-        if(request()->category){
-        // Fetch the requested category
-        $category = Category::where('slug', request()->category)->firstOrFail();
-        $selectedCategory = $category->name;
-        // Get all the IDs of the requested category and its children
-        $categoryIds = $category->children->pluck('id')->toArray();
-        $categoryIds[] = $category->id; // Include the requested category itself
 
-        // Fetch products that belong to any of these categories
-        $products = Product::whereHas('categories', function($query) use ($categoryIds) {
-            $query->whereIn('categories.id', $categoryIds);
-        })
-        ->with(['images', 'lowestPricedItem'])
-        ->get();
+        if (request()->category) {
+            // Fetch the requested category
+            $category = Category::where('slug', request()->category)->firstOrFail();
+            $selectedCategory = $category->name;
+            // Get all the IDs of the requested category and its children
+            $categoryIds = $category->children->pluck('id')->toArray();
+            $categoryIds[] = $category->id; // Include the requested category itself
 
+            // Fetch products that belong to any of these categories
+            $products = Product::whereHas('categories', function ($query) use ($categoryIds) {
+                $query->whereIn('categories.id', $categoryIds);
+            })
+                ->with(['images', 'productItem.color'])
+                ->get();
         } else {
             $selectedCategory = 'All';
-            $products = Product::with(['images', 'lowestPricedItem'])
-            ->get();
+            $products = Product::with(['images', 'productItem.color'])->get();
         }
         // dd($products);
         return inertia('Shop/Index', [
@@ -67,10 +66,18 @@ class ShopController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Product $product)
+    public function show(Product $product, ProductItem $productItem)
     {
-        return inertia('Shop/Show',[
-            'product' => $product->load(['images', 'lowestPricedItem.images', 'lowestPricedItem.sizeOptions', 'productItems.color', 'productItems.sizeOptions', 'brand'])     
+        // dd($productItem->load(['color', 'sizeOptions', 'images']));
+        return inertia('Shop/Show', [
+            'product' => $product->load([
+                'productItems' => function ($query) use ($productItem) {
+                    $query->whereNot('id', $productItem->id)
+                        ->with(['color', 'sizeOptions', 'images']); // Load related data for the specific ProductItem
+                },
+                'brand',
+            ]),
+            'productItem' => $productItem->load(['color', 'sizeOptions', 'images']),
         ]);
     }
 
