@@ -3,6 +3,9 @@ import NavigationHeader from '@/Components/NavigationHeader.vue';
 import { Head, Link } from '@inertiajs/vue3';
 import { ref } from 'vue';
 
+defineProps({
+    items: Object,
+})
 const quantity = ref(1);
 function decrementQuantity(item) {
     //   if (item.quantity > 1) {
@@ -31,6 +34,7 @@ function incrementQuantity(item) {
     </NavigationHeader>
     <div class="container mx-auto px-4 py-8">
         <h1 class="text-3xl font-bold text-center mb-8">Your Shopping Cart</h1>
+        {{items}}
         <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
             <div class="md:col-span-9">
                 <table class="table table-auto w-full">
