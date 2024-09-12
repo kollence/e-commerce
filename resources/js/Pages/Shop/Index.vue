@@ -30,17 +30,17 @@ defineProps({
 
         <div class="border-l w-4/5 mx-auto">
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 sm:gap-2 md:gap-4 lg:gap-5 sm:p-0 md:p-4">
-                <Link :href="route('shop.show', product.slug)" class="card rounded-lg p-2 shadow-md" v-for="(product, index) in products" :key="index">
+                <Link :href="route('shop.show', [product.slug, product.product_item.id])" class="card rounded-lg p-2 shadow-md" v-for="(product, index) in products" :key="index">
                 <img v-if="product.images.length > 0" :src="product.images[0].url" :alt="product.name"
                     class="object-cover">
                 <img v-else :src="'/storage/images/defaults/default.jpg'" alt=""
                     class="object-cover">
                 <div class="flex justify-around bg-gray-200 py-2">
                     <span>
-                        {{ currencyFormat(product.lowest_priced_item.original_price) }}
+                        {{ currencyFormat(product.product_item.original_price) }}
                     </span>
-                    <span v-if="product.lowest_priced_item && product.lowest_priced_item.sale_price > 0" class="text-red-500 font-bold">
-                        ON SAIL! {{currencyFormat(product.lowest_priced_item.sale_price)}}
+                    <span v-if="product.product_item && product.product_item.sale_price > 0" class="text-red-500 font-bold">
+                        ON SAIL! {{currencyFormat(product.product_item.sale_price)}}
 
                     </span>
                     <span v-else class="line-through text-gray-500">
