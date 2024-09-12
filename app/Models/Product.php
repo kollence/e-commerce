@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Product extends Model
@@ -60,8 +61,8 @@ class Product extends Model
     {
         return $this->hasMany(ProductItem::class);
     }
-
-    public function lowestPricedItem()
+    // first item by the lowest `sale_price` or `original_price`
+    public function productItem(): HasOne
     {
         return $this->hasOne(ProductItem::class)
         ->where('is_active', true)
