@@ -56,14 +56,8 @@ function incrementQuantity() {
 // });
 // Initialize the form with the product data
 const form = useForm({
-    id: props.product.id,
     product_item_id: props.productItem.id,
     size_option: { id: selectedSizeOption.value.id, name: selectedSizeOption.value.name },
-    // sku: selectedSizeOption.value.pivot.sku,
-    // product_code: props.productItem.product_code,
-    // original_price: props.productItem.original_price,
-    // sale_price: props.productItem.sale_price,
-    // images: props.productItem.images,
     // in_stock: selectedSizeOption.value.pivot.in_stock - quantity.value,
     quantity: quantity.value,
     // submitted_pxq: priceXquantity.value,
