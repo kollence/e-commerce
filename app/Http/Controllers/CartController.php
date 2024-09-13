@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\ProductItem;
 use Exception;
 use Illuminate\Http\Request;
 
@@ -16,41 +17,44 @@ class CartController extends Controller
 
     public function add(Request $request)
     {
-        // $this->items = [];
-        // session()->forget('cart');
-        dd($request->all());
-        // $quantity = $this->getQuantity($product, $quantity);
-    //     array:11 [▼ // app/Http/Controllers/CartController.php:18
-    //     "id" => 5
-    //     "name" => "qui aut"
-    //     "size_option" => "38C"
-    //     "sku" => "SKU-EVCDA"
-    //     "product_code" => "ZZB1JWE4T4"
-    //     "original_price" => 2736
-    //     "sale_price" => 1062
-    //     "images" => array:3 [▶]
-    //     "in_stock" => 65
-    //     "quantity" => 3
-    //     "submitted_pxq" => 3186
-    //   ]
-        // $product = Product::find($request->id);
-        // $uid = str_replace(' ', '-', strtolower($product->id . '_' . $request->size_option));
-        // // $quantity = $this->getQuantity($product, $quantity);
-        // if (isset($this->items[$uid])) {
-            
-        //     if(strcmp(serialize(['sale_price' => $request->sale_price, 'original_price' => $request->original_price]), serialize(['sale_price' => $product->lowestPricedItem->sale_price, 'original_price' => $product->lowestPricedItem->original_price])) === 0){
-        //         $this->items[$uid]['quantity'] = (int) $request->quantity;
-        //         $this->items[$uid]['in_stock'] = (int) $request->in_stock;
-        //         $this->items[$uid]['submitted_pxq'] = (int) $request->submitted_pxq;
-        //     }else{
-        //         throw new Exception("Product out dated", 1);
-        //     }
+        // Extract the product_item_id, size_option, and quantity from the request
+        $productItemId = $request->input('product_item_id');
+        $sizeOption = $request->input('size_option');
+        $quantity = $request->input('quantity', 1); // Default quantity to 1 if not provided
 
-        // } else {
-        //     $this->items[$uid] = $request->all();
-        // }
+        // Check if the item already exists in the cart
+        $existingItemIndex = $this->findExistingItemIndex($productItemId, $sizeOption['name']);
 
-        // return $this->store();
+        if ($existingItemIndex !== null) {
+            // Item exists, so increment the quantity
+            $this->items[$existingItemIndex]['quantity'] += $quantity;
+        } else {
+            // Item doesn't exist, so add it as a new item
+            $this->items[] = [
+                'product_item_id' => $productItemId,
+                'size_option' => $sizeOption,
+                'quantity' => $quantity,
+            ];
+        }
+        return $this->store();
+    }
+
+    /**
+     * Find the index of an existing cart item by product_item_id and size_option name.
+     * 
+     * @param  int    $productItemId
+     * @param  string $sizeOptionName
+     * @return int|null
+     */
+    private function findExistingItemIndex($productItemId, $sizeOptionName)
+    {
+        foreach ($this->items as $index => $item) {
+            if ($item['product_item_id'] == $productItemId && $item['size_option']['name'] == $sizeOptionName) {
+                return $index;
+            }
+        }
+
+        return null;
     }
     /**
      * Display a listing of the resource.
@@ -107,6 +111,18 @@ class CartController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        if (count($this->items) > 1) {
+            unset($this->items[$id]);
+        } else {
+            $this->forget();
+        }
+
+        return $this->store();
+    }
+
+    public function forget()
+    {
+        $this->items = [];
+        session()->forget('cart');
     }
 }
