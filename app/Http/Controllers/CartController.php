@@ -15,46 +15,71 @@ class CartController extends Controller
         $this->items = session()->has('cart') ? json_decode(session('cart'), true) : [];
     }
 
+    /**
+     * Add a product item to the cart.
+     */
     public function add(Request $request)
     {
-        // Extract the product_item_id, size_option, and quantity from the request
         $productItemId = $request->input('product_item_id');
         $sizeOption = $request->input('size_option');
         $quantity = $request->input('quantity', 1); // Default quantity to 1 if not provided
 
-        // Check if the item already exists in the cart
-        $existingItemIndex = $this->findExistingItemIndex($productItemId, $sizeOption['name']);
+        // Generate a unique key for the cart item
+        $uniqueKey = $this->generateUniqueKey($productItemId, $sizeOption['name']);
 
-        if ($existingItemIndex !== null) {
+        if (isset($this->items[$uniqueKey])) {
             // Item exists, so increment the quantity
-            $this->items[$existingItemIndex]['quantity'] += $quantity;
+            $this->items[$uniqueKey]['quantity'] += $quantity;
         } else {
             // Item doesn't exist, so add it as a new item
-            $this->items[] = [
+            $this->items[$uniqueKey] = [
                 'product_item_id' => $productItemId,
                 'size_option' => $sizeOption,
                 'quantity' => $quantity,
             ];
         }
+
         return $this->store();
     }
 
     /**
-     * Find the index of an existing cart item by product_item_id and size_option name.
-     * 
-     * @param  int    $productItemId
-     * @param  string $sizeOptionName
-     * @return int|null
+     * Remove a product item from the cart.
      */
-    private function findExistingItemIndex($productItemId, $sizeOptionName)
+    public function remove(Request $request)
     {
-        foreach ($this->items as $index => $item) {
-            if ($item['product_item_id'] == $productItemId && $item['size_option']['name'] == $sizeOptionName) {
-                return $index;
-            }
+        $productItemId = $request->input('product_item_id');
+        $sizeOption = $request->input('size_option');
+
+        // Generate the unique key for the item to remove
+        $uniqueKey = $this->generateUniqueKey($productItemId, $sizeOption['name']);
+
+        if (isset($this->items[$uniqueKey])) {
+            // Remove the item from the cart
+            unset($this->items[$uniqueKey]);
+
+            // Update the session with the new cart
+            session(['cart' => json_encode($this->items)]);
+
+            return response()->json(['message' => 'Item removed from cart', 'cart' => $this->items]);
         }
 
-        return null;
+        return response()->json(['message' => 'Item not found in cart'], 404);
+    }
+
+    /**
+     * Generate a unique key for a cart item.
+     * 
+     * @param int $productItemId
+     * @param string $sizeOptionName
+     * @return string
+     */
+    private function generateUniqueKey($productItemId, $sizeOptionName)
+    {
+        // Convert sizeOptionName to uppercase and replace spaces with underscores
+        $formattedSizeOptionName = strtoupper(str_replace(' ', '_', $sizeOptionName));
+    
+        // Return the unique key
+        return $productItemId . '_' . $formattedSizeOptionName;
     }
     /**
      * Display a listing of the resource.
