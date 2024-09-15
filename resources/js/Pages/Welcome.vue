@@ -28,13 +28,13 @@ const props = defineProps({
     </div>
     <div class="flex flex-col max-w-7x1 mx-auto px-4 sm:container sm:flex-row sm:space-x-4 sm:my-4 sm:px-6 lg:px-8">
         <div v-for="(product, index) in featured_products" :key="index" class="flex flex-col ">
-            <Link :href="route('shop.show', product.slug)"  class="w-full h-full gap-4">
+            <Link :href="route('shop.show', [product.slug, product.product_item.id])"  class="w-full h-full gap-4">
                 <div class="text-center text-white bg-gray-700 py-2">
                     <span>
                         {{ product.name }}
                     </span>
                 </div>
-                <img v-if="product.images.length > 0" :src="product.images[0].url" :alt="product.name"
+                <img v-if="product.product_item.images.length > 0" :src="product.product_item.images[0].url" :alt="product.name"
                     class="h-72 object-cover md:w-72 lg:w-96">
                 <img v-else :src="'/storage/images/defaults/default.jpg'" alt="" class="h-72 object-cover md:w-72 lg:w-96">
             </Link>
