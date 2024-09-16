@@ -30,8 +30,8 @@ defineProps({
 
         <div class="border-l w-4/5 mx-auto">
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 sm:gap-2 md:gap-4 lg:gap-5 sm:p-0 md:p-4">
-                <Link :href="route('shop.show', [product.slug, product.product_item.id])" class="card rounded-lg p-2 shadow-md" v-for="(product, index) in products" :key="index">
-                <img v-if="product.images.length > 0" :src="product.images[0].url" :alt="product.name"
+                <Link :href="route('shop.show', [product.slug, product.product_item.color.slug])" class="card rounded-lg p-2 shadow-md" v-for="(product, index) in products" :key="index">
+                <img v-if="product.product_item.images.length > 0" :src="product.product_item.images[0].url" :alt="product.name"
                     class="object-cover">
                 <img v-else :src="'/storage/images/defaults/default.jpg'" alt=""
                     class="object-cover">

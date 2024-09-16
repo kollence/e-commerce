@@ -146,7 +146,7 @@ function orderNow() {
                             <div class="flex items-center mb-1  pb-1">
                                 Colors:
                             </div>
-                            <Link  preserve-scroll :href="route('shop.show', [product.slug, color.id])"
+                            <Link  preserve-scroll :href="route('shop.show', [product.slug, color.color.slug])"
                                 :style="{ 'background-color': color.color.hex }"
                                 class="mr-2 card rounded-lg p-2 shadow-md" v-for="(color, i) in product.product_items"
                                 :key="i">

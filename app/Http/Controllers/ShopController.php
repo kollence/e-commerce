@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\Color;
 use App\Models\Product;
 use App\Models\ProductItem;
 use Illuminate\Http\Request;
@@ -28,11 +29,11 @@ class ShopController extends Controller
             $products = Product::whereHas('categories', function ($query) use ($categoryIds) {
                 $query->whereIn('categories.id', $categoryIds);
             })
-                ->with(['images', 'productItem.color'])
+                ->with(['productItem.images', 'productItem.color'])
                 ->get();
         } else {
             $selectedCategory = 'All';
-            $products = Product::with(['images', 'productItem.color'])->get();
+            $products = Product::with(['productItem.images', 'productItem.color'])->get();
         }
         // dd($products);
         return inertia('Shop/Index', [
@@ -66,9 +67,14 @@ class ShopController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Product $product, ProductItem $productItem)
+    public function show(Product $product, $color)
     {
-        // dd($productItem->load(['color', 'sizeOptions', 'images']));
+        $productItem = $product->productItem()
+        ->whereHas('color', function ($query) use ($color) {
+            $query->where('slug', $color);
+        })
+        ->with(['color', 'sizeOptions', 'images'])
+        ->firstOrFail(); // Load related data for the specific ProductItem
         return inertia('Shop/Show', [
             'product' => $product->load([
                 'productItems' => function ($query) use ($productItem) {
@@ -77,7 +83,7 @@ class ShopController extends Controller
                 },
                 'brand',
             ]),
-            'productItem' => $productItem->load(['color', 'sizeOptions', 'images']),
+            'productItem' => $productItem,
         ]);
     }
 
