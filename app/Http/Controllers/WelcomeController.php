@@ -14,7 +14,7 @@ class WelcomeController extends Controller
         return inertia('Welcome', [
             'parent_categories' => \App\Models\Category::where('parent_category_id', null)->get(['name', 'slug']),
             'featured_products' => \App\Models\Product::where('is_featured', true)
-            ->with(['productItem.images', 'categories' => function ($query) {
+            ->with(['productItem.color', 'productItem.images', 'categories' => function ($query) {
                 $query->select('id', 'name', 'slug'); // Select only necessary columns
             }])
             ->limit(4)
