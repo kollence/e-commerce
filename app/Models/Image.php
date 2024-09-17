@@ -24,6 +24,10 @@ class Image extends Model
         'imageable_id',
         'imageable_type',
     ];
+    protected $hidden = [
+        'created_at',
+        'updated_at'
+    ];
 
     /**
      * The attributes that should be cast to native types.
