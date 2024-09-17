@@ -20,9 +20,13 @@ class CartController extends Controller
      */
     public function add(Request $request)
     {
+        // dd($request->all());
+        $name = $request->input('name');
         $productItemId = $request->input('product_item_id');
         $sizeOption = $request->input('size_option');
         $quantity = $request->input('quantity', 1); // Default quantity to 1 if not provided
+        $productItem = ProductItem::find($productItemId);
+        // dd($productItem);
 
         // Generate a unique key for the cart item
         $uniqueKey = $this->generateUniqueKey($productItemId, $sizeOption['name']);
@@ -33,13 +37,20 @@ class CartController extends Controller
         } else {
             // Item doesn't exist, so add it as a new item
             $this->items[$uniqueKey] = [
+                'name' => $name,
                 'product_item_id' => $productItemId,
                 'size_option' => $sizeOption,
                 'quantity' => $quantity,
+                'original_price' => $productItem->original_price,
+                'sale_price' => $productItem->sale_price,
+                'images' => $productItem->images,
+                'color' => $productItem->color,
             ];
         }
 
         return $this->store();
+        // return $this->forget();
+        
     }
 
     /**
@@ -104,7 +115,7 @@ class CartController extends Controller
      */
     public function store()
     {
-        return session()->put('cart', json_encode($this->items, JSON_UNESCAPED_UNICODE));
+        return session()->put('cart', json_encode($this->items));
     }
 
     /**
