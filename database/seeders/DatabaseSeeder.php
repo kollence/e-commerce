@@ -50,7 +50,7 @@ class DatabaseSeeder extends Seeder
         });
 
         $parentCategories = [
-            'Men' => Category::factory()->create(['name' => 'Man', 'slug' => 'man']),
+            'Men' => Category::factory()->create(['name' => 'Men', 'slug' => 'men']),
             'Women' => Category::factory()->create(['name' => 'Women', 'slug' => 'women']),
             'Kids' => Category::factory()->create(['name' => 'Kids', 'slug' => 'kids']),
         ];
