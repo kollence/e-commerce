@@ -5,12 +5,14 @@ import NavLink from '@/Components/NavLink.vue';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
 
 const showingNavigationDropdown = ref(false);
+const page = usePage()
 
 const logout = () => {
     router.post(route('logout'));
 };
 
-const page = usePage()
+const cartCounter = computed(() => page.props.cart_count)
+
 const authUser = computed(() => page.props.auth.user)
 </script>
 
@@ -69,7 +71,7 @@ const authUser = computed(() => page.props.auth.user)
 
                             <Link :href="route('cart.index')" class="hover:text-red-700 transition">
                             <span class="bg-red-600 text-white text-xs rounded-full px-1 absolute" style="top: -10px; right: -8px;">
-                                3
+                                {{cartCounter}}
                             </span>
 
                             <Icon class="w-4 h-4 fill-current" name="cart"></Icon>
@@ -131,8 +133,8 @@ const authUser = computed(() => page.props.auth.user)
                     
                     <Icon class="w-4 h-4 fill-current" name="cart"></Icon>
                     
-                    <span class="ml-2">
-                        3 items in cart
+                    <span class="ml-1 text-red-600">
+                        {{cartCounter > 0 ? cartCounter+' in cart' : ''}} 
                     </span>
                 </Link>
             </div>
