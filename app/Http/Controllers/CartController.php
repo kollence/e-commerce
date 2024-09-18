@@ -21,6 +21,7 @@ class CartController extends Controller
     public function add(Request $request)
     {
         // dd($request->all());
+        $id = $request->input('id');
         $name = $request->input('name');
         $productItemId = $request->input('product_item_id');
         $sizeOption = $request->input('size_option');
@@ -37,6 +38,7 @@ class CartController extends Controller
         } else {
             // Item doesn't exist, so add it as a new item
             $this->items[$uniqueKey] = [
+                'id' => $id,
                 'name' => $name,
                 'product_item_id' => $productItemId,
                 'size_option' => $sizeOption,
@@ -69,12 +71,11 @@ class CartController extends Controller
             unset($this->items[$uniqueKey]);
 
             // Update the session with the new cart
-            session(['cart' => json_encode($this->items)]);
+            session(['cart' => json_encode($this->items, JSON_UNESCAPED_UNICODE)]);
 
-            return response()->json(['message' => 'Item removed from cart', 'cart' => $this->items]);
+            return redirect()->back()->with('message', 'Item removed from the cart');
         }
-
-        return response()->json(['message' => 'Item not found in cart'], 404);
+        return redirect()->back()->with('message', 'Item not found in the cart');
     }
 
     /**
@@ -115,7 +116,7 @@ class CartController extends Controller
      */
     public function store()
     {
-        return session()->put('cart', json_encode($this->items));
+        return session()->put('cart', json_encode($this->items, JSON_UNESCAPED_UNICODE));
     }
 
     /**

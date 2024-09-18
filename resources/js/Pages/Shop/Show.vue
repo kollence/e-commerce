@@ -56,6 +56,7 @@ function incrementQuantity() {
 // });
 // Initialize the form with the product data
 const form = useForm({
+    id: props.product.id,
     name: props.product.name,
     product_item_id: props.productItem.id,
     size_option: { id: selectedSizeOption.value.id, name: selectedSizeOption.value.name },
