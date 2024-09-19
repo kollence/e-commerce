@@ -16,12 +16,14 @@ class OrderItem extends Model
      * @var array
      */
     protected $fillable = [
-        'product_id',
+        'product_item_id',
         'order_id',
         'quantity',
-        'unit_amount',
-        'total_amount',
-        'price',
+        'color_id',
+        'size_option_id',
+        'product_code',
+        'original_price',
+        'sale_price',
         'total',
     ];
 
@@ -31,16 +33,30 @@ class OrderItem extends Model
      * @var array
      */
     protected $casts = [
-        'created_at' => 'datetime',
+        'id' => 'integer',
+        'product_item_id' => 'integer',
+        'order_id' => 'integer',
+        'color_id' => 'integer',
+        'size_option_id' => 'integer',
     ];
 
-    public function product(): BelongsTo
+    public function productItem(): BelongsTo
     {
-        return $this->belongsTo(Product::class);
+        return $this->belongsTo(ProductItem::class);
     }
 
     public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
+    }
+
+    public function color(): BelongsTo
+    {
+        return $this->belongsTo(Color::class);
+    }
+
+    public function sizeOption(): BelongsTo
+    {
+        return $this->belongsTo(SizeOption::class);
     }
 }

@@ -33,6 +33,7 @@ models:
     relationships:
       belongsTo: Product, Color
       belongsToMany: SizeOption
+      hasMany: OrderItem
   Category:
     name: string unique
     slug: string unique
@@ -83,15 +84,17 @@ models:
       belongsTo: User
       hasMany: OrderItem 
   OrderItem:
-    product_id: id foreign:products
+    product_item_id: id foreign:product_items
     order_id: id foreign:orders
     quantity: integer default:1
-    unit_amount: integer
-    total_amount: integer
-    price: integer
+    color_id: id foreign:colors nullable
+    size_option_id: id foreign:size_options nullable
+    product_code: string
+    original_price: integer
+    sale_price: integer nullable
     total: integer
     relationships:
-      belongsTo: Product, Order
+      belongsTo: ProductItem, Order, Color, SizeOption
   Address:
     user_id: id foreign:users nullable
     order_id: id foreign:orders nullable
