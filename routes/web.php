@@ -12,6 +12,7 @@ Route::get('/shop/{product:slug}/{color}', [ShopController::class, 'show'])->nam
 
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
 Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
+Route::post('/cart/updateQuantity', [CartController::class, 'updateQuantity'])->name('cart.updateQuantity')->middleware('throttle:40,1');
 Route::post('/cart/remove', [CartController::class, 'remove'])->name('cart.remove');
 
 Route::middleware([
