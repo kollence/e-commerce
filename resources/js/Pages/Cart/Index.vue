@@ -1,42 +1,60 @@
 <script setup>
 import NavigationHeader from '@/Components/NavigationHeader.vue';
-import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { ref, onMounted, onBeforeUnmount, computed } from 'vue';
 import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
+import { cloneDeep, isEqual } from 'lodash'; // Import lodash for deep comparison
 
-const page = usePage();
-const showPopup = ref(false);
-let timeoutID = undefined
-defineProps({
-    items: Object,
+const props = defineProps({
+    cart_items: Object,
+    cart_subtotal: Number,
+    cart_tax: Number,
+    tax_rate: Number,
+    new_total: Number,
 })
+let timeoutID = undefined
+const showPopup = ref(false);
+const cartItems = ref(cloneDeep(props.cart_items));
+const cartTableWrapper = ref(null); // ref for cart table wrapper
+const page = usePage();
+const cartCounter = computed(() => page.props.cart_count)
+// console.log(cartItems.value);
 onMounted(() => {
-  if (page.props.flash.message) {
-    showPopup.value = true;
-    timeoutID = setTimeout(() => {
-      showPopup.value = false;
-    }, 3000);
-  }
+    if (page.props.flash.message) {
+        showPopup.value = true;
+        timeoutID = setTimeout(() => {
+        showPopup.value = false;
+        }, 3000);
+    }
 })
 
 onBeforeUnmount(() => {
-  clearTimeout(timeoutID);
+    clearTimeout(timeoutID);
 });
+// Detect mouse leave outside the cart table
+const handleMouseOutside = () => {
+    // If the mouseleave compare if object got changed and if it is then submit cart items
+    if (!isEqual(cartItems.value, props.cart_items)) {
+       submitCartItems();
+    }
+};
 
 function closePopup() {
   showPopup.value = false;
 }
 
 const form = useForm({
-    product_item_id: null,
-    size_option: null,
+    cart_items: null,
 })
-function removeFromCart(item_id, size_option) {
-    form.product_item_id = item_id;
-    form.size_option = size_option;
-    form.post(route('cart.remove'), {
+const formRemoveKey = useForm({
+    cart_item_key: null,
+})
+function removeFromCart(key) {
+    formRemoveKey.cart_item_key = key;
+    
+    formRemoveKey.post(route('cart.remove'), {
         preserveScroll: true,
         onSuccess: () => {
-            form.reset();
+            // formRemoveKey.reset();
             clearTimeout(timeoutID);
         },
         onFinish: () => {
@@ -46,17 +64,47 @@ function removeFromCart(item_id, size_option) {
                 showPopup.value = false;
                 }, 3000);
             }
+            // Delete operator to delete object property by key
+            delete cartItems.value[key]
         }
     });
 }
-const quantity = ref(1);
-function decrementQuantity(item) {
-    //   if (item.quantity > 1) {
-    //     item.quantity--;
-    //   }
+
+function decrementQuantity(key) {
+    const item = cartItems.value[key];
+    if (item.product_item.quantity > 1) {
+        --item.product_item.quantity;
+        updateQuantity(key); // Update after decrement
+    }else{
+        item.product_item.quantity = 1
+    }
 }
-function incrementQuantity(item) {
-    //   item.quantity++;
+function incrementQuantity(key) { 
+    const item = cartItems.value[key];
+    if (item.product_item.quantity < 599) {
+        ++item.product_item.quantity;
+        updateQuantity(key); // Update after decrement
+    }else{
+        item.product_item.quantity = 599
+    }
+}
+// Update quantity in the local cartItems object
+const updateQuantity = (key) => {
+  const item = cartItems.value[key];
+  // Optional: update the subtotal locally
+  item.subtotal = ((item.product_item.sale_price < item.product_item.original_price && item.product_item.sale_price > 0) ? item.product_item.sale_price : item.product_item.original_price) * item.product_item.quantity;
+};
+
+const  submitCartItems = () => {
+    // change have been made to cartItems 
+
+        form.cart_items = cartItems.value;
+        form.post(route('cart.updateQuantity'), {
+            preserveScroll: true,
+            onSuccess: () => {
+                // form.reset();
+            },
+        });
 }
 </script>
 
@@ -85,8 +133,8 @@ function incrementQuantity(item) {
                 </div>
             </div>
         <h1 class="text-3xl font-bold text-center mb-8">Your Shopping Cart</h1>
-            <div v-if="Object.keys(items).length > 0" class="grid grid-cols-1 md:grid-cols-12 gap-4">
-                <div class="md:col-span-9 text-center">
+            <div v-if="Object.keys(cart_items).length > 0" class="grid grid-cols-1 md:grid-cols-12 gap-4">
+                <div ref="cartTableWrapper" class="md:col-span-9 text-center"  @mouseleave="handleMouseOutside">
                     <table class="table table-auto w-full">
                         <thead>
                             <tr>
@@ -96,59 +144,56 @@ function incrementQuantity(item) {
                                 <th class="px-4 py-2">Size</th>
                                 <th class="px-4 py-2">Quantity</th>
                                 <th class="px-4 py-2">Price</th>
+                                <th class="px-4 py-2">Subtotal</th>
                                 <th class="px-4 py-2">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="item in items" :key="item.id">
+                            <tr v-for="(item, key) in cartItems" :key="key">
                                 
-                                <td class="px-4 py-2 text-center">{{ item.name }}</td>
+                                <td class="px-4 py-2 text-center">{{ item.product.name }}</td>
                                 <td class="px-4 py-2 flex justify-center">
-                                    <img v-if="item.images.length > 0" :src="item.images[0].url" :alt="item.name" class="w-24 h-24 object-cover">
+                                    <img v-if="item.product_item.images.length > 0" :src="item.product_item.images[0].url" :alt="item.product.name" class="w-24 h-24 object-cover">
                                     <img v-else :src="'/storage/images/defaults/default.jpg'" alt=""  class="w-24 h-24 object-cover">
                                 </td>
-
                                 <td class="px-4 py-2 text-center">
                                     <div class="flex justify-center items-center">
-                                        <div class="bg-red-300 rounded-full text-stone-400 h-10 w-10" :style="{'background-color': item.color.hex}"></div>
-
+                                        <div class="bg-red-300 rounded-full text-stone-400 h-10 w-10" :style="{'background-color': item.product_item.color.hex}"></div>
                                     </div>
                                 </td>
                                 <td class="px-4 py-2 text-center">
-                                    <div class="p-2 bg-stone-200 border-red-300 border-1" >{{ item.size_option.name }}</div>
+                                    <div class="p-2 bg-stone-200 border-red-300 border-1" >{{ item.product_item.size_option.name }}</div>
                                 </td>
                                 <td class="px-4 py-2 text-center">
-                                    <div class="flex text-black items-center justify-center">
-                                        <button class="border-l border-gray-700 border-y px-3 bg-stone-200 rounded-l text-2xl" @click="decrementQuantity">-</button>
-                                        <input :value="item.quantity" type="number" min="1" max="599" class="appearance-none-arrow border rounded-none px-4 py-1 w-17 text-center">
-                                        <button class="border-r border-gray-700 border-y px-3 bg-stone-200 rounded-r text-2xl" @click="incrementQuantity">+</button>
+                                    <div  class="flex text-black items-center justify-center">
+                                        <button class="decrement-button border-l border-gray-700 border-y px-3 bg-stone-200 rounded-l text-2xl" @click="decrementQuantity(key)">-</button>
+                                        <input v-model="item.product_item.quantity" @change="updateQuantity(key)" type="number" min="1" max="599" class="appearance-none-arrow border rounded-none px-4 py-1 w-17 text-center">
+                                        <button class="increment-button border-r border-gray-700 border-y px-3 bg-stone-200 rounded-r text-2xl" @click="incrementQuantity(key)">+</button>
                                     </div>
                                 </td>
-                                <td v-if="item.sale_price < item.original_price && item.sale_price > 0" class="px-4 py-2 text-center text-red-600 font-bold">
+                                <td v-if="item.product_item.sale_price < item.product_item.original_price && item.product_item.sale_price > 0" class="px-4 py-2 text-center text-red-600 font-bold">
                                     <div class="grid item-center">
                                         <div class="text-red-600 font-bold text-md">On Sale!</div>
-                                        <div class="text-red-500">{{ currencyFormat(item.sale_price) }}</div>
+                                        <div class="text-red-500">{{ currencyFormat(item.product_item.sale_price) }}</div>
                                     </div>
                                 </td>
                                 <td v-else class="px-4 py-2 text-center">
                                     <div class="grid item-center">
-                                        <div class="text-black font-bold text-lg">{{ currencyFormat(item.original_price) }}</div>
+                                        <div class="text-black font-bold text-lg">{{ currencyFormat(item.product_item.original_price) }}</div>
                                     </div>
                                 </td>
                                 <td class="px-4 py-2 text-center">
-                                    <button @click="removeFromCart(item.product_item_id, item.size_option)" type="button" class="text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-full text-sm p-2.5 text-center inline-flex items-center me-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800">
+                                    <div class="grid item-center">
+                                        <div class="text-black font-bold text-lg">{{ currencyFormat(item.subtotal) }}</div>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-2 text-center">
+                                    <button @click="removeFromCart(key)" type="button" class="remove-button text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-full text-sm p-2.5 text-center inline-flex items-center me-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800">
                                         <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
                                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 17.94 6M18 18 6.06 6"/>
                                         </svg>
                                         <span class="sr-only">Remove</span>
                                     </button>
-                                    <!-- <button type="button" class="text-white bg-yellow-700 hover:bg-yellow-800 focus:ring-4 focus:outline-none focus:ring-yellow-300 font-medium rounded-full text-sm p-2.5 text-center inline-flex items-center me-2 dark:bg-yellow-600 dark:hover:bg-yellow-700 dark:focus:ring-yellow-800">
-                                        <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-                                            <path fill-rule="evenodd" d="M5 3a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7.414A2 2 0 0 0 20.414 6L18 3.586A2 2 0 0 0 16.586 3H5Zm10 11a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM8 7V5h8v2a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1Z" clip-rule="evenodd"/>
-                                        </svg>
-
-                                        <span class="sr-only">Save</span>
-                                    </button> -->
                                 </td>
                             </tr>
 
@@ -159,16 +204,20 @@ function incrementQuantity(item) {
                 <div class="bg-white rounded-lg shadow-md p-6">
                     <h2 class="text-lg font-medium mb-4">Order Summary</h2>
                     <div class="flex justify-between mb-2">
-                    <span>Subtotal:</span>
-                    <span>$99</span>
+                    <span>Subtotal of {{cartCounter}} items:</span>
+                    <span>{{currencyFormat(cart_subtotal)}}</span>
                     </div>
                     <div class="flex justify-between mb-2">
                     <span>Tax:</span>
-                    <span>$99</span>
+                    <span>{{tax_rate}}%</span>
+                    </div>
+                    <div class="flex justify-between mb-2">
+                    <span>Cart Tax:</span>
+                    <span>{{currencyFormat(cart_tax)}}</span>
                     </div>
                     <div class="flex justify-between mb-4">
                     <span>Total:</span>
-                    <span>$99</span>
+                    <span>{{currencyFormat(new_total)}}</span>
                     </div>
                     <button class="btn btn-primary w-full">Checkout</button>
                 </div>
