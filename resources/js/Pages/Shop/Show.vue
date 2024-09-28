@@ -139,20 +139,27 @@ function orderNow() {
                                 Picked:
                             </div>
                             <div class="border border-stone-100 rounded-lg shadow-md">
-                                <span class="p-2 shadow-md border border-2 border-stone-100"
-                                    :style="{ 'background-color': productItem.color.hex }">{{ productItem.color.name}}</span>
+                                <span class="p-2 shadow-md border border-2 border-stone-100" :style="{ 'background-color': productItem.color.hex }">
+                                    <span class="color-name">
+                                        {{ productItem.color.name}}
+                                    </span>
+                                </span>
 
                             </div>
                         </div>
                         <div>
-                            <div class="flex items-center mb-1  pb-1">
+                            <div class="flex items-center mb-1 pb-1">
                                 Colors:
                             </div>
                             <Link  preserve-scroll :href="route('shop.show', [product.slug, color.color.slug])"
                                 :style="{ 'background-color': color.color.hex }"
                                 class="mr-2 card rounded-lg p-2 shadow-md" v-for="(color, i) in product.product_items"
                                 :key="i">
-                            {{ color.color.name }}
+                            <span>
+                                <span class="color-name">
+                                    {{ color.color.name }}
+                                </span>
+                            </span>
                             </Link>
                         </div>
 
@@ -214,7 +221,7 @@ function orderNow() {
                         </span>
                     </div>
                     <div class="items-center mb-1 border-b border-gray-300 ">
-                        <span class="  mr-2">Description:</span>
+                        <span class="mr-2">Description:</span>
                         <p class="mb-2">{{ product.description }}</p>
                     </div>
                     <div class="items-center mb-2 border-b border-gray-300">
@@ -278,5 +285,11 @@ input[type=number]::-webkit-outer-spin-button {
     -moz-appearance: none;
     appearance: none;
     margin: 0;
+}
+.color-name {
+    /* This value is the OPPOSITE color of our background */
+    color: rgb(255, 255, 255) !important; 
+    mix-blend-mode: exclusion !important;
+    -webkit-mix-blend-mode: exclusion !important;
 }
 </style>
