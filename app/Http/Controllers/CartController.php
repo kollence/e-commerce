@@ -20,39 +20,94 @@ class CartController extends Controller
      */
     public function add(Request $request)
     {
-        // dd($request->all());
-        $id = $request->input('id');
-        $name = $request->input('name');
         $productItemId = $request->input('product_item_id');
         $sizeOption = $request->input('size_option');
         $quantity = $request->input('quantity', 1); // Default quantity to 1 if not provided
-        $productItem = ProductItem::find($productItemId);
+        // Return product item with size option that will be unique product item with its in_stock value
+        $productItem = ProductItem::with(['sizeOptions' => function($query) use ($sizeOption) {
+            $query->where('name', $sizeOption['name']); // Filter by size name
+        }])
+        ->where('id', $productItemId)
+        ->first();
         // dd($productItem);
-
+        $productItemPrice = ($productItem->sale_price < $productItem->original_price && $productItem->sale_price > 0) ? $productItem->sale_price : $productItem->original_price;
         // Generate a unique key for the cart item
         $uniqueKey = $this->generateUniqueKey($productItemId, $sizeOption['name']);
 
         if (isset($this->items[$uniqueKey])) {
-            // Item exists, so increment the quantity
-            $this->items[$uniqueKey]['quantity'] += $quantity;
+            if($this->items[$uniqueKey]['product_item']['quantity'] < $productItem->sizeOptions->first()->pivot->in_stock){
+                // Item exists, so increment the quantity
+                $this->items[$uniqueKey]['product_item']['quantity'] += $quantity;
+            }
         } else {
             // Item doesn't exist, so add it as a new item
             $this->items[$uniqueKey] = [
-                'id' => $id,
-                'name' => $name,
-                'product_item_id' => $productItemId,
-                'size_option' => $sizeOption,
-                'quantity' => $quantity,
-                'original_price' => $productItem->original_price,
-                'sale_price' => $productItem->sale_price,
-                'images' => $productItem->images,
-                'color' => $productItem->color,
+                'product' => [
+                    'id' => $productItem->product->id,
+                    'name' => $productItem->product->name,
+                ],
+                'product_item' => [
+                    'product_item_id' => $productItemId,
+                    'original_price' => $productItem->original_price,
+                    'sale_price' => $productItem->sale_price,
+                    'images' => $productItem->images,
+                    'color' => $productItem->color,
+                    'quantity' => $quantity,
+                    'size_option' => $sizeOption,
+                ],
+                'subtotal' => $productItemPrice * $quantity, // Calculating subtotal
             ];
         }
 
         return $this->store();
         // return $this->forget();
-        
+    }
+
+    // public function decrease($productItemUniqueKey, int $quantity)
+    // {
+    //     if (isset($this->items[$productItemUniqueKey]) && $this->items[$productItemUniqueKey]['product_item']['quantity'] > 1) {
+    //         $this->items[$productItemUniqueKey]['product_item']['quantity'] -= (int) $quantity;
+    //     }
+    //     return $this->store();
+    // }
+
+    // public function increase($productItemUniqueKey, int $quantity)
+    // {
+    //     if (isset($this->items[$productItemUniqueKey])) {
+    //         $this->items[$productItemUniqueKey]['product_item']['quantity'] += (int) $quantity;
+    //     }
+    //     return $this->store();
+    // }
+
+    public function updateQuantity(Request $request)
+    {
+        // dd($request->all());
+        if($request->input('cart_items')){
+            $cartItems = $request->input('cart_items');
+            foreach ($cartItems as  $productItemUniqueKey => $cartItem ) {
+                    $productItemPrice = ($cartItem['product_item']['sale_price'] < $cartItem['product_item']['original_price'] && $cartItem['product_item']['sale_price'] > 0) ? $cartItem['product_item']['sale_price'] : $cartItem['product_item']['original_price'];
+                        $this->items[$productItemUniqueKey]['product_item']['quantity'] = (int) $cartItem['product_item']['quantity'];
+                        $this->items[$productItemUniqueKey]['subtotal'] = $productItemPrice * $cartItem['product_item']['quantity'];
+            }
+            
+            session()->put('cart', json_encode($this->items, JSON_UNESCAPED_UNICODE));
+            $taxRate = config('cart.tax') * 100;
+            $cartSubtotal = $this->totalSubtotal();
+            $tax = config('cart.tax');
+            $cartTax = $cartSubtotal * $tax;
+            // dd($cartTax);
+            $newTotal = $cartSubtotal + (1 + $cartTax);
+            // dd($this->items);
+            return redirect()->back()->with([
+                'cart_items' => $this->items,
+                'cart_subtotal' => $cartSubtotal, // Total price of all cart items
+                'cart_tax' => $cartTax, // Total tax of all cart items
+                'tax_rate' => $taxRate,
+                'new_total' => $newTotal // Total price of all cart items including tax 
+            ]);
+        }
+        return redirect()->back()->with('message', 'Cart is empty');
+
     }
 
     /**
@@ -60,12 +115,8 @@ class CartController extends Controller
      */
     public function remove(Request $request)
     {
-        $productItemId = $request->input('product_item_id');
-        $sizeOption = $request->input('size_option');
-
-        // Generate the unique key for the item to remove
-        $uniqueKey = $this->generateUniqueKey($productItemId, $sizeOption['name']);
-
+        $uniqueKey = $request->input('cart_item_key');
+        // dd($uniqueKey);
         if (isset($this->items[$uniqueKey])) {
             // Remove the item from the cart
             unset($this->items[$uniqueKey]);
@@ -98,8 +149,19 @@ class CartController extends Controller
      */
     public function index()
     {
+        // $this->forget();
+        $taxRate = config('cart.tax') * 100;
+        $cartSubtotal = $this->totalSubtotal();
+        $tax = config('cart.tax');
+        $cartTax = $cartSubtotal * $tax;
+        // dd($cartTax);
+        $newTotal = $cartSubtotal + (1 + $cartTax);
         return inertia('Cart/Index', [
-            'items' => $this->items,
+            'cart_items' => $this->items,
+            'cart_subtotal' => $cartSubtotal, // Total price of all cart items
+            'cart_tax' => $cartTax, // Total tax of all cart items
+            'tax_rate' => $taxRate,
+            'new_total' => $newTotal // Total price of all cart items including tax  
         ]);
     }
 
@@ -136,14 +198,6 @@ class CartController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
      * Remove the specified resource from storage.
      */
     public function destroy(string $id)
@@ -161,5 +215,10 @@ class CartController extends Controller
     {
         $this->items = [];
         session()->forget('cart');
+    }
+
+    private function totalSubtotal()
+    {
+        return array_sum(array_column($this->items, 'subtotal'));
     }
 }
