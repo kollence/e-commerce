@@ -58,44 +58,22 @@ class CartController extends Controller
                 'subtotal' => $productItemPrice * $quantity, // Calculating subtotal
             ];
         }
-
         return $this->store();
-        // return $this->forget();
     }
-
-    // public function decrease($productItemUniqueKey, int $quantity)
-    // {
-    //     if (isset($this->items[$productItemUniqueKey]) && $this->items[$productItemUniqueKey]['product_item']['quantity'] > 1) {
-    //         $this->items[$productItemUniqueKey]['product_item']['quantity'] -= (int) $quantity;
-    //     }
-    //     return $this->store();
-    // }
-
-    // public function increase($productItemUniqueKey, int $quantity)
-    // {
-    //     if (isset($this->items[$productItemUniqueKey])) {
-    //         $this->items[$productItemUniqueKey]['product_item']['quantity'] += (int) $quantity;
-    //     }
-    //     return $this->store();
-    // }
 
     public function updateQuantity(Request $request)
     {
-        // dd($request->all());
         if($request->input('cart_items')){
             $cartItems = $request->input('cart_items');
             foreach ($cartItems as  $productItemUniqueKey => $cartItem ) {
-                    $productItemPrice = ($cartItem['product_item']['sale_price'] < $cartItem['product_item']['original_price'] && $cartItem['product_item']['sale_price'] > 0) ? $cartItem['product_item']['sale_price'] : $cartItem['product_item']['original_price'];
-                        $this->items[$productItemUniqueKey]['product_item']['quantity'] = (int) $cartItem['product_item']['quantity'];
-                        $this->items[$productItemUniqueKey]['subtotal'] = $productItemPrice * $cartItem['product_item']['quantity'];
+                $productItemPrice = ($cartItem['product_item']['sale_price'] < $cartItem['product_item']['original_price'] && $cartItem['product_item']['sale_price'] > 0) ? $cartItem['product_item']['sale_price'] : $cartItem['product_item']['original_price'];
+                $this->items[$productItemUniqueKey]['product_item']['quantity'] = (int) $cartItem['product_item']['quantity'];
+                $this->items[$productItemUniqueKey]['subtotal'] = $productItemPrice * $cartItem['product_item']['quantity'];
             }
-            
             session()->put('cart', json_encode($this->items, JSON_UNESCAPED_UNICODE));
         }else{
             return redirect()->back()->with("message", "Item in cart doesn't exist");
         }
-        return redirect()->back()->with('message', 'Cart is empty');
-
     }
 
     /**
@@ -104,11 +82,10 @@ class CartController extends Controller
     public function remove(Request $request)
     {
         $uniqueKey = $request->input('cart_item_key');
-        // dd($uniqueKey);
+
         if (isset($this->items[$uniqueKey])) {
             // Remove the item from the cart
             unset($this->items[$uniqueKey]);
-
             // Update the session with the new cart
             session(['cart' => json_encode($this->items, JSON_UNESCAPED_UNICODE)]);
 
@@ -128,7 +105,6 @@ class CartController extends Controller
     {
         // Convert sizeOptionName to uppercase and replace spaces with underscores
         $formattedSizeOptionName = strtoupper(str_replace(' ', '_', $sizeOptionName));
-    
         // Return the unique key
         return $productItemId . '_' . $formattedSizeOptionName;
     }
