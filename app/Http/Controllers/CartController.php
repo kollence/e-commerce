@@ -91,20 +91,8 @@ class CartController extends Controller
             }
             
             session()->put('cart', json_encode($this->items, JSON_UNESCAPED_UNICODE));
-            $taxRate = config('cart.tax') * 100;
-            $cartSubtotal = $this->totalSubtotal();
-            $tax = config('cart.tax');
-            $cartTax = $cartSubtotal * $tax;
-            // dd($cartTax);
-            $newTotal = $cartSubtotal + (1 + $cartTax);
-            // dd($this->items);
-            return redirect()->back()->with([
-                'cart_items' => $this->items,
-                'cart_subtotal' => $cartSubtotal, // Total price of all cart items
-                'cart_tax' => $cartTax, // Total tax of all cart items
-                'tax_rate' => $taxRate,
-                'new_total' => $newTotal // Total price of all cart items including tax 
-            ]);
+        }else{
+            return redirect()->back()->with("message", "Item in cart doesn't exist");
         }
         return redirect()->back()->with('message', 'Cart is empty');
 
