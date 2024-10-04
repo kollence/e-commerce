@@ -103,9 +103,20 @@ function incrementQuantity(key) {
 }
 // Update quantity in the local cartItems object
 const updateQuantity = (key) => {
-  const item = cartItems.value[key];
-  // Optional: update the subtotal locally
-  item.subtotal = ((item.product_item.sale_price < item.product_item.original_price && item.product_item.sale_price > 0) ? item.product_item.sale_price : item.product_item.original_price) * item.product_item.quantity;
+    const item = cartItems.value[key];
+    // Ensure tax_rate is a number
+    const taxRate = Number(props.tax_rate);
+    // Optional: update the subtotal locally
+    const subtotal_format = ((item.product_item.sale_price < item.product_item.original_price && item.product_item.sale_price > 0) ? item.product_item.sale_price : item.product_item.original_price) * item.product_item.quantity;
+    item.subtotal = Number(subtotal_format.toFixed(2));
+    const cart_subtotal_format = Object.values(cartItems.value).reduce((total, item) => total + item.subtotal, 0);
+    orderSummary.value.cart_subtotal = Number(cart_subtotal_format.toFixed(2));
+    orderSummary.value.cart_tax = Number(( cart_subtotal_format  * (taxRate / 100) ).toFixed(2));
+
+    const new_total_format = orderSummary.value.cart_subtotal + orderSummary.value.cart_tax;
+    orderSummary.value.new_total = Number(new_total_format.toFixed(2));
+    // console.log(orderSummary.value);
+    
 };
 
 const  submitCartItems = () => {
