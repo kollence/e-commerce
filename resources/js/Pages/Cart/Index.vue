@@ -79,8 +79,6 @@ function removeFromCart(key) {
                 showPopup.value = false;
                 }, 3000);
             }
-            // Delete operator to delete object property by key
-            delete cartItems.value[key]
         }
     });
 }
@@ -111,8 +109,6 @@ const updateQuantity = (key) => {
 };
 
 const  submitCartItems = () => {
-    // change have been made to cartItems 
-
         form.cart_items = cartItems.value;
         form.post(route('cart.updateQuantity'), {
             preserveScroll: true,
