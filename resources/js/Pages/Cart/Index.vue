@@ -216,7 +216,7 @@ const  submitCartItems = () => {
                     <h2 class="text-lg font-medium mb-4">Order Summary</h2>
                     <div class="flex justify-between mb-2">
                     <span>Subtotal of {{cartCounter}} items:</span>
-                    <span>{{currencyFormat(cart_subtotal)}}</span>
+                    <span>{{currencyFormat(orderSummary.cart_subtotal)}}</span>
                     </div>
                     <div class="flex justify-between mb-2">
                     <span>Tax:</span>
@@ -224,11 +224,11 @@ const  submitCartItems = () => {
                     </div>
                     <div class="flex justify-between mb-2">
                     <span>Cart Tax:</span>
-                    <span>{{currencyFormat(cart_tax)}}</span>
+                    <span>{{currencyFormat(orderSummary.cart_tax)}}</span>
                     </div>
                     <div class="flex justify-between mb-4">
                     <span>Total:</span>
-                    <span>{{currencyFormat(new_total)}}</span>
+                    <span>{{currencyFormat(orderSummary.new_total)}}</span>
                     </div>
                     <button class="btn btn-primary w-full">Checkout</button>
                 </div>
