@@ -14,6 +14,12 @@ const props = defineProps({
 let timeoutID = undefined
 const showPopup = ref(false);
 const cartItems = ref(cloneDeep(props.cart_items));
+const orderSummary = ref({
+    cart_subtotal: props.cart_subtotal,
+    cart_tax: props.cart_tax,
+    total: props.new_total,
+    new_total: Number(props.new_total.toFixed(2)),
+});
 const cartTableWrapper = ref(null); // ref for cart table wrapper
 const page = usePage();
 const cartCounter = computed(() => page.props.cart_count)
