@@ -56,6 +56,15 @@ const formRemoveKey = useForm({
 })
 function removeFromCart(key) {
     formRemoveKey.cart_item_key = key;
+
+    // Delete operator to delete object property by key
+    delete cartItems.value[key]
+    // Recalculate totals
+    orderSummary.value.cart_subtotal = Object.values(cartItems.value).reduce((total, item) => total + item.subtotal, 0);
+    const taxRate = Number(props.tax_rate);
+    orderSummary.value.cart_tax = Number((orderSummary.value.cart_subtotal * (taxRate / 100)).toFixed(2));
+    const new_total_format = orderSummary.value.cart_subtotal + orderSummary.value.cart_tax;
+    orderSummary.value.new_total = Number(new_total_format.toFixed(2));
     
     formRemoveKey.post(route('cart.remove'), {
         preserveScroll: true,
