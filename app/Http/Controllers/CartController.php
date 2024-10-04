@@ -117,9 +117,9 @@ class CartController extends Controller
         $taxRate = config('cart.tax') * 100;
         $cartSubtotal = $this->totalSubtotal();
         $tax = config('cart.tax');
-        $cartTax = $cartSubtotal * $tax;
-        // dd($cartTax);
-        $newTotal = $cartSubtotal + (1 + $cartTax);
+        $cartTax = ($cartSubtotal * $tax);
+        $cartTax =  round($cartTax, 2);
+        $newTotal = round($cartSubtotal + $cartTax, 2);
         return inertia('Cart/Index', [
             'cart_items' => $this->items,
             'cart_subtotal' => $cartSubtotal, // Total price of all cart items
