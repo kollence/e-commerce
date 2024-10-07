@@ -29,15 +29,15 @@ class CartController extends Controller
         }])
         ->where('id', $productItemId)
         ->first();
-        // dd($productItem);
+
         $productItemPrice = ($productItem->sale_price < $productItem->original_price && $productItem->sale_price > 0) ? $productItem->sale_price : $productItem->original_price;
         // Generate a unique key for the cart item
         $uniqueKey = $this->generateUniqueKey($productItemId, $sizeOption['name']);
 
         if (isset($this->items[$uniqueKey])) {
             if($this->items[$uniqueKey]['product_item']['quantity'] < $productItem->sizeOptions->first()->pivot->in_stock){
-                // Item exists, so increment the quantity
                 $this->items[$uniqueKey]['product_item']['quantity'] += $quantity;
+                $this->items[$uniqueKey]['subtotal'] += ($productItemPrice * $quantity);
             }
         } else {
             // Item doesn't exist, so add it as a new item
