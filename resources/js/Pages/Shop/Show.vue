@@ -71,12 +71,9 @@ watch([selectedSizeOption, quantity], () => {
 });
 // On submit, add additional fields and send the form data to the server
 function addToCart() {
-    // console.log(form);
     form.post(route('cart.add'), {
         preserveScroll: true,
         onSuccess: () => {
-            // Reset the form after successful submission
-            form.reset();
         },
     });
 }
