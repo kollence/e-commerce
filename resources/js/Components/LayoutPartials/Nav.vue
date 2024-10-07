@@ -70,7 +70,7 @@ const authUser = computed(() => page.props.auth.user)
                                 </Link>
 
                             <Link :href="route('cart.index')" class="hover:text-red-700 transition">
-                            <span class="bg-red-600 text-white text-xs rounded-full px-1 absolute" style="top: -10px; right: -8px;">
+                            <span  v-if="$page.props.cart_count > 0" class="bg-red-600 text-white text-xs rounded-full px-1 absolute" style="top: -10px; right: -8px;">
                                 {{cartCounter}}
                             </span>
 
@@ -133,7 +133,7 @@ const authUser = computed(() => page.props.auth.user)
                     
                     <Icon class="w-4 h-4 fill-current" name="cart"></Icon>
                     
-                    <span class="ml-1 text-red-600">
+                    <span class="ml-1 text-red-600" v-if="$page.props.cart_count > 0">
                         {{cartCounter > 0 ? cartCounter+' in cart' : ''}} 
                     </span>
                 </Link>
