@@ -2,6 +2,7 @@
 import { Head } from '@inertiajs/vue3';
 import Nav from '@/Components/LayoutPartials/Nav.vue';
 import Footer from '@/Components/LayoutPartials/Footer.vue';
+import ToastList from '@/Components/Toast/ToastList.vue';
 
 defineProps({
     title: String,
@@ -12,7 +13,7 @@ defineProps({
 
 <template>
     <div class="">
-
+        <ToastList/>
         <Head :title="title" />
 
         <div class="min-h-screen bg-gray-100">
