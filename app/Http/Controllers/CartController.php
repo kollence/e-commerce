@@ -39,6 +39,7 @@ class CartController extends Controller
                 $this->items[$uniqueKey]['product_item']['quantity'] += $quantity;
                 $this->items[$uniqueKey]['subtotal'] += ($productItemPrice * $quantity);
             }
+            $message = "Updated item in cart";
         } else {
             // Item doesn't exist, so add it as a new item
             $this->items[$uniqueKey] = [
@@ -57,8 +58,10 @@ class CartController extends Controller
                 ],
                 'subtotal' => $productItemPrice * $quantity, // Calculating subtotal
             ];
+            $message = "Added new item to cart";
         }
-        return $this->store();
+        session()->put('cart', json_encode($this->items, JSON_UNESCAPED_UNICODE));
+        return redirect()->back()->with("message", $message);
     }
 
     public function updateQuantity(Request $request)
