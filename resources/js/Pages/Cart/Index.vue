@@ -11,8 +11,6 @@ const props = defineProps({
     tax_rate: Number,
     new_total: Number,
 })
-let timeoutID = undefined
-const showPopup = ref(false);
 const cartItems = ref(cloneDeep(props.cart_items));
 const orderSummary = ref({
     cart_subtotal: props.cart_subtotal,
@@ -24,18 +22,7 @@ const cartTableWrapper = ref(null); // ref for cart table wrapper
 const page = usePage();
 const cartCounter = computed(() => page.props.cart_count)
 // console.log(cartItems.value);
-onMounted(() => {
-    if (page.props.flash.message) {
-        showPopup.value = true;
-        timeoutID = setTimeout(() => {
-        showPopup.value = false;
-        }, 3000);
-    }
-})
 
-onBeforeUnmount(() => {
-    clearTimeout(timeoutID);
-});
 // Detect mouse leave outside the cart table
 const handleMouseOutside = () => {
     // If the mouseleave compare if object got changed and if it is then submit cart items
@@ -44,9 +31,6 @@ const handleMouseOutside = () => {
     }
 };
 
-function closePopup() {
-  showPopup.value = false;
-}
 
 const form = useForm({
     cart_items: null,
@@ -68,18 +52,6 @@ function removeFromCart(key) {
     
     formRemoveKey.post(route('cart.remove'), {
         preserveScroll: true,
-        onSuccess: () => {
-            // formRemoveKey.reset();
-            clearTimeout(timeoutID);
-        },
-        onFinish: () => {
-              if (page.props.flash.message) {
-                showPopup.value = true;
-                timeoutID = setTimeout(() => {
-                showPopup.value = false;
-                }, 3000);
-            }
-        }
     });
 }
 
@@ -146,14 +118,6 @@ const  submitCartItems = () => {
         </template>
     </NavigationHeader>
     <div class="container mx-auto px-4 py-8">
-            <div v-if="showPopup" class="fixed top-20 right-5 z-10 border-red-500 border-2 bg-white rounded-lg shadow-md">
-                <div class="flex bg-white rounded-lg shadow-md p-4 items-center justify-between">
-                <p class="px-1 text-green-500">{{ page.props.flash.message }}</p>
-                <button class="px-3 text-gray-500 hover:text-gray-700 text-xl font-bold ml-auto" @click="closePopup">
-                    &times;
-                </button>
-                </div>
-            </div>
         <h1 class="text-3xl font-bold text-center mb-8">Your Shopping Cart</h1>
             <div v-if="Object.keys(cart_items).length > 0" class="grid grid-cols-1 md:grid-cols-12 gap-4">
                 <div ref="cartTableWrapper" class="md:col-span-9 text-center"  @mouseleave="handleMouseOutside">
