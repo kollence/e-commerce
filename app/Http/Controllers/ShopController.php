@@ -16,10 +16,15 @@ class ShopController extends Controller
     public function index()
     {
         $categories = Category::where('parent_category_id', null)->with('children')->get();
-
+        $breadcrumbs = [];
         if (request()->category) {
             // Fetch the requested category
-            $category = Category::where('slug', request()->category)->firstOrFail();
+            $category = Category::where('slug', request()->category)->with('allParents')->firstOrFail();
+            if (!$category) {
+                return redirect()->back()->with('message', 'Category not found.');
+            }
+        
+            $breadcrumbs = $this->getBreadcrumbs($category);
             $selectedCategory = $category->name;
             // Get all the IDs of the requested category and its children
             $categoryIds = $category->children->pluck('id')->toArray();
@@ -40,12 +45,22 @@ class ShopController extends Controller
             'products' => $products,
             'categories' => $categories,
             'selectedCategory' => $selectedCategory,
+            'breadcrumbs' => $breadcrumbs,
         ]);
-        return inertia('Shop/Index', [
-            'products' => $products,
-            'categories' => $categories,
-            'selectedCategory' => $selectedCategory,
-        ]);
+    }
+    
+    private function getBreadcrumbs($category)
+    {
+        $breadcrumbs = [];
+        while ($category) {
+            $breadcrumbs[] = [
+                'name' => $category->name,
+                'url' => route('shop.index', "category=". $category->slug),
+            ];
+            $category = $category->parent;
+        }
+    
+        return array_reverse($breadcrumbs);
     }
 
     /**
@@ -83,7 +98,8 @@ class ShopController extends Controller
                 },
                 'brand',
             ]),
-            'productItem' => $productItem,
+            'productItem' => $productItem,        // DODAJ JOS KATEGORIJA NASTAVI ODAVDE JER SVE RADI SAMO VIDI BAGOVE KADA PRIPADA U VISE KATEGORIJA
+            'breadcrumbs' => $this->getBreadcrumbs($product->categories->first()),
         ]);
     }
 
