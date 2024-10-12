@@ -1,8 +1,9 @@
 <script setup>
-import NavigationHeader from '@/Components/NavigationHeader.vue';
-import { ref, onMounted, onBeforeUnmount, computed } from 'vue';
+import { ref, computed } from 'vue';
 import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
 import { cloneDeep, isEqual } from 'lodash'; // Import lodash for deep comparison
+import Breadcrumbs from '@/Components/LayoutPartials/Breadcrumbs.vue';
+import breadcrumbs from '@/Components/LayoutPartials/store/breadcrumbs';
 
 const props = defineProps({
     cart_items: Object,
@@ -105,18 +106,20 @@ const  submitCartItems = () => {
 <template>
 
     <Head title="Cart" />
-    <NavigationHeader>
+    <Breadcrumbs :breadcrumbs="breadcrumbs.crumbs">
         <template #breadcrumbs>
-            <span class="mx-2">/</span>
             <Link :href="route('shop.index')">Shop</Link>
+            <span class="mx-2">/</span>
+        </template>
+        <template #breadcrumbs-end>
             <span class="mx-2">/</span>
             <span>Cart</span>
         </template>
         <template #search>
-            <input type="search" class="w-full bg-gray-200 rounded-lg py-2 px-4 focus:outline-none focus:bg-white"
+            <input type="text" class="w-full bg-gray-200 rounded-lg py-2 px-4 focus:outline-none focus:bg-white"
                 placeholder="Search for products">
         </template>
-    </NavigationHeader>
+    </Breadcrumbs>
     <div class="container mx-auto px-4 py-8">
         <h1 class="text-3xl font-bold text-center mb-8">Your Shopping Cart</h1>
             <div v-if="Object.keys(cart_items).length > 0" class="grid grid-cols-1 md:grid-cols-12 gap-4">
