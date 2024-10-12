@@ -1,18 +1,22 @@
 <script setup>
-import NavigationHeader from '@/Components/NavigationHeader.vue';
-import NavCategories from '@/Components/Shop/NavCategories.vue';
+import Breadcrumbs from '@/Components/LayoutPartials/Breadcrumbs.vue';
+import breadcrumbsStore from '@/Components/LayoutPartials/store/breadcrumbs'
 import { Link, Head, useForm } from '@inertiajs/vue3';
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 
 const props = defineProps({
     product: Object,
     productItem: Object,
+    breadcrumbs: Object,
 });
 const selectedSizeOptionId = ref(props.productItem.size_options[0].id);
 const selectedSizeOption = ref(props.productItem.size_options[0]);
 const quantity = ref(1);
-
-
+// NEED FIX!! only clear previous breadcrumbs (category history) so they don't pile up just in Cart/Index output
+onBeforeUnmount(() => {
+    breadcrumbsStore.removeCrumbs()
+    breadcrumbsStore.addCrumbs(props.breadcrumbs)  
+})
 const priceXquantity = computed(() => {
     if (props.productItem.sale_price && props.productItem.sale_price > 0) {
         return props.productItem.sale_price * quantity.value;
@@ -86,10 +90,12 @@ function orderNow() {
 <template>
 
     <Head :title="product.name" />
-    <NavigationHeader>
+    <Breadcrumbs :breadcrumbs="breadcrumbs">
         <template #breadcrumbs>
-            <span class="mx-2">/</span>
             <Link :href="route('shop.index')">Shop</Link>
+            <span class="mx-2">/</span>
+        </template>
+        <template #breadcrumbs-end>
             <span class="mx-2">/</span>
             <span>{{ product.name }}</span>
         </template>
@@ -97,7 +103,7 @@ function orderNow() {
             <input type="text" class="w-full bg-gray-200 rounded-lg py-2 px-4 focus:outline-none focus:bg-white"
                 placeholder="Search for products">
         </template>
-    </NavigationHeader>
+    </Breadcrumbs>
     <div class="flex flex-col lg:flex-row bg-gray-300">
         <div class="container mx-auto px-4 py-8 justify-end">
             <div class="grid grid-cols-1 md:grid-cols-12 gap-2 mb-5">

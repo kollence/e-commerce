@@ -1,29 +1,34 @@
 <script setup>
-import NavigationHeader from '@/Components/NavigationHeader.vue';
+import Breadcrumbs from '@/Components/LayoutPartials/Breadcrumbs.vue';
 import NavCategories from '@/Components/Shop/NavCategories.vue';
 import { Link, Head } from '@inertiajs/vue3';
-import { onMounted } from 'vue';
-
-defineProps({
+import { onBeforeUnmount, onMounted } from 'vue';
+import breadcrumbsStore from '@/Components/LayoutPartials/store/breadcrumbs.js'
+const props = defineProps({
     products: Object,
     categories: Object,
-    selectedCategory: String
-
+    selectedCategory: String,
+    breadcrumbs: Object,
 });
-
+// NEED FIX!! only clear previous breadcrumbs (category history) so they don't pile up just in Cart/Index output
+onBeforeUnmount(() => {
+    breadcrumbsStore.removeCrumbs()
+    breadcrumbsStore.addCrumbs(props.breadcrumbs)  
+})
 </script>
 
 <template>
     <Head :title="selectedCategory" />
-    <NavigationHeader>
+    <Breadcrumbs :breadcrumbs="breadcrumbs">
         <template #breadcrumbs>
+            <Link :href="route('shop.index')">Shop</Link>
             <span class="mx-2">/</span>
-            <span>Shop {{ selectedCategory ? '- '+selectedCategory : ''}}</span>
         </template>
         <template #search>
-            <input type="search" class="w-full bg-gray-200 rounded-lg py-2 px-4 focus:outline-none focus:bg-white" placeholder="Search for products">
+            <input type="text" class="w-full bg-gray-200 rounded-lg py-2 px-4 focus:outline-none focus:bg-white"
+                placeholder="Search for products">
         </template>
-    </NavigationHeader>
+    </Breadcrumbs>
 
     <div class="flex flex-col lg:flex-row">
         <NavCategories :categories="categories" />
