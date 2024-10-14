@@ -82,23 +82,23 @@ class ShopController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Product $product, $color)
+    public function show(Product $product, ProductItem $productItem)
     {
-        $productItem = $product->productItem()
-        ->whereHas('color', function ($query) use ($color) {
-            $query->where('slug', $color);
-        })
-        ->with(['color', 'sizeOptions', 'images'])
-        ->firstOrFail(); // Load related data for the specific ProductItem
+        // Ensure the ProductItem belongs to the Product
+        if ($product->id !== $productItem->product_id) {
+            abort(404);
+        }
+        $productItem->load('color', 'sizeOptions', 'images');
+        // Filter product items excluding the current productItem
+        $productItems = $product->productItems()
+            ->whereNot('id', $productItem->id)
+            ->with(['color', 'sizeOptions', 'images'])
+            ->get();
+
         return inertia('Shop/Show', [
-            'product' => $product->load([
-                'productItems' => function ($query) use ($productItem) {
-                    $query->whereNot('id', $productItem->id)
-                        ->with(['color', 'sizeOptions', 'images']); // Load related data for the specific ProductItem
-                },
-                'brand',
-            ]),
-            'productItem' => $productItem,        // DODAJ JOS KATEGORIJA NASTAVI ODAVDE JER SVE RADI SAMO VIDI BAGOVE KADA PRIPADA U VISE KATEGORIJA
+            'product' => $product->load('brand'),
+            'productItems' => $productItems,
+            'productItem' => $productItem,       // DODAJ JOS KATEGORIJA NASTAVI ODAVDE JER SVE RADI SAMO VIDI BAGOVE KADA PRIPADA U VISE KATEGORIJA
             'breadcrumbs' => $this->getBreadcrumbs($product->categories->first()),
         ]);
     }
