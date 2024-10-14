@@ -7,6 +7,7 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 const props = defineProps({
     product: Object,
     productItem: Object,
+    productItems: Object,
     breadcrumbs: Object,
 });
 const selectedSizeOptionId = ref(props.productItem.size_options[0].id);
@@ -154,9 +155,9 @@ function orderNow() {
                             <div class="flex items-center mb-1 pb-1">
                                 Colors:
                             </div>
-                            <Link  preserve-scroll :href="route('shop.show', [product.slug, color.color.slug])"
+                            <Link  preserve-scroll :href="route('shop.show', [product.slug, color.id])"
                                 :style="{ 'background-color': color.color.hex }"
-                                class="mr-2 card rounded-lg p-2 shadow-md" v-for="(color, i) in product.product_items"
+                                class="mr-2 card rounded-lg p-2 shadow-md" v-for="(color, i) in productItems"
                                 :key="i">
                             <span>
                                 <span class="color-name">
@@ -240,7 +241,7 @@ function orderNow() {
             <h2 class="text-xl text-cyan-950 font-semibold m-2 mt-3">Product Variants</h2>
             <div class="grid grid-cols-1 md:grid-cols-3  gap-4 p-2 rounded-lg mt-5  ">
                 <!-- product item variants -->
-                <div v-for="variant in product.product_items" :key="variant.product_code"
+                <div v-for="variant in productItems" :key="variant.product_code"
                     class="card rounded-lg p-4 shadow-md align-self-end relative border border-gray-700  border-1">
                     <div class="flex flex-row justify-between items-center mb-2">
                         <div class="md:col-span-3">

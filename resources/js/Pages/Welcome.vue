@@ -28,7 +28,7 @@ const props = defineProps({
     </div>
     <div class="flex flex-col max-w-7x1 mx-auto px-4 sm:container sm:flex-row sm:space-x-4 sm:my-4 sm:px-6 lg:px-8">
         <div v-for="(product, index) in featured_products" :key="index" class="flex flex-col ">
-            <Link :href="route('shop.show', [product.slug, product.product_item.color.slug])"  class="w-full h-full gap-4">
+            <Link :href="route('shop.show', [product.slug, product.product_item.id])"  class="w-full h-full gap-4">
                 <div class="text-center text-white bg-gray-700 py-2">
                     <span>
                         {{ product.name }}
