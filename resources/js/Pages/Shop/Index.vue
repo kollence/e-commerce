@@ -1,8 +1,8 @@
 <script setup>
 import Breadcrumbs from '@/Components/LayoutPartials/Breadcrumbs.vue';
 import NavCategories from '@/Components/Shop/NavCategories.vue';
-import { Link, Head } from '@inertiajs/vue3';
-import { onBeforeUnmount, onMounted } from 'vue';
+import { Link, Head, router } from '@inertiajs/vue3';
+import { onBeforeUnmount, onMounted, ref } from 'vue';
 import breadcrumbsStore from '@/Components/LayoutPartials/store/breadcrumbs.js'
 const props = defineProps({
     products: Object,
