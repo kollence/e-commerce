@@ -1,7 +1,7 @@
 <script setup>
 import Breadcrumbs from '@/Components/LayoutPartials/Breadcrumbs.vue';
 import breadcrumbsStore from '@/Components/LayoutPartials/store/breadcrumbs'
-import { Link, Head, useForm } from '@inertiajs/vue3';
+import { Link, Head, useForm, router } from '@inertiajs/vue3';
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 
 const props = defineProps({
@@ -13,11 +13,27 @@ const props = defineProps({
 const selectedSizeOptionId = ref(props.productItem.size_options[0].id);
 const selectedSizeOption = ref(props.productItem.size_options[0]);
 const quantity = ref(1);
-// NEED FIX!! only clear previous breadcrumbs (category history) so they don't pile up just in Cart/Index output
-onBeforeUnmount(() => {
-    breadcrumbsStore.removeCrumbs()
-    breadcrumbsStore.addCrumbs(props.breadcrumbs)  
+
+onMounted(() => {
+    const url = new URL(window.location.href);
+      const sizeOptionSlug = url.searchParams.get('size_option');
+      if (sizeOptionSlug) {
+        const matchedOption = props.productItem.size_options.find(option => option.slug === sizeOptionSlug);
+        if (matchedOption) {
+          selectedSizeOption.value = matchedOption;
+          selectedSizeOptionId.value = matchedOption.id;
+        }
+      } 
 })
+
+const updateQueryParam = (sizeOptionSlug) => {
+// console.log(sizeOptionSlug);
+
+    const url = new URL(window.location.href);
+    url.searchParams.set('size_option', selectedSizeOption.value.slug);
+    window.history.replaceState({}, '', url)
+};
+
 const priceXquantity = computed(() => {
     if (props.productItem.sale_price && props.productItem.sale_price > 0) {
         return props.productItem.sale_price * quantity.value;
@@ -33,6 +49,7 @@ function selectSizeOption(sizeOptionId) {
     selectedSizeOption.value = props.productItem.size_options.find(
         size_option => size_option.id === parseInt(sizeOptionId)
     );
+    updateQueryParam(selectedSizeOption.value.slug)
 }
 function decrementQuantity() {
     if (quantity.value > 1) {
@@ -84,8 +101,12 @@ function addToCart() {
 }
 function orderNow() {
     // console.log('order now ', form);
-
 }
+// NEED FIX!! only clear previous breadcrumbs (category history) so they don't pile up just in Cart/Index output
+onBeforeUnmount(() => {
+    breadcrumbsStore.removeCrumbs()
+    breadcrumbsStore.addCrumbs(props.breadcrumbs)  
+})
 </script>
 
 <template>
@@ -136,9 +157,7 @@ function orderNow() {
                         </div>
                     </div>
                     <div class="flex justify-start items-center mb-3 pb-1 border-b border-gray-300">
-
                         <div class="mr-2">
-
                             <div class="flex items-center mb-1  pb-1">
                                 Picked:
                             </div>
@@ -148,7 +167,6 @@ function orderNow() {
                                         {{ productItem.color.name}}
                                     </span>
                                 </span>
-
                             </div>
                         </div>
                         <div>
@@ -183,20 +201,37 @@ function orderNow() {
                     </div>
                     <div v-if="selectedSizeOption" class="ml-1">
                         <p><strong>SKU:</strong> {{ selectedSizeOption.pivot.sku }}</p>
-                        <p v-if="selectedSizeOption.pivot.in_stock - quantity < 1"><strong class="text-red-600">Sold
-                                out</strong></p>
+                        <p v-if="selectedSizeOption.pivot.in_stock - quantity < 1">
+                            <strong class="text-red-600">Sold out</strong>
+                        </p>
+                        <p v-else-if="selectedSizeOption.pivot.in_stock - quantity < 5">
+                            <strong class="text-orange-700">Only a few left  {{ selectedSizeOption.pivot.in_stock - quantity }}</strong>
+                        </p>
                         <p v-else><strong>In Stock:</strong> {{ selectedSizeOption.pivot.in_stock - quantity }}</p>
                         <!-- <p class="mt-1" v-if="selectedSizeOption.size_description"><strong>Description:</strong> {{ selectedSizeOption.size_description }}</p> -->
                     </div>
                     <div class="flex items-center justify-between font-bold py-1 ">
-                        <div class="flex text-black items-center ">
-                            <button class="border-l border-gray-700 border-y px-3 bg-stone-200 rounded-l text-2xl"
+                        <div class="flex text-black items-center">
+                            <button
+                                :disabled="quantity <= 1"
+                                :class="{'bg-stone-300 text-gray-500 cursor-not-allowed': quantity <= 1, 'bg-stone-200': quantity > 1}"
+                                class="border-l border-gray-700 border-y px-3 rounded-l text-2xl"
                                 @click="decrementQuantity">-</button>
-                            <input v-model="quantity" type="number" min="1" max="599"
+                            <input
+                                :disabled="selectedSizeOption.pivot.in_stock - quantity < 1"
+                                :class="{'bg-stone-300 text-gray-500 cursor-not-allowed': selectedSizeOption.pivot.in_stock - quantity < 1, 'bg-stone-200': selectedSizeOption.pivot.in_stock - quantity >= 1}"
+                                v-model="quantity"
+                                type="number"
+                                min="1"
+                                max="599"
                                 class="appearance-none-arrow border rounded-none px-4 py-1 w-17 text-center">
-                            <button class="border-r border-gray-700 border-y px-3 bg-stone-200 rounded-r text-2xl"
+                            <button
+                                :disabled="selectedSizeOption.pivot.in_stock - quantity < 1"
+                                :class="{'bg-stone-300 text-gray-500 cursor-not-allowed': selectedSizeOption.pivot.in_stock - quantity < 1, 'bg-stone-200': selectedSizeOption.pivot.in_stock - quantity >= 1}"
+                                class="border-r border-gray-700 border-y px-3 rounded-r text-2xl"
                                 @click="incrementQuantity">+</button>
                         </div>
+
                         <div>
                             price per quantity: {{ currencyFormat(priceXquantity) }}
                         </div>
