@@ -15,7 +15,8 @@ return new class extends Migration
 
         Schema::create('size_options', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->unique();
+            $table->string('name');
+            $table->string('slug')->unique();
             $table->string('size_description')->nullable();
             $table->integer('sort_order')->default(1);
             $table->foreignId('size_category_id')->constrained();

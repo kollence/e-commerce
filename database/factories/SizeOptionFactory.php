@@ -22,8 +22,11 @@ class SizeOptionFactory extends Factory
     public function definition(): array
     {
         static $order = 1;
+        $name = fake()->words(2, true);
+        $slug = Str::slug($name);
         return [
-            'name' => fake()->name(),
+            'name' => $name,
+            'slug' => $slug,
             'size_description' => fake()->word(),
             'sort_order' => $order++,
             'size_category_id' => SizeCategory::factory(),

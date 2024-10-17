@@ -43,7 +43,7 @@ class DatabaseSeeder extends Seeder
 
                 SizeOption::factory()
                     ->for($sizeCategory)
-                    ->create(['name' => $value, 'sort_order' => $sortOrder++]);
+                    ->create(['name' => $value, 'slug' => str($value)->slug(), 'sort_order' => $sortOrder++]);
             }
 
             return $sizeCategory->id;
