@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Product extends Model
 {
@@ -25,6 +27,7 @@ class Product extends Model
         'care_instructions',
         'about',
         'is_active',
+        'is_featured',
         'brand_id',
     ];
 
@@ -35,6 +38,7 @@ class Product extends Model
      */
     protected $casts = [
         'is_active' => 'boolean',
+        'is_featured' => 'boolean',
         'created_at' => 'datetime',
     ];
 
@@ -57,4 +61,17 @@ class Product extends Model
     {
         return $this->hasMany(ProductItem::class);
     }
+    // first item by the lowest `sale_price` or `original_price`
+    public function productItem(): HasOne
+    {
+        return $this->hasOne(ProductItem::class)
+        ->where('is_active', true)
+        ->orderByRaw('
+            CASE 
+                WHEN sale_price > 0 THEN sale_price
+                ELSE original_price
+            END ASC
+        ');
+    }
+
 }

@@ -20,8 +20,11 @@ class ColorFactory extends Factory
      */
     public function definition(): array
     {
+        $name = fake()->unique()->colorName();
+        $slug = Str::slug($name);
         return [
-            'name' => fake()->unique()->colorName(),
+            'name' => $name,
+            'slug' => $slug,
             'hex' => fake()->hexColor(),
         ];
     }

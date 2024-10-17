@@ -21,6 +21,7 @@ return new class extends Migration
             $table->text('care_instructions')->nullable();
             $table->text('about')->nullable();
             $table->boolean('is_active')->default(true);
+            $table->boolean('is_featured')->default(false);
             $table->foreignId('brand_id')->nullable()->constrained();
             $table->timestamps();
         });

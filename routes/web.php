@@ -1,24 +1,26 @@
 <?php
 
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\ShopController;
+use App\Http\Controllers\WelcomeController;
 use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
-Route::get('/', function () {
-    return view('welcome');
+Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
+Route::get('/shop', [ShopController::class, 'index'])->name('shop.index');
+Route::get('/shop/{product:slug}/{productItem}', [ShopController::class, 'show'])->name('shop.show');
+
+Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
+Route::post('/cart/updateQuantity', [CartController::class, 'updateQuantity'])->name('cart.updateQuantity')->middleware('throttle:40,1');
+Route::post('/cart/remove', [CartController::class, 'remove'])->name('cart.remove');
+
+Route::middleware([
+    'auth:sanctum',
+    config('jetstream.auth_session'),
+    'verified',
+])->group(function () {
+    Route::get('/dashboard', function () {
+        return Inertia::render('Dashboard');
+    })->name('dashboard');
 });
-
-
-Route::resource('categories', App\Http\Controllers\CategoryController::class);
-
-Route::resource('brands', App\Http\Controllers\BrandController::class);
-
-Route::resource('products', App\Http\Controllers\ProductController::class);
-
-Route::resource('colors', App\Http\Controllers\ColorController::class);
-
-Route::resource('size-categories', App\Http\Controllers\SizeCategoryController::class);
-
-Route::resource('size-options', App\Http\Controllers\SizeOptionController::class);
-
-Route::resource('orders', App\Http\Controllers\OrderController::class);
-
-Route::resource('users', App\Http\Controllers\UserController::class);

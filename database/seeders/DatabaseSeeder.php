@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
         User::factory()->create([
             'name' => 'Test User',
             'email' => 'test@mail.com',
+            'password' => '123123123'
         ]);
 
         // $sizeCategoryNames = ['shirt sizes', 'display sizes', 'voltages', 'liters', 'cup sizes'];
@@ -39,7 +40,7 @@ class DatabaseSeeder extends Seeder
             $sizeCategory = SizeCategory::factory()->create(['name' => $name, 'slug' => str($name)->slug()]);
             $sortOrder = 1;
             foreach ($options as $value) {
-                
+
                 SizeOption::factory()
                     ->for($sizeCategory)
                     ->create(['name' => $value, 'sort_order' => $sortOrder++]);
@@ -48,12 +49,18 @@ class DatabaseSeeder extends Seeder
             return $sizeCategory->id;
         });
 
+        $parentCategories = [
+            'Men' => Category::factory()->create(['name' => 'Men', 'slug' => 'men']),
+            'Women' => Category::factory()->create(['name' => 'Women', 'slug' => 'women']),
+            'Kids' => Category::factory()->create(['name' => 'Kids', 'slug' => 'kids']),
+        ];
+
         // create product categories and add them size_category_id
         $categories = Category::factory()
             ->count(5)
             ->create()
-            ->each(function ($category, $index) use ($sizeCategoryIds) {
-                // logger()->error("index :" . $index);
+            ->each(function ($category, $index) use ($sizeCategoryIds, $parentCategories) {
+                $category->parent_category_id = rand(1, count($parentCategories));
                 $randomIndex = rand(1, $sizeCategoryIds->count());
                 $category->update(['size_category_id' => $randomIndex]);
             });
@@ -62,38 +69,55 @@ class DatabaseSeeder extends Seeder
         Product::factory()
             ->count(10)
             ->create()
-            ->each(function ($product, $index) use ($categories) {
+            ->each(function ($product, $indexPr) use ($categories) {
 
-                $repeat1to5 = $categories[$index % $categories->count()];
+                $repeat1to5 = $categories[$indexPr % $categories->count()];
+
+                $product->update([
+                    'is_featured' => fake()->boolean,
+                ]);
 
                 $product->categories()->attach($repeat1to5);
                 // Create and attach one image to the product
-                // $productImage = Image::factory()->create();
+                $nameOverPicture = $product->slug . (string) $indexPr;
                 $product->images()->create([
-                    'filename' => 'product'.$index.'.jpg', 'url' => '/storage/public/images/products/product'.$index.'.jpg'
+                    'filename' => 'product-' . $nameOverPicture,
+                    'url' => fake()->imageUrl(800, 600, $nameOverPicture)
                 ]);
 
                 if ($product->categories->count() > 0) {
-                    // $sizeOptions = SizeOption::whereHas('sizeCategory', function ($query) use ($repeat1to5) {
-                    //     $query->where('id', $repeat1to5->size_category_id);
-                    // })->get();
+
                     $sizeOptions = SizeOption::where('size_category_id', $repeat1to5->size_category_id)->get();
                 } else {
                     // Handle case where there are no product categories
                     logger()->error("Product {$product->id} has no product categories");
                 }
-                
+
                 ProductItem::factory()
                     ->count(3)
                     ->for($product)
                     ->create()
-                    ->each(function ($productItem, $index) use ($sizeOptions) { // attached 3 random size options to it
-                        $productItem->sizeOptions()->attach($sizeOptions->random(3)->pluck('id'));
+                    ->each(function ($productItem, $index) use ($sizeOptions, $indexPr) { // attached 3 random size options to it
+                        // $indexPr to string
+                        $selectedSizeOptions = $sizeOptions->random(3);
+                        $pivotData = [];
+                        foreach ($selectedSizeOptions as $sizeOption) {
+                            $pivotData[$sizeOption->id] = [
+                                'sku' => 'SKU-' . strtoupper(str()->random(5)), // Example SKU
+                                'in_stock' => rand(0, 100), // Random stock value
+                            ];
+                        }
+                        $productItem->sizeOptions()->attach($pivotData);
 
+                        // $uniqueImg = (string) $indexPr . (string) $index;
                         // Create and attach 3 images to the ProductItem
-                        $productItem->images()->create([
-                            'filename' => 'product-item'.$index.'.jpg', 'url' => '/storage/public/images/productItems/product-item'.$index.'.jpg'
-                        ]);
+                        foreach (range(1, 3) as $i) {
+                            $uniqueImg = $productItem->id . '-' . $i; // Create a unique identifier for each image
+                            $productItem->images()->create([
+                                'filename' => 'product-item-' . $uniqueImg,
+                                'url' => fake()->imageUrl(800, 600, $uniqueImg),
+                            ]);
+                        }
                     });
             });
     }

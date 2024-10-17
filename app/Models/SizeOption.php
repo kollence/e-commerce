@@ -39,6 +39,6 @@ class SizeOption extends Model
 
     public function productItems(): BelongsToMany
     {
-        return $this->belongsToMany(ProductItem::class);
+        return $this->belongsToMany(ProductItem::class)->withPivot('in_stock', 'sku');
     }
 }

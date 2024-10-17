@@ -17,7 +17,12 @@ class Color extends Model
      */
     protected $fillable = [
         'name',
+        'slug',
         'hex',
+    ];
+    protected $hidden = [
+        'created_at',
+        'updated_at'
     ];
 
     /**

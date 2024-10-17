@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Traits\Imageable;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -23,7 +24,36 @@ class ProductItem extends Model
         'product_code',
         'original_price',
         'sale_price',
+        // 'price'
     ];
+    protected $appends = ['price'];
+    protected function originalPrice(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value / 100,
+            set: fn ($value) => (int)($value * 100),
+        );
+    }
+    protected function salePrice(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value / 100,
+            set: fn ($value) => (int)($value * 100),
+        );
+    }
+    // price attribute based on sale_price and original_price (if sale_price is less than original_price)
+    protected function price(): Attribute
+    {
+        if($this->sale_price > 0 && $this->sale_price < $this->original_price) {
+            return Attribute::make(
+                get: fn () => $this->sale_price,
+            );
+        } else {
+            return Attribute::make(
+                get: fn () => $this->original_price,
+            );
+        }
+    }
 
     /**
      * The attributes that should be cast to native types.
@@ -46,6 +76,6 @@ class ProductItem extends Model
 
     public function sizeOptions(): BelongsToMany
     {
-        return $this->belongsToMany(SizeOption::class);
+        return $this->belongsToMany(SizeOption::class)->withPivot('in_stock', 'sku');
     }
 }
