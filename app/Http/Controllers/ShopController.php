@@ -115,6 +115,12 @@ class ShopController extends Controller
         if ($product->id !== $productItem->product_id) {
             abort(404);
         }
+        if (request()->has('size_option')) {
+            $sizeOptionSlug = request()->input('size_option');
+            $productItems = $productItem->whereHas('sizeOptions', function ($query) use ($sizeOptionSlug) {
+                $query->where('slug', $sizeOptionSlug);
+            })->get();
+        }
         $productItem->load('color', 'sizeOptions', 'images');
         // Filter product items excluding the current productItem
         $productItems = $product->productItems()
