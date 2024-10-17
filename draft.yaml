@@ -49,7 +49,8 @@ models:
     relationships:
       hasMany: ProductItem
   SizeOption:
-    name: string unique
+    name: string
+    slug: string unique
     size_description: string nullable
     sort_order: integer default:1
     size_category_id: id foreign:size_categories
