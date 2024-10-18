@@ -88,8 +88,6 @@ const updateQuantity = (key) => {
 
     const new_total_format = orderSummary.value.cart_subtotal + orderSummary.value.cart_tax;
     orderSummary.value.new_total = Number(new_total_format.toFixed(2));
-    // console.log(orderSummary.value);
-    
 };
 
 const  submitCartItems = () => {
@@ -140,7 +138,11 @@ const  submitCartItems = () => {
                         <tbody>
                             <tr v-for="(item, key) in cartItems" :key="key">
                                 
-                                <td class="px-4 py-2 text-center">{{ item.product.name }}</td>
+                                <td class="px-4 py-2 text-center">
+                                    <Link :href="`${route('shop.show', [item.product.slug, item.product_item.id])}?size_option=${item.product_item.size_option.slug}`" class="text-blue-500 hover:underline">
+                                        {{ item.product.name }}
+                                    </Link>
+                                </td>
                                 <td class="px-4 py-2 flex justify-center">
                                     <img v-if="item.product_item.images.length > 0" :src="item.product_item.images[0].url" :alt="item.product.name" class="w-24 h-24 object-cover">
                                     <img v-else :src="'/storage/images/defaults/default.jpg'" alt=""  class="w-24 h-24 object-cover">

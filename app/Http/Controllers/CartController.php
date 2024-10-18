@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\ProductItem;
+use App\Models\SizeOption;
 use Exception;
 use Illuminate\Http\Request;
 
@@ -46,15 +47,16 @@ class CartController extends Controller
                 'product' => [
                     'id' => $productItem->product->id,
                     'name' => $productItem->product->name,
+                    'slug' => $productItem->product->slug,
                 ],
                 'product_item' => [
-                    'product_item_id' => $productItemId,
+                    'id' => $productItemId,
                     'original_price' => $productItem->original_price,
                     'sale_price' => $productItem->sale_price,
                     'images' => $productItem->images,
                     'color' => $productItem->color,
                     'quantity' => $quantity,
-                    'size_option' => $sizeOption,
+                    'size_option' => SizeOption::find($sizeOption['id']),
                 ],
                 'subtotal' => $productItemPrice * $quantity, // Calculating subtotal
             ];
