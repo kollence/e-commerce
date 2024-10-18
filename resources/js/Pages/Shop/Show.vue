@@ -14,7 +14,7 @@ const selectedSizeOptionId = ref(props.productItem.size_options[0].id);
 const selectedSizeOption = ref(props.productItem.size_options[0]);
 const quantity = ref(1);
 
-onMounted(() => {
+onMounted(() => { // pick size_option if provided in url (no call request)
     const url = new URL(window.location.href);
       const sizeOptionSlug = url.searchParams.get('size_option');
       if (sizeOptionSlug) {
@@ -27,8 +27,7 @@ onMounted(() => {
 })
 
 const updateQueryParam = (sizeOptionSlug) => {
-// console.log(sizeOptionSlug);
-
+    // make changes to the URL query parameters but don't make request (data is already there)
     const url = new URL(window.location.href);
     url.searchParams.set('size_option', selectedSizeOption.value.slug);
     window.history.replaceState({}, '', url)
@@ -63,19 +62,6 @@ function incrementQuantity() {
         quantity.value = selectedSizeOption.value.pivot.in_stock;
     }
 }
-// const pickedProduct = ref({
-//     id: props.product.id,
-//     name: props.product.name,
-//     size_option: selectedSizeOption.value.name,
-//     sku: selectedSizeOption.value.pivot.sku,
-//     product_code: props.productItem.product_code,
-//     original_price: props.productItem.original_price,
-//     sale_price: props.productItem.sale_price,
-//     images: props.productItem.images,
-//     in_stock: selectedSizeOption.value.pivot.in_stock - quantity.value,
-//     quantity: quantity.value,
-//     submitted_pxq: priceXquantity.value,
-// });
 // Initialize the form with the product data
 const form = useForm({
     id: props.product.id,

@@ -18,6 +18,7 @@ class SizeOption extends Model
      */
     protected $fillable = [
         'name',
+        'slug',
         'size_description',
         'sort_order',
         'size_category_id',
