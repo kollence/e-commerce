@@ -22,11 +22,7 @@ class CartController extends Controller
     public function add(Request $request)
     {
         $productItemId = $request->input('product_item_id');
-        $sizeOptionId = $request->input('size_option');
-        if($request->input('size_option')){
-            $sizeOption = SizeOption::find($sizeOptionId['id']);
-        }
-        
+        $sizeOption = $request->input('size_option');
         $quantity = $request->input('quantity', 1); // Default quantity to 1 if not provided
         // Return product item with size option that will be unique product item with its in_stock value
         $productItem = ProductItem::with(['sizeOptions' => function($query) use ($sizeOption) {
@@ -34,13 +30,19 @@ class CartController extends Controller
         }])
         ->where('id', $productItemId)
         ->first();
-
+        //Get size option of productItem by id
+        $selectedSizeOption = $productItem->getSizeOptionById($sizeOption['id']);
+        // dd($selectedSizeOption);
+        //If productItem is out of stock
+        $productInStockIsNotZero = $selectedSizeOption->pivot->in_stock > 0;
+        if(!$productInStockIsNotZero) return redirect()->back()->with("message", "The product item is out of stock");
+        // Pick right price for product item (Need fix on DB lvl)
         $productItemPrice = ($productItem->sale_price < $productItem->original_price && $productItem->sale_price > 0) ? $productItem->sale_price : $productItem->original_price;
-        // Generate a unique key for the cart item
-        $uniqueKey = $this->generateUniqueKey($productItemId, $sizeOption['name']);
+        // Generate a unique key for the cart item (For now it can be unique id = product_item_size_option PIVOT)
+        $uniqueKey = $selectedSizeOption->pivot->id;
 
         if (isset($this->items[$uniqueKey])) {
-            if($this->items[$uniqueKey]['product_item']['quantity'] < $sizeOption->pivot->in_stock){
+            if($this->items[$uniqueKey]['product_item']['quantity'] < $selectedSizeOption->pivot->in_stock){
                 $this->items[$uniqueKey]['product_item']['quantity'] += $quantity;
                 $this->items[$uniqueKey]['subtotal'] += ($productItemPrice * $quantity);
             }
@@ -60,7 +62,7 @@ class CartController extends Controller
                     'images' => $productItem->images,
                     'color' => $productItem->color,
                     'quantity' => $quantity,
-                    'size_option' => $sizeOption,
+                    'size_option' => $selectedSizeOption,
                 ],
                 'subtotal' => $productItemPrice * $quantity, // Calculating subtotal
             ];
@@ -101,21 +103,6 @@ class CartController extends Controller
             return redirect()->back()->with('message', 'Item removed from the cart');
         }
         return redirect()->back()->with('message', 'Item not found in the cart');
-    }
-
-    /**
-     * Generate a unique key for a cart item.
-     * 
-     * @param int $productItemId
-     * @param string $sizeOptionName
-     * @return string
-     */
-    private function generateUniqueKey($productItemId, $sizeOptionName)
-    {
-        // Convert sizeOptionName to uppercase and replace spaces with underscores
-        $formattedSizeOptionName = strtoupper(str_replace(' ', '_', $sizeOptionName));
-        // Return the unique key
-        return $productItemId . '_' . $formattedSizeOptionName;
     }
     /**
      * Display a listing of the resource.

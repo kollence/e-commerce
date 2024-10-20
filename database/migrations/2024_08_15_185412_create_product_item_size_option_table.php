@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::disableForeignKeyConstraints();
 
         Schema::create('product_item_size_option', function (Blueprint $table) {
+            $table->id(); // for unique identification for Cart items
             $table->foreignId('product_item_id')->constrained()->cascadeOnDelete();
             $table->foreignId('size_option_id')->constrained()->cascadeOnDelete();
             $table->string('sku')->unique();
