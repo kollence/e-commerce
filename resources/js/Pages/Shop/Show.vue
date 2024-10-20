@@ -196,23 +196,17 @@ onBeforeUnmount(() => {
                         <p v-else><strong>In Stock:</strong> {{ selectedSizeOption.pivot.in_stock - quantity }}</p>
                         <!-- <p class="mt-1" v-if="selectedSizeOption.size_description"><strong>Description:</strong> {{ selectedSizeOption.size_description }}</p> -->
                     </div>
-                    <div class="flex items-center justify-between font-bold py-1 ">
-                        <div class="flex text-black items-center">
-                            <button
-                                :disabled="quantity <= 1"
+                    <div class="flex items-center font-bold py-1" :class="{'justify-between' : selectedSizeOption.pivot.in_stock > 0, 'justify-end': selectedSizeOption.pivot.in_stock == 0}">
+                        <div class="flex text-black items-center" v-if="selectedSizeOption.pivot.in_stock > 0" >
+                            <button :disabled="quantity <= 1"
                                 :class="{'bg-stone-300 text-gray-500 cursor-not-allowed': quantity <= 1, 'bg-stone-200': quantity > 1}"
                                 class="border-l border-gray-700 border-y px-3 rounded-l text-2xl"
                                 @click="decrementQuantity">-</button>
-                            <input
-                                :disabled="selectedSizeOption.pivot.in_stock - quantity < 1"
+                            <input :disabled="selectedSizeOption.pivot.in_stock - quantity < 1" type="number" min="1" :max="selectedSizeOption.pivot.in_stock"
                                 :class="{'bg-stone-300 text-gray-500 cursor-not-allowed': selectedSizeOption.pivot.in_stock - quantity < 1, 'bg-stone-200': selectedSizeOption.pivot.in_stock - quantity >= 1}"
                                 v-model="quantity"
-                                type="number"
-                                min="1"
-                                max="599"
                                 class="appearance-none-arrow border rounded-none px-4 py-1 w-17 text-center">
-                            <button
-                                :disabled="selectedSizeOption.pivot.in_stock - quantity < 1"
+                            <button :disabled="selectedSizeOption.pivot.in_stock - quantity < 1"
                                 :class="{'bg-stone-300 text-gray-500 cursor-not-allowed': selectedSizeOption.pivot.in_stock - quantity < 1, 'bg-stone-200': selectedSizeOption.pivot.in_stock - quantity >= 1}"
                                 class="border-r border-gray-700 border-y px-3 rounded-r text-2xl"
                                 @click="incrementQuantity">+</button>
