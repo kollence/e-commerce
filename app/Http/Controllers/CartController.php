@@ -22,7 +22,11 @@ class CartController extends Controller
     public function add(Request $request)
     {
         $productItemId = $request->input('product_item_id');
-        $sizeOption = $request->input('size_option');
+        $sizeOptionId = $request->input('size_option');
+        if($request->input('size_option')){
+            $sizeOption = SizeOption::find($sizeOptionId['id']);
+        }
+        
         $quantity = $request->input('quantity', 1); // Default quantity to 1 if not provided
         // Return product item with size option that will be unique product item with its in_stock value
         $productItem = ProductItem::with(['sizeOptions' => function($query) use ($sizeOption) {
@@ -36,7 +40,7 @@ class CartController extends Controller
         $uniqueKey = $this->generateUniqueKey($productItemId, $sizeOption['name']);
 
         if (isset($this->items[$uniqueKey])) {
-            if($this->items[$uniqueKey]['product_item']['quantity'] < $productItem->sizeOptions->first()->pivot->in_stock){
+            if($this->items[$uniqueKey]['product_item']['quantity'] < $sizeOption->pivot->in_stock){
                 $this->items[$uniqueKey]['product_item']['quantity'] += $quantity;
                 $this->items[$uniqueKey]['subtotal'] += ($productItemPrice * $quantity);
             }
@@ -56,7 +60,7 @@ class CartController extends Controller
                     'images' => $productItem->images,
                     'color' => $productItem->color,
                     'quantity' => $quantity,
-                    'size_option' => SizeOption::find($sizeOption['id']),
+                    'size_option' => $sizeOption,
                 ],
                 'subtotal' => $productItemPrice * $quantity, // Calculating subtotal
             ];
