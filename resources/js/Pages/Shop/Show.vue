@@ -108,8 +108,7 @@ onBeforeUnmount(() => {
             <span>{{ product.name }}</span>
         </template>
         <template #search>
-            <input type="text" class="w-full bg-gray-200 rounded-lg py-2 px-4 focus:outline-none focus:bg-white"
-                placeholder="Search for products">
+            <input type="text" class="w-full bg-gray-200 rounded-lg py-2 px-4 focus:outline-none focus:bg-white" placeholder="Search for products">
         </template>
     </Breadcrumbs>
     <div class="flex flex-col lg:flex-row bg-gray-300">
@@ -187,8 +186,11 @@ onBeforeUnmount(() => {
                     </div>
                     <div v-if="selectedSizeOption" class="ml-1">
                         <p><strong>SKU:</strong> {{ selectedSizeOption.pivot.sku }}</p>
-                        <p v-if="selectedSizeOption.pivot.in_stock - quantity < 1">
+                        <p v-if="selectedSizeOption.pivot.in_stock == 0">
                             <strong class="text-red-600">Sold out</strong>
+                        </p>
+                        <p v-else-if="selectedSizeOption.pivot.in_stock - quantity < 1">
+                            <strong class="text-red-600">The last one left that you can order!</strong>
                         </p>
                         <p v-else-if="selectedSizeOption.pivot.in_stock - quantity < 5">
                             <strong class="text-orange-700">Only a few left  {{ selectedSizeOption.pivot.in_stock - quantity }}</strong>
@@ -216,7 +218,7 @@ onBeforeUnmount(() => {
                             price per quantity: {{ currencyFormat(priceXquantity) }}
                         </div>
                     </div>
-                    <div class="flex justify-between items-center mt-5 mb-1 border font-bold text-lg p-4">
+                    <div v-if="selectedSizeOption.pivot.in_stock != 0" class="flex justify-between items-center mt-5 mb-1 border font-bold text-lg p-4">
                         <button
                             class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                             @click="addToCart">
