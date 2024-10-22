@@ -20,7 +20,7 @@ models:
     is_featured: boolean default:false
     brand_id: id foreign:brands nullable
     relationships:
-      belongsToMany: CategoryProduct
+      belongsToMany: Category
       belongsTo: Brand
       hasMany: OrderItem, ProductItem
   ProductItem:
@@ -39,12 +39,8 @@ models:
     parent_category_id: id foreign:categories nullable
     size_category_id: id foreign:size_categories nullable
     relationships:
-      belongsToMany: CategoryProduct
+      belongsToMany: Product
       belongsTo: SizeCategory
-  CategoryProduct:
-    category_id: foreignId
-    product_id: foreignId
-    main: boolean:default(false)
   Color:
     name: string unique
     hex: string unique nullable
