@@ -16,7 +16,7 @@ class ShopController extends Controller
     public function index()
     {
         $sort = request()->input('sort'); // Default to 'newest'
-        $categories = Category::where('parent_category_id', null)->with('children')->get();
+        $categories = Category::whereNull('parent_category_id')->with('allChildren')->get();
         $breadcrumbs = [];
         $queryParams = collect();
         if (request()->category) {
