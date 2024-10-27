@@ -56,7 +56,7 @@ function toggleSubcategories(index) {
               {{ category.name }}
               </Link>
               <div class="flex justify-end">
-                <button v-if="category.children.length > 0" class="toggle-subcategories flex justify-end"
+                <button v-if="category.all_children.length > 0" class="toggle-subcategories flex justify-end"
                   @click="toggleSubcategories(index)">
                   <div v-if="!expandedCategories.includes(index)" class="py-2 px-4 hover:bg-gray-200">
                     &#9655; <!-- Right arrow -->
@@ -70,7 +70,7 @@ function toggleSubcategories(index) {
 
             <!-- Subcategories -->
             <div v-if="expandedCategories.includes(index)" class="pl-3">
-              <div v-for="subcategory in category.children" :key="subcategory.name">
+              <div v-for="subcategory in category.all_children" :key="subcategory.name">
                 <Link :href="route('shop.index', { category:  subcategory.slug})" class="py-2 px-4 hover:bg-gray-200 block">
                 {{ subcategory.name }}
                 </Link>
@@ -94,7 +94,7 @@ function toggleSubcategories(index) {
           {{ category.name }}
           </Link>
           <div class="flex justify-end">
-            <button v-if="category.children.length > 0" class="toggle-subcategories flex justify-end"
+            <button v-if="category.all_children.length > 0" class="toggle-subcategories flex justify-end"
               @click="toggleSubcategories(index)">
               <div v-if="!expandedCategories.includes(index)" class="py-2 px-4 hover:bg-gray-200">
                 &#9655; <!-- Right arrow -->
@@ -107,7 +107,7 @@ function toggleSubcategories(index) {
         </div>
         <!-- Subcategories -->
         <div v-if="expandedCategories.includes(index)" class="pl-6">
-          <div v-for="subcategory in category.children" :key="subcategory.name">
+          <div v-for="subcategory in category.all_children" :key="subcategory.name">
             <Link :href="route('shop.index', { category:  subcategory.slug })" class="py-2 px-4 hover:bg-gray-200 block">
             {{ subcategory.name }}
             </Link>
@@ -117,6 +117,5 @@ function toggleSubcategories(index) {
     </div>
   </div>
   <!-- Overlay Background -->
-  <div v-if="showingNavigationDropdown" @click="hideNavigation"
-    class="fixed inset-0 bg-black opacity-50 z-40 lg:hidden"> </div>
+  <div v-if="showingNavigationDropdown" @click="hideNavigation"class="fixed inset-0 bg-black opacity-50 z-40 lg:hidden"> </div>
 </template>
