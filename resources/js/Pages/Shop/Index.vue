@@ -1,9 +1,9 @@
 <script setup>
 import Breadcrumbs from '@/Components/LayoutPartials/Breadcrumbs.vue';
-import NavCategories from '@/Components/Shop/NavCategories.vue';
 import { Link, Head, router } from '@inertiajs/vue3';
 import { onBeforeUnmount, ref } from 'vue';
 import breadcrumbsStore from '@/Components/LayoutPartials/store/breadcrumbs.js'
+import SidebarCategories from '@/Components/Shop/SidebarCategories.vue';
 const props = defineProps({
     products: Object,
     categories: Object,
@@ -42,9 +42,10 @@ onBeforeUnmount(() => {
     </Breadcrumbs>
 
     <div class="flex flex-col lg:flex-row">
-        <NavCategories :categories="categories" />
 
-        <div class="border-l w-4/5 mx-auto">
+        <SidebarCategories :categories="categories" />
+
+        <div class=" w-4/5 mx-auto">
             <div class="flex items-center justify-end space-x-2 pt-4 pr-6">
                 <span class="text-gray-500">Sort by:</span>
                 <select v-model="sort" name="sort" id="sort" class="bg-gray-200 rounded-lg py-2 px-7 focus:outline-none focus:bg-white" @change="updateSort">
