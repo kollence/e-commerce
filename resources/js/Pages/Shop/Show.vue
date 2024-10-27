@@ -111,7 +111,7 @@ onBeforeUnmount(() => {
             <input type="text" class="w-full bg-gray-200 rounded-lg py-2 px-4 focus:outline-none focus:bg-white" placeholder="Search for products">
         </template>
     </Breadcrumbs>
-    <div class="flex flex-col lg:flex-row bg-gray-300">
+    <div class="flex flex-col lg:flex-row">
         <div class="container mx-auto px-4 py-8 justify-end">
             <div class="grid grid-cols-1 md:grid-cols-12 gap-2 mb-5">
                 <div class="md:col-span-2 px-3">
@@ -141,12 +141,12 @@ onBeforeUnmount(() => {
                             <span>{{ productItem.product_code }}</span>
                         </div>
                     </div>
-                    <div class="flex justify-start items-center mb-3 pb-1 border-b border-gray-300">
+                    <div class="flex justify-start items-center mb-3 pb-3 border-b border-gray-300">
                         <div class="mr-2">
                             <div class="flex items-center mb-1  pb-1">
                                 Picked:
                             </div>
-                            <div class="border border-stone-100 rounded-lg shadow-md">
+                            <div class="shadow-md">
                                 <span class="p-2 shadow-md border border-2 border-stone-100" :style="{ 'background-color': productItem.color.hex }">
                                     <span class="color-name">
                                         {{ productItem.color.name}}
