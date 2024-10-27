@@ -1,5 +1,15 @@
 
 models:
+  Coupon:
+    code: string unique
+    couponable_id: integer default:0
+    couponable_type: string
+    indexes:
+      - unique: couponable_id, couponable_type
+  FixedValueCoupon:
+    value: integer
+  PercentageCoupon:
+    percentage: integer
   Image:
     filename: string
     url: string
@@ -68,13 +78,14 @@ models:
       hasMany: Product
   Order:
     user_id: id foreign:users
+    order_number: string unique
     status: enum:pending,processing,completed,cancelled default:pending
     total_price: integer
-    shipping_price: integer
-    shipping_method: string
+    shipping_price: integer nullable
+    shipping_method: string nullable
     payment_method: string
-    payment_status: string
-    billing_address: text
+    payment_status: enum:pending,paid,refunded,failed,cancelled default:pending
+    billing_address: text nullable
     shipping_address: text
     currency: string
     notes: text nullable
