@@ -4,6 +4,7 @@ import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
 import { cloneDeep, isEqual } from 'lodash'; // Import lodash for deep comparison
 import Breadcrumbs from '@/Components/LayoutPartials/Breadcrumbs.vue';
 import breadcrumbs from '@/Components/LayoutPartials/store/breadcrumbs';
+import toast from '@/Components/Toast/store/toast';
 
 const props = defineProps({
     cart_items: Object,
@@ -39,6 +40,19 @@ const form = useForm({
 const formRemoveKey = useForm({
     cart_item_key: null,
 })
+const formCoupon = useForm({
+    coupon_code: null
+})
+const applyCoupon = () => {
+    // console.log(formCoupon.coupon_code);
+    formCoupon.post(route('coupon.store'), {
+        preserveScroll: true,
+        onSuccess: () => {
+            formCoupon.reset()
+        },
+    })
+}
+
 function removeFromCart(key) {
     formRemoveKey.cart_item_key = key;
 
@@ -192,27 +206,36 @@ const  submitCartItems = () => {
                     </table>
                 </div>
                 <div class="md:col-span-3">
-                <div class="bg-white rounded-lg shadow-md p-6">
-                    <h2 class="text-lg font-medium mb-4">Order Summary</h2>
-                    <div class="flex justify-between mb-2">
-                    <span>Subtotal of {{cartCounter}} items:</span>
-                    <span>{{currencyFormat(orderSummary.cart_subtotal)}}</span>
+                    <div class="rounded-lg border border-grey-300 shadow-md p-5">
+                        <h2 class="text-lg font-medium mb-4">Order Summary</h2>
+                        <div class="flex justify-between mb-2">
+                        <span>Subtotal of {{cartCounter}} items:</span>
+                        <span>{{currencyFormat(orderSummary.cart_subtotal)}}</span>
+                        </div>
+                        <div class="flex justify-between mb-2">
+                        <span>Tax:</span>
+                        <span>{{tax_rate}}%</span>
+                        </div>
+                        <div class="flex justify-between mb-2">
+                        <span>Cart Tax:</span>
+                        <span>{{currencyFormat(orderSummary.cart_tax)}}</span>
+                        </div>
+                        <div class="flex justify-between mb-4">
+                        <span>Total:</span>
+                        <span>{{currencyFormat(orderSummary.new_total)}}</span>
+                        </div>
+                        <button class="btn btn-primary w-full">Checkout</button>
                     </div>
-                    <div class="flex justify-between mb-2">
-                    <span>Tax:</span>
-                    <span>{{tax_rate}}%</span>
+                    <div class="flex flex-col item-center justify-center shadow-md rounded-lg border border-grey-300 mt-3 p-5">
+                        <span class="mx-auto">Coupon code:</span>
+                        <form class="mx-auto flex flex-col" @submit.prevent="applyCoupon">
+                            <input type="text" v-model="formCoupon.coupon_code" class="text-black border border-grey-300 rounded-lg p-2" placeholder="Enter coupon code">
+                                <span v-if="page.props.errors.error" class="text-red-500 text-sm text-center">{{page.props.errors.error[0]}}</span>
+                            <button class="border border-lime-600 rounded-md px-5 py-2 bg-lime-500 text-black font-semibold mx-auto btn btn-primary mt-2">Apply</button>
+                        </form>
                     </div>
-                    <div class="flex justify-between mb-2">
-                    <span>Cart Tax:</span>
-                    <span>{{currencyFormat(orderSummary.cart_tax)}}</span>
-                    </div>
-                    <div class="flex justify-between mb-4">
-                    <span>Total:</span>
-                    <span>{{currencyFormat(orderSummary.new_total)}}</span>
-                    </div>
-                    <button class="btn btn-primary w-full">Checkout</button>
                 </div>
-                </div>
+                
             </div>
             <div v-else class="pt-5 text-center">Cart is empty.</div>
         </div>
