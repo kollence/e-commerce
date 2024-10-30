@@ -1,5 +1,15 @@
 
 models:
+  Coupon:
+    code: string unique
+    couponable_id: integer default:0
+    couponable_type: string
+    indexes:
+      - unique: couponable_id, couponable_type
+  FixedValueCoupon:
+    value: integer
+  PercentageCoupon:
+    percentage: integer
   Image:
     filename: string
     url: string
@@ -28,12 +38,10 @@ models:
     color_id: id foreign:colors nullable
     product_code: string
     original_price: integer
-    is_active: boolean default:true
     sale_price: integer nullable
     relationships:
       belongsTo: Product, Color
       belongsToMany: SizeOption
-      hasMany: OrderItem
   Category:
     name: string
     slug: string unique
@@ -49,8 +57,7 @@ models:
     relationships:
       hasMany: ProductItem
   SizeOption:
-    name: string
-    slug: string unique
+    name: string unique
     size_description: string nullable
     sort_order: integer default:1
     size_category_id: id foreign:size_categories
@@ -71,13 +78,14 @@ models:
       hasMany: Product
   Order:
     user_id: id foreign:users
+    order_number: string unique
     status: enum:pending,processing,completed,cancelled default:pending
     total_price: integer
-    shipping_price: integer
-    shipping_method: string
+    shipping_price: integer nullable
+    shipping_method: string nullable
     payment_method: string
-    payment_status: enum:pending,paid,refunded,failed,cancelled
-    billing_address: text
+    payment_status: enum:pending,paid,refunded,failed,cancelled default:pending
+    billing_address: text nullable
     shipping_address: text
     currency: string
     notes: text nullable
@@ -85,17 +93,15 @@ models:
       belongsTo: User
       hasMany: OrderItem 
   OrderItem:
-    product_item_id: id foreign:product_items
+    product_id: id foreign:products
     order_id: id foreign:orders
     quantity: integer default:1
-    color_id: id foreign:colors nullable
-    size_option_id: id foreign:size_options nullable
-    product_code: string
-    original_price: integer
-    sale_price: integer nullable
+    unit_amount: integer
+    total_amount: integer
+    price: integer
     total: integer
     relationships:
-      belongsTo: ProductItem, Order, Color, SizeOption
+      belongsTo: Product, Order
   Address:
     user_id: id foreign:users nullable
     order_id: id foreign:orders nullable
