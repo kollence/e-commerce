@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\CouponController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\WelcomeController;
 use Illuminate\Support\Facades\Route;
@@ -15,6 +16,7 @@ Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
 Route::post('/cart/updateQuantity', [CartController::class, 'updateQuantity'])->name('cart.updateQuantity')->middleware('throttle:40,1');
 Route::post('/cart/remove', [CartController::class, 'remove'])->name('cart.remove');
 
+Route::post('coupon', [CouponController::class, 'store'])->name('coupon.store');
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
