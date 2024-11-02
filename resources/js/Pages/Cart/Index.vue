@@ -152,7 +152,7 @@ const  submitCartItems = () => {
                             <tr v-for="(item, key) in cartItems" :key="key">
                                 
                                 <td class="px-4 py-2 text-center">
-                                    <Link :href="`${route('shop.show', [item.product.slug, item.product_item.id])}?size_option=${item.product_item.size_option.slug}`" class="text-blue-500 hover:underline">
+                                    <Link :href="`${route('shop.show', [item.product.slug, item.product_item.product_item_id])}?size_option=${item.product_item.size_option.slug}`" class="text-blue-500 hover:underline">
                                         {{ item.product.name }}
                                     </Link>
                                 </td>
@@ -213,7 +213,7 @@ const  submitCartItems = () => {
                         </div>
                         <div class="flex justify-between mb-2">
                         <span>Tax:</span>
-                        <span>{{tax_rate}}%</span>
+                        <span>{{orderSummary.tax_rate}}%</span>
                         </div>
                         <div class="flex justify-between mb-2">
                         <span>Cart Tax:</span>
@@ -225,9 +225,13 @@ const  submitCartItems = () => {
                         </div>
                         <button class="btn btn-primary w-full">Checkout</button>
                     </div>
-                    <div class="flex justify-between mb-2">
-                    <span>Tax:</span>
-                    <span>{{orderSummary.tax_rate}}%</span>
+                    <div class="flex flex-col item-center justify-center shadow-md rounded-lg border border-grey-300 mt-3 p-5">
+                        <span class="mx-auto">Coupon code:</span>
+                        <form class="mx-auto flex flex-col" @submit.prevent="applyCoupon">
+                            <input type="text" v-model="formCoupon.coupon_code" class="text-black border border-grey-300 rounded-lg p-2" placeholder="Enter coupon code">
+                                <span v-if="page.props.errors.error" class="text-red-500 text-sm text-center">{{page.props.errors.error[0]}}</span>
+                            <button class="border border-lime-600 rounded-md px-5 py-2 bg-lime-500 text-black font-semibold mx-auto btn btn-primary mt-2">Apply</button>
+                        </form>
                     </div>
                 </div>
                 
