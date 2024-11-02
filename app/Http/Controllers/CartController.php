@@ -51,32 +51,19 @@ class CartController extends Controller
      */
     public function remove(Request $request)
     {
-        $uniqueKey = $request->input('cart_item_key');
-
-        if (isset($this->items[$uniqueKey])) {
-            // Remove the item from the cart
-            unset($this->items[$uniqueKey]);
-            // Update the session with the new cart
-            session(['cart' => json_encode($this->items, JSON_UNESCAPED_UNICODE)]);
-
-            return redirect()->back()->with('message', 'Item removed from the cart');
-        }
-        return redirect()->back()->with('message', 'Item not found in the cart');
+        $key = $request->input('cart_item_key');
+        $cart = new Cart();
+        $cart->removeCartItem($key);
+    
+        return redirect()->back()->with('message', 'Item removed from the cart');
     }
-
-    /**
-     * Generate a unique key for a cart item.
-     * 
-     * @param int $productItemId
-     * @param string $sizeOptionName
-     * @return string
-     */
-    private function generateUniqueKey($productItemId, $sizeOptionName)
+    
+    public function clear()
     {
-        // Convert sizeOptionName to uppercase and replace spaces with underscores
-        $formattedSizeOptionName = strtoupper(str_replace(' ', '_', $sizeOptionName));
-        // Return the unique key
-        return $productItemId . '_' . $formattedSizeOptionName;
+        $cart = new Cart();
+        $cart->clearCart();
+    
+        return redirect()->back()->with('message', 'Cart cleared');
     }
     /**
      * Display a listing of the resource.
