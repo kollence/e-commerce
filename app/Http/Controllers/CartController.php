@@ -28,6 +28,10 @@ class CartController extends Controller
         $sizeOption = $productItem->sizeOptions->where('id', $sizeOptionId)->firstOrFail();
         $price = $productItem->price; // Appended `price` field in `ProductItem`
         
+        $cart = new Cart();
+        $cart->addItem($productItem, $quantity, $sizeOption, $price);
+
+        $message = "Added new item to cart";
         return redirect()->back()->with("message", $message);
     }
 
