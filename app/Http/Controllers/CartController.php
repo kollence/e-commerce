@@ -23,44 +23,11 @@ class CartController extends Controller
         $productItemId = $request->input('product_item_id');
         $sizeOptionId = $request->input('size_option_id');
         $quantity = $request->input('quantity', 1); // Default quantity to 1 if not provided
-        // Return product item with size option that will be unique product item with its in_stock value
-        $productItem = ProductItem::with(['sizeOptions' => function($query) use ($sizeOption) {
-            $query->where('name', $sizeOption['name']); // Filter by size name
-        }])
-        ->where('id', $productItemId)
-        ->first();
 
-        $productItemPrice = ($productItem->sale_price < $productItem->original_price && $productItem->sale_price > 0) ? $productItem->sale_price : $productItem->original_price;
-        // Generate a unique key for the cart item
-        $uniqueKey = $this->generateUniqueKey($productItemId, $sizeOption['name']);
-
-        if (isset($this->items[$uniqueKey])) {
-            if($this->items[$uniqueKey]['product_item']['quantity'] < $productItem->sizeOptions->first()->pivot->in_stock){
-                $this->items[$uniqueKey]['product_item']['quantity'] += $quantity;
-                $this->items[$uniqueKey]['subtotal'] += ($productItemPrice * $quantity);
-            }
-            $message = "Updated item in cart";
-        } else {
-            // Item doesn't exist, so add it as a new item
-            $this->items[$uniqueKey] = [
-                'product' => [
-                    'id' => $productItem->product->id,
-                    'name' => $productItem->product->name,
-                ],
-                'product_item' => [
-                    'product_item_id' => $productItemId,
-                    'original_price' => $productItem->original_price,
-                    'sale_price' => $productItem->sale_price,
-                    'images' => $productItem->images,
-                    'color' => $productItem->color,
-                    'quantity' => $quantity,
-                    'size_option' => $sizeOption,
-                ],
-                'subtotal' => $productItemPrice * $quantity, // Calculating subtotal
-            ];
-            $message = "Added new item to cart";
-        }
-        session()->put('cart', json_encode($this->items, JSON_UNESCAPED_UNICODE));
+        $productItem = ProductItem::findOrFail($productItemId);
+        $sizeOption = $productItem->sizeOptions->where('id', $sizeOptionId)->firstOrFail();
+        $price = $productItem->price; // Appended `price` field in `ProductItem`
+        
         return redirect()->back()->with("message", $message);
     }
 
