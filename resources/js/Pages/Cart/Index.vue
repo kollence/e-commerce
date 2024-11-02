@@ -91,12 +91,13 @@ const updateQuantity = (key) => {
 };
 
 const  submitCartItems = () => {
-        form.cart_items = cartItems.value;
+        // Extract cart item properties and create a new object with the desired properties
+        const extractCartItemProperties = Object.fromEntries(Object.entries(cartItems.value).map(([key, value]) => [key, { product_item_id: value.product_item.product_item_id, quantity: value.product_item.quantity, subtotal: value.subtotal, size_option_id: value.product_item.size_option.id}]));
+        // console.log(extractCartItemProperties);
+        form.cart_items = extractCartItemProperties
         form.post(route('cart.updateQuantity'), {
             preserveScroll: true,
-            onSuccess: () => {
-                // form.reset();
-            },
+            onSuccess: () => {},
         });
 }
 </script>
