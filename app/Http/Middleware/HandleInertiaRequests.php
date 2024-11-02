@@ -37,15 +37,10 @@ class HandleInertiaRequests extends Middleware
     {
         return array_merge(parent::share($request), [
             'cart_count' =>  function() use($request) {
-                $cart =  $request->session()->get('cart'); // Retrieve the 'cart' from the session
-
-            // Decode JSON to a PHP array (if stored as a JSON string)
-                if (is_string($cart)) {
-                    $cart = json_decode($cart, true); // Convert JSON string to an array
-                }
-
-                // Count the number of items in the cart
-                $cartItemCount = is_array($cart) ? count($cart) : 0;
+                $cartItems = json_decode(session('default_cart'), true)['cart_items'] ?? [];
+                $itemCount = count($cartItems); // Count the number of items in the cart
+                // Check if the cart items are an array
+                $cartItemCount = is_array($cartItems) ? $itemCount : 0;
                 return $cartItemCount;
             },
             'flash' => [

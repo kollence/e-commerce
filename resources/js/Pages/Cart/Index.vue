@@ -8,17 +8,15 @@ import toast from '@/Components/Toast/store/toast';
 
 const props = defineProps({
     cart_items: Object,
-    cart_subtotal: Number,
-    cart_tax: Number,
-    tax_rate: Number,
-    new_total: Number,
+    order_summary: Object,
 })
+                    // use Lodash isEqual to compare objects
 const cartItems = ref(cloneDeep(props.cart_items));
 const orderSummary = ref({
-    cart_subtotal: props.cart_subtotal,
-    cart_tax: props.cart_tax,
-    total: props.new_total,
-    new_total: Number(props.new_total.toFixed(2)),
+    cart_subtotal: Number(props.order_summary.cart_subtotal.toFixed(2)),
+    cart_tax: props.order_summary.cart_tax,
+    tax_rate: props.order_summary.tax_rate,
+    new_total: Number(props.order_summary.new_total.toFixed(2)),
 });
 const cartTableWrapper = ref(null); // ref for cart table wrapper
 const page = usePage();
@@ -59,8 +57,8 @@ function removeFromCart(key) {
     // Delete operator to delete object property by key
     delete cartItems.value[key]
     // Recalculate totals
-    orderSummary.value.cart_subtotal = Object.values(cartItems.value).reduce((total, item) => total + item.subtotal, 0);
-    const taxRate = Number(props.tax_rate);
+    orderSummary.value.cart_subtotal = Number(Object.values(cartItems.value).reduce((total, item) => total + item.subtotal, 0).toFixed(2));
+    const taxRate = Number(props.order_summary.tax_rate);
     orderSummary.value.cart_tax = Number((orderSummary.value.cart_subtotal * (taxRate / 100)).toFixed(2));
     const new_total_format = orderSummary.value.cart_subtotal + orderSummary.value.cart_tax;
     orderSummary.value.new_total = Number(new_total_format.toFixed(2));
@@ -92,7 +90,7 @@ function incrementQuantity(key) {
 const updateQuantity = (key) => {
     const item = cartItems.value[key];
     // Ensure tax_rate is a number
-    const taxRate = Number(props.tax_rate);
+    const taxRate = Number(props.order_summary.tax_rate);
     // Optional: update the subtotal locally
     const subtotal_format = ((item.product_item.sale_price < item.product_item.original_price && item.product_item.sale_price > 0) ? item.product_item.sale_price : item.product_item.original_price) * item.product_item.quantity;
     item.subtotal = Number(subtotal_format.toFixed(2));
@@ -105,12 +103,13 @@ const updateQuantity = (key) => {
 };
 
 const  submitCartItems = () => {
-        form.cart_items = cartItems.value;
+        // Extract cart item properties and create a new object with the desired properties
+        const extractCartItemProperties = Object.fromEntries(Object.entries(cartItems.value).map(([key, value]) => [key, { product_item_id: value.product_item.product_item_id, quantity: value.product_item.quantity, subtotal: value.subtotal, size_option_id: value.product_item.size_option.id}]));
+        // console.log(extractCartItemProperties);
+        form.cart_items = extractCartItemProperties
         form.post(route('cart.updateQuantity'), {
             preserveScroll: true,
-            onSuccess: () => {
-                // form.reset();
-            },
+            onSuccess: () => {},
         });
 }
 </script>
@@ -226,13 +225,9 @@ const  submitCartItems = () => {
                         </div>
                         <button class="btn btn-primary w-full">Checkout</button>
                     </div>
-                    <div class="flex flex-col item-center justify-center shadow-md rounded-lg border border-grey-300 mt-3 p-5">
-                        <span class="mx-auto">Coupon code:</span>
-                        <form class="mx-auto flex flex-col" @submit.prevent="applyCoupon">
-                            <input type="text" v-model="formCoupon.coupon_code" class="text-black border border-grey-300 rounded-lg p-2" placeholder="Enter coupon code">
-                                <span v-if="page.props.errors.error" class="text-red-500 text-sm text-center">{{page.props.errors.error[0]}}</span>
-                            <button class="border border-lime-600 rounded-md px-5 py-2 bg-lime-500 text-black font-semibold mx-auto btn btn-primary mt-2">Apply</button>
-                        </form>
+                    <div class="flex justify-between mb-2">
+                    <span>Tax:</span>
+                    <span>{{orderSummary.tax_rate}}%</span>
                     </div>
                 </div>
                 
