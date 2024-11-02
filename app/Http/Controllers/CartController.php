@@ -21,7 +21,7 @@ class CartController extends Controller
     public function add(Request $request)
     {
         $productItemId = $request->input('product_item_id');
-        $sizeOption = $request->input('size_option');
+        $sizeOptionId = $request->input('size_option_id');
         $quantity = $request->input('quantity', 1); // Default quantity to 1 if not provided
         // Return product item with size option that will be unique product item with its in_stock value
         $productItem = ProductItem::with(['sizeOptions' => function($query) use ($sizeOption) {
