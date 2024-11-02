@@ -9,6 +9,7 @@ const props = defineProps({
     cart_items: Object,
     order_summary: Object,
 })
+                    // use Lodash isEqual to compare objects
 const cartItems = ref(cloneDeep(props.cart_items));
 const orderSummary = ref({
     cart_subtotal: props.cart_subtotal,
