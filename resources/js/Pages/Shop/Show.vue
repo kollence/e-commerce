@@ -61,10 +61,8 @@ function incrementQuantity() {
 // });
 // Initialize the form with the product data
 const form = useForm({
-    id: props.product.id,
-    name: props.product.name,
     product_item_id: props.productItem.id,
-    size_option: { id: selectedSizeOption.value.id, name: selectedSizeOption.value.name },
+    size_option_id: selectedSizeOptionId,
     // in_stock: selectedSizeOption.value.pivot.in_stock - quantity.value,
     quantity: quantity.value,
     // submitted_pxq: priceXquantity.value,
@@ -72,7 +70,7 @@ const form = useForm({
 // Watchers to update form fields when values change
 watch([selectedSizeOption, quantity], () => {
     form.quantity = quantity.value;
-    form.size_option = { id: selectedSizeOption.value.id, name: selectedSizeOption.value.name };
+    form.size_option_id = selectedSizeOptionId;
 });
 // On submit, add additional fields and send the form data to the server
 function addToCart() {
