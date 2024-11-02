@@ -39,13 +39,9 @@ class CartController extends Controller
     {
         if($request->input('cart_items')){
             $cartItems = $request->input('cart_items');
-            foreach ($cartItems as  $productItemUniqueKey => $cartItem ) {
-                $productItemPrice = ($cartItem['product_item']['sale_price'] < $cartItem['product_item']['original_price'] && $cartItem['product_item']['sale_price'] > 0) ? $cartItem['product_item']['sale_price'] : $cartItem['product_item']['original_price'];
-                $this->items[$productItemUniqueKey]['product_item']['quantity'] = (int) $cartItem['product_item']['quantity'];
-                $this->items[$productItemUniqueKey]['subtotal'] = $productItemPrice * $cartItem['product_item']['quantity'];
-            }
-            session()->put('cart', json_encode($this->items, JSON_UNESCAPED_UNICODE));
-        }else{
+            $cart = new Cart();
+            $cart->updateCartItems($cartItems);
+        } else {
             return redirect()->back()->with("message", "Item in cart doesn't exist");
         }
     }
