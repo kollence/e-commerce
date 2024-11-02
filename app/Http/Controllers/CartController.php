@@ -9,11 +9,7 @@ use Illuminate\Http\Request;
 
 class CartController extends Controller
 {
-    private $items = [];
-    public function __construct()
-    {
-        $this->items = session()->has('cart') ? json_decode(session('cart'), true) : [];
-    }
+    public function __construct(){}
 
     /**
      * Add a product item to the cart.
