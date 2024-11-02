@@ -101,6 +101,7 @@ class Cart extends Model
                 'product' => [
                     'id' => $productItem->product->id,
                     'name' => $productItem->product->name,
+                    'slug' => $productItem->product->slug,
                 ],
                 'product_item' => [
                     'product_item_id' => $productItem->id,
