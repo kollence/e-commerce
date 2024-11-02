@@ -69,47 +69,10 @@ class CartController extends Controller
         $cart = new Cart();
         $cartData = $cart->getCartItems();
         $orderSummary = $cart->getCartSummary();
-        
+
         return inertia('Cart/Index', [
             'cart_items' => $cartData,  
             'order_summary' => $orderSummary,
         ]);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store()
-    {
-        return session()->put('cart', json_encode($this->items, JSON_UNESCAPED_UNICODE));
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    private function totalSubtotal()
-    {
-        return array_sum(array_column($this->items, 'subtotal'));
     }
 }
