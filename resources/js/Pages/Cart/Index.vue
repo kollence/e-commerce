@@ -7,10 +7,7 @@ import breadcrumbs from '@/Components/LayoutPartials/store/breadcrumbs';
 
 const props = defineProps({
     cart_items: Object,
-    cart_subtotal: Number,
-    cart_tax: Number,
-    tax_rate: Number,
-    new_total: Number,
+    order_summary: Object,
 })
 const cartItems = ref(cloneDeep(props.cart_items));
 const orderSummary = ref({
