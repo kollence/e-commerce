@@ -62,6 +62,7 @@ class Cart extends Model
             $price = $productItem->price;
             return $carry + ($price * $item['product_item']['quantity']);
         }, 0);
+        
         $taxRate = config('cart.tax');
         $cartTax = $this->taxedTotal($subtotal);
         $newTotal = round($subtotal + $cartTax, 2);
@@ -71,6 +72,11 @@ class Cart extends Model
             'tax_rate' => $taxRate * 100, // To represent percentage
             'new_total' => $newTotal
         ];
+    }
+    
+    private function totalSubtotal()
+    {
+        return array_sum(array_column($this->items, 'subtotal'));
     }
 
     public function taxedTotal($subtotal)
