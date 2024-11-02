@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Product;
+use App\Models\Cart;
 use App\Models\ProductItem;
 use Exception;
 use Illuminate\Http\Request;
