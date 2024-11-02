@@ -112,26 +112,6 @@ class CartController extends Controller
         //
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        if (count($this->items) > 1) {
-            unset($this->items[$id]);
-        } else {
-            $this->forget();
-        }
-
-        return $this->store();
-    }
-
-    public function forget()
-    {
-        $this->items = [];
-        session()->forget('cart');
-    }
-
     private function totalSubtotal()
     {
         return array_sum(array_column($this->items, 'subtotal'));
