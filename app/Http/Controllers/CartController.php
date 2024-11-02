@@ -70,19 +70,13 @@ class CartController extends Controller
      */
     public function index()
     {
-        // $this->forget();
-        $taxRate = config('cart.tax') * 100;
-        $cartSubtotal = $this->totalSubtotal();
-        $tax = config('cart.tax');
-        $cartTax = ($cartSubtotal * $tax);
-        $cartTax =  round($cartTax, 2);
-        $newTotal = round($cartSubtotal + $cartTax, 2);
+        $cart = new Cart();
+        $cartData = $cart->getCartItems();
+        $orderSummary = $cart->getCartSummary();
+        
         return inertia('Cart/Index', [
-            'cart_items' => $this->items,
-            'cart_subtotal' => $cartSubtotal, // Total price of all cart items
-            'cart_tax' => $cartTax, // Total tax of all cart items
-            'tax_rate' => $taxRate,
-            'new_total' => $newTotal // Total price of all cart items including tax  
+            'cart_items' => $cartData,  
+            'order_summary' => $orderSummary,
         ]);
     }
 
