@@ -29,8 +29,7 @@ class CartController extends Controller
         $sizeOption = $productItem->sizeOptions->where('id', $sizeOptionId)->firstOrFail();
         $price = $productItem->price; // Appended `price` field in `ProductItem`
         
-        $cart = new Cart();
-        $cart->addItem($productItem, $quantity, $sizeOption, $price);
+        $this->cart->addItem($productItem, $quantity, $sizeOption, $price);
 
         $message = "Added new item to cart";
         return redirect()->back()->with("message", $message);
@@ -40,8 +39,8 @@ class CartController extends Controller
     {
         if($request->input('cart_items')){
             $cartItems = $request->input('cart_items');
-            $cart = new Cart();
-            $cart->updateCartItems($cartItems);
+            
+            $this->cart->updateCartItems($cartItems);
         } else {
             return redirect()->back()->with("message", "Item in cart doesn't exist");
         }
@@ -53,16 +52,15 @@ class CartController extends Controller
     public function remove(Request $request)
     {
         $key = $request->input('cart_item_key');
-        $cart = new Cart();
-        $cart->removeCartItem($key);
+        
+        $this->cart->removeCartItem($key);
     
         return redirect()->back()->with('message', 'Item removed from the cart');
     }
     
     public function clear()
     {
-        $cart = new Cart();
-        $cart->clearCart();
+        $this->cart->clearCart();
     
         return redirect()->back()->with('message', 'Cart cleared');
     }
@@ -71,9 +69,8 @@ class CartController extends Controller
      */
     public function index()
     {
-        $cart = new Cart();
-        $cartData = $cart->getCartItems();
-        $orderSummary = $cart->getCartSummary();
+        $cartData = $this->cart->getCartItems();
+        $orderSummary = $this->cart->getCartSummary();
 
         return inertia('Cart/Index', [
             'cart_items' => $cartData,  
