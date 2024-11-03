@@ -5,15 +5,18 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Session;
+use App\Enums\CartTypeEnum;
 
 class Cart extends Model
 {
     use HasFactory;
 
     protected $items = [];
+    protected $cartType; // CartType::DEFAULT_CART
 
-    public function __construct()
+    public function __construct(CartTypeEnum $cartType = CartTypeEnum::DEFAULT_CART)
     {
+        $this->cartType = $cartType;
         $this->items = $this->cartItems();
     }
 
