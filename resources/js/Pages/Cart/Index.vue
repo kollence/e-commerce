@@ -43,7 +43,7 @@ const formCoupon = useForm({
 })
 const applyCoupon = () => {
     // console.log(formCoupon.coupon_code);
-    formCoupon.post(route('coupon.store'), {
+    formCoupon.post(route('coupon.apply'), {
         preserveScroll: true,
         onSuccess: () => {
             formCoupon.reset()

@@ -16,7 +16,7 @@ Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
 Route::post('/cart/updateQuantity', [CartController::class, 'updateQuantity'])->name('cart.updateQuantity')->middleware('throttle:40,1');
 Route::post('/cart/remove', [CartController::class, 'remove'])->name('cart.remove');
 
-Route::post('coupon', [CouponController::class, 'store'])->name('coupon.store');
+Route::post('coupon', [CouponController::class, 'apply'])->name('coupon.apply');
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),

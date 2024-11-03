@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Cart;
 use App\Models\Coupon;
 use Illuminate\Http\Request;
 
@@ -28,11 +29,24 @@ class CouponController extends Controller
      */
     public function store(Request $request)
     {
-        $coupon = Coupon::findByCode($request->coupon_code);
-        if (!$coupon) {                           //VALUE                               // KEY
+    }
+
+    /**
+     * Apply coupon code
+     */
+    public function apply(Request $request)
+    {   // if request is received but coupon code is empty (NULL)
+        if(!$request->coupon_code) return redirect()->back()->withErrors("You need to enter coupon code first.", "error");
+
+        $couponCode = Coupon::findByCode($request->coupon_code);
+        if (!$couponCode) {                           //VALUE                               // KEY
             return redirect()->back()->withErrors("Coupon code is invalid. Try again.", "error");
         }
-        // Make better Cart model with its methods
+        $coupon = $couponCode->couponable;
+        $cart = new Cart();
+        $subtotal = $cart->totalSubtotal();
+        // dd($subtotal);
+        $discount = $coupon->discount($subtotal);
         return redirect()->back()->with("message", "Coupon applied successfully");
     }
 
