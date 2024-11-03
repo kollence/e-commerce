@@ -73,8 +73,8 @@ class Cart extends Model
             'new_total' => $newTotal
         ];
     }
-    
-    private function totalSubtotal()
+    // TESTING method. Maybe it need to calculate with items from DB and not from data builded from session
+    public function totalSubtotal()
     {
         return array_sum(array_column($this->items, 'subtotal'));
     }
