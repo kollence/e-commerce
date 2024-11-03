@@ -5,15 +5,18 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Session;
+use App\Enums\CartTypeEnum;
 
 class Cart extends Model
 {
     use HasFactory;
 
     protected $items = [];
+    protected $cartType; // CartType::DEFAULT_CART
 
-    public function __construct()
+    public function __construct(CartTypeEnum $cartType = CartTypeEnum::DEFAULT_CART)
     {
+        $this->cartType = $cartType;
         $this->items = $this->cartItems();
     }
 
@@ -22,10 +25,8 @@ class Cart extends Model
      */
     public function addItem($productItem, $quantity, $sizeOption, $price)
     {
-        // $key = "{$productItem->id}_{$sizeOption->slug}";
         $key = $this->generateUniqueKey($productItem->id, $sizeOption->slug);
         
-
         if (isset($this->items[$key])) {
             $this->items[$key]['product_item']['quantity'] += $quantity;
             $this->items[$key]['subtotal'] += $price * $quantity;
@@ -50,7 +51,7 @@ class Cart extends Model
     */
     public function cartItems()
     {
-        $cart = json_decode(Session::get('default_cart'), true);
+        $cart = json_decode(Session::get($this->cartType->value), true);
         return $cart['cart_items'] ?? [];
     }
 
@@ -137,7 +138,7 @@ class Cart extends Model
 
     protected function updateCart()
     {
-        Session::put('default_cart', json_encode([
+        Session::put($this->cartType->value, json_encode([
             'cart_items' => $this->items,
             'order_summary' => $this->getCartSummary()
         ], JSON_UNESCAPED_UNICODE));
@@ -183,6 +184,6 @@ class Cart extends Model
     public function clearCart()
     {
         $this->items = [];
-        Session::forget('default_cart');
+        Session::forget($this->cartType->value);
     }
 }
