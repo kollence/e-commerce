@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\CartTypeEnum;
 use App\Models\Cart;
 use App\Models\ProductItem;
 use Exception;
@@ -9,7 +10,11 @@ use Illuminate\Http\Request;
 
 class CartController extends Controller
 {
-    public function __construct(){}
+    protected $cart;
+    public function __construct(){
+        // Provide default value when Cart model is initialized
+        $this->cart = new Cart(CartTypeEnum::DEFAULT_CART);
+    }
 
     /**
      * Add a product item to the cart.
