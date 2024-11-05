@@ -102,7 +102,8 @@ const updateQuantity = (key) => {
     // Optional: update the subtotal locally
     const subtotal_format = ((item.product_item.sale_price < item.product_item.original_price && item.product_item.sale_price > 0) ? item.product_item.sale_price : item.product_item.original_price) * item.product_item.quantity;
     item.subtotal = Number(subtotal_format.toFixed(2));
-    const cart_subtotal_format = Object.values(cartItems.value).reduce((total, item) => total + item.subtotal, 0);
+    const cart_total_subtotal = Object.values(cartItems.value).reduce((total, item) => total + item.subtotal, 0);
+    const cart_subtotal_format = couponCode ? Number((cart_total_subtotal - discountWithCoupon.value).toFixed(2)) : cart_total_subtotal;
     orderSummary.value.cart_subtotal = Number(cart_subtotal_format.toFixed(2));
     orderSummary.value.cart_tax = Number(( cart_subtotal_format  * (taxRate / 100) ).toFixed(2));
 
