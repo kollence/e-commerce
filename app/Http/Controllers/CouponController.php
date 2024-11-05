@@ -83,6 +83,7 @@ class CouponController extends Controller
      */
     public function forget(Coupon $coupon)
     {
-        //
+        session()->forget("coupon");
+        return redirect()->back()->with("message", "Coupon removed successfully");
     }
 }
