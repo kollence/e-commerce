@@ -140,6 +140,7 @@ class Cart extends Model
                     'size_option' => [
                         'id' => $item['product_item']['size_option']['id'],
                         'name' => $productItem->sizeOptions->where('id', $item['product_item']['size_option']['id'])->first()->name,
+                        'slug' => $productItem->sizeOptions->where('id', $item['product_item']['size_option']['id'])->first()->slug,
                     ],
                 ],
                 'subtotal' => $item['subtotal'],
