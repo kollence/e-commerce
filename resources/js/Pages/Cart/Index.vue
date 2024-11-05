@@ -47,6 +47,17 @@ watch(couponCode, (newCode) => {
         orderSummary.value.new_total = props.order_summary.new_total;
     }
 })
+// don't give values with discount to go in negative numbers when its FREE!
+const validateNumericValues = (obj) => {
+    Object.keys(obj).forEach(key => { 
+        console.log(obj[key]);
+        if (typeof obj[key] === 'number' && obj[key] < 0) { 
+            obj[key] = 0;
+        }
+    }); 
+};
+// Validate numeric values in orderSummary object (don't let go values go under 0)
+watch(orderSummary, (newVal) => { validateNumericValues(newVal); }, { deep: true });
 
 function removeFromCart(key) {
     formRemoveKey.cart_item_key = key;
