@@ -65,7 +65,7 @@ function removeFromCart(key) {
     // Delete operator to delete object property by key
     delete cartItems.value[key]
     // Recalculate totals
-    orderSummary.value.cart_subtotal = Number(Object.values(cartItems.value).reduce((total, item) => total + item.subtotal, 0).toFixed(2));
+    orderSummary.value.cart_subtotal = couponCode ?  Number((Object.values(cartItems.value).reduce((total, item) => total + item.subtotal, 0)  - Number(discountWithCoupon.value)).toFixed(2)) : Number(Object.values(cartItems.value).reduce((total, item) => total + item.subtotal, 0).toFixed(2));
     const taxRate = Number(props.order_summary.tax_rate);
     orderSummary.value.cart_tax = Number((orderSummary.value.cart_subtotal * (taxRate / 100)).toFixed(2));
     const new_total_format = orderSummary.value.cart_subtotal + orderSummary.value.cart_tax;
