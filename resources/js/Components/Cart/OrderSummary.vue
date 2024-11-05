@@ -84,12 +84,12 @@ const removeCoupon = () => {
                 <button class="border border-lime-600 rounded-md px-5 py-2 bg-lime-500 text-black font-semibold mx-auto  mt-2 w-full">Checkout</button>
             </div>
         </div>
-        <div v-if="!couponCode" class="flex flex-col item-center justify-center shadow-md rounded-lg border border-grey-300 mt-3 p-5">
-            <span class="mx-auto">Coupon code:     FIXED_VALUE</span>
+        <div v-if="!couponCode" class="flex flex-col item-center justify-center shadow-md rounded-lg border border-green-700 mt-3 py-2 border-2">
+            <span class="mx-auto">Coupon code:</span>
             <form class="mx-auto flex flex-col" @submit.prevent="applyCoupon">
-                <input type="text" v-model="formCoupon.coupon_code" class="text-black border border-grey-300 rounded-lg p-2" placeholder="Enter coupon code">
+                <input type="text" v-model="formCoupon.coupon_code" class="text-black bg-green-100 border border-green-200 rounded-lg p-2" placeholder="Enter coupon code">
                 <span v-if="page.props.errors.error" class="text-red-500 text-sm text-center">{{ page.props.errors.error[0] }}</span>
-                <button class="border border-lime-600 rounded-md px-5 py-2 bg-lime-500 text-black font-semibold mx-auto  mt-2">Apply</button>
+                <button class="border border-lime-600 rounded-md px-5 py-2 bg-lime-500 text-black font-semibold mt-2">Apply</button>
             </form>
         </div>
     </div>

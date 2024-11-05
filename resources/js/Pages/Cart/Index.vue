@@ -134,7 +134,7 @@ const submitCartItems = () => {
             <span>Cart</span>
         </template>
         <template #search>
-            <input type="text" class="w-full bg-gray-200 rounded-lg py-2 px-4 focus:outline-none focus:bg-white"
+            <input type="text" class="w-full  bg-green-100 rounded-lg py-2 px-4 focus:outline-none focus:bg-white"
                 placeholder="Search for products">
         </template>
     </Breadcrumbs>

@@ -36,7 +36,7 @@ onBeforeUnmount(() => {
             <span class="mx-2">/</span>
         </template>
         <template #search>
-            <input type="text" class="w-full bg-gray-200 rounded-lg py-2 px-4 focus:outline-none focus:bg-white"
+            <input type="text" class="w-full   bg-green-100 rounded-lg py-2 px-4 focus:outline-none focus:bg-white"
                 placeholder="Search for products">
         </template>
     </Breadcrumbs>
@@ -48,7 +48,7 @@ onBeforeUnmount(() => {
         <div class=" w-4/5 mx-auto">
             <div class="flex items-center justify-end space-x-2 pt-4 pr-6">
                 <span class="text-gray-500">Sort by:</span>
-                <select v-model="sort" name="sort" id="sort" class="bg-gray-200 rounded-lg py-2 px-7 focus:outline-none focus:bg-white" @change="updateSort">
+                <select v-model="sort" name="sort" id="sort" class="text-black  bg-green-100 rounded-lg py-2 px-7 focus:outline-none focus:bg-white" @change="updateSort">
                     <option value="default" selected="selected">Pick option</option>
                     <option value="is_featured">Featured</option>
                     <option value="price_ascending">Price: Low to High</option>
