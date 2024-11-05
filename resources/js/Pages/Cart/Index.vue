@@ -41,11 +41,9 @@ const formRemoveKey = useForm({
 })
 // if coupon code exist in session then set orderSummary to coupon values NEEDED FOR REHYDRATING DATA (didn't want rehydrate without watch :(  )
 watch(couponCode, (newCode) => {
-    if(newCode !== null) {
         orderSummary.value.cart_subtotal = props.order_summary.cart_subtotal; 
         orderSummary.value.cart_tax = props.order_summary.cart_tax; 
         orderSummary.value.new_total = props.order_summary.new_total;
-    }
 })
 // don't give values with discount to go in negative numbers when its FREE!
 const validateNumericValues = (obj) => {
