@@ -64,14 +64,26 @@ class Cart extends Model
             return $carry + ($price * $item['product_item']['quantity']);
         }, 0);
         
-        $taxRate = config('cart.tax');
+        $taxRate = config('cart.tax') * 100; // 0.2 to 20%
         $cartTax = $this->taxedTotal($subtotal);
         $newTotal = round($subtotal + $cartTax, 2);
-        return [
-            'cart_subtotal' => $subtotal,
-            'cart_tax' => $cartTax,
-            'tax_rate' => $taxRate * 100, // To represent percentage
-            'new_total' => $newTotal
+        $couponCode = Session::get('coupon')['code'] ?? null; 
+        $discountWithCoupon = Session::get('coupon')['discount'] ?? 0; 
+        $subtotalWithCoupon = max(0, $subtotal - $discountWithCoupon); 
+        $taxedTotalWithCoupon = $this->taxedTotal($subtotalWithCoupon, $taxRate); 
+        $newTotalWithCoupon = round($subtotalWithCoupon + $taxedTotalWithCoupon, 2); 
+        // if discount exists then apply it
+        $cart_subtotal = $couponCode ? $subtotalWithCoupon : $subtotal; 
+        $cart_tax = $couponCode ? $taxedTotalWithCoupon : $cartTax; 
+        $new_total = $couponCode ? $newTotalWithCoupon : $newTotal; 
+        return [ 
+            'tax_rate' => $taxRate, // To represent percentage 
+            'cart_subtotal' => $cart_subtotal, 
+            'cart_tax' => $cart_tax, 
+            'new_total' => $new_total, 
+            'coupon' => [ 
+                'code' => $couponCode, 'discount' => $discountWithCoupon,
+            ],
         ];
     }
     // TESTING method. Maybe it need to calculate with items from DB and not from data builded from session
