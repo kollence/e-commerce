@@ -213,37 +213,14 @@ const submitCartItems = () => {
                         </tbody>
                     </table>
                 </div>
-                <div class="md:col-span-3">
-                    <div class="rounded-lg border border-grey-300 shadow-md p-5">
-                        <h2 class="text-lg font-medium mb-4">Order Summary</h2>
-                        <div class="flex justify-between mb-2">
-                        <span>Subtotal of {{cartCounter}} items:</span>
-                        <span>{{currencyFormat(orderSummary.cart_subtotal)}}</span>
-                        </div>
-                        <div class="flex justify-between mb-2">
-                        <span>Tax:</span>
-                        <span>{{orderSummary.tax_rate}}%</span>
-                        </div>
-                        <div class="flex justify-between mb-2">
-                        <span>Cart Tax:</span>
-                        <span>{{currencyFormat(orderSummary.cart_tax)}}</span>
-                        </div>
-                        <div class="flex justify-between mb-4">
-                        <span>Total:</span>
-                        <span>{{currencyFormat(orderSummary.new_total)}}</span>
-                        </div>
-                        <button class="btn btn-primary w-full">Checkout</button>
-                    </div>
-                    <div class="flex flex-col item-center justify-center shadow-md rounded-lg border border-grey-300 mt-3 p-5">
-                        <span class="mx-auto">Coupon code:</span>
-                        <form class="mx-auto flex flex-col" @submit.prevent="applyCoupon">
-                            <input type="text" v-model="formCoupon.coupon_code" class="text-black border border-grey-300 rounded-lg p-2" placeholder="Enter coupon code">
-                                <span v-if="page.props.errors.error" class="text-red-500 text-sm text-center">{{page.props.errors.error[0]}}</span>
-                            <button class="border border-lime-600 rounded-md px-5 py-2 bg-lime-500 text-black font-semibold mx-auto btn btn-primary mt-2">Apply</button>
-                        </form>
-                    </div>
-                </div>
-                
+                <OrderSummary
+                    :cartSubtotal="orderSummary.cart_subtotal"
+                    :cartTax="orderSummary.cart_tax"
+                    :taxRate="orderSummary.tax_rate"
+                    :cartTotal="orderSummary.new_total"
+                    :couponCode="couponCode"
+                    :couponDiscount="discountWithCoupon"
+                />
             </div>
             <div v-else class="pt-5 text-center">Cart is empty.</div>
         </div>
