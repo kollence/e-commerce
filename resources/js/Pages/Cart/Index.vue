@@ -20,10 +20,10 @@ const discountWithCoupon = computed(() => props.order_summary.coupon.discount ??
 
 // set dynamic data based on couponCode if exist. Load coupon discounts or load default values
 const orderSummary = ref({
-    cart_subtotal: Number(props.order_summary.cart_subtotal.toFixed(2)),
+    cart_subtotal: props.order_summary.cart_subtotal,
     cart_tax: props.order_summary.cart_tax,
     tax_rate: props.order_summary.tax_rate,
-    new_total: Number(props.order_summary.new_total.toFixed(2)),
+    new_total: props.order_summary.new_total,
 });
 const cartTableWrapper = ref(null); // ref for cart table wrapper
 const page = usePage();
