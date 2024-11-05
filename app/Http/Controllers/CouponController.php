@@ -47,6 +47,10 @@ class CouponController extends Controller
         $subtotal = $cart->totalSubtotal();
         // dd($subtotal);
         $discount = $coupon->discount($subtotal);
+        $request->session()->put("coupon", [
+            "code" => $couponCode->code,
+            "discount" => $discount,
+        ]);
         return redirect()->back()->with("message", "Coupon applied successfully");
     }
 
