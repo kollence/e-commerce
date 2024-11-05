@@ -39,18 +39,14 @@ const form = useForm({
 const formRemoveKey = useForm({
     cart_item_key: null,
 })
-const formCoupon = useForm({
-    coupon_code: null
+// if coupon code exist in session then set orderSummary to coupon values NEEDED FOR REHYDRATING DATA (didn't want rehydrate without watch :(  )
+watch(couponCode, (newCode) => {
+    if(newCode !== null) {
+        orderSummary.value.cart_subtotal = props.order_summary.cart_subtotal; 
+        orderSummary.value.cart_tax = props.order_summary.cart_tax; 
+        orderSummary.value.new_total = props.order_summary.new_total;
+    }
 })
-const applyCoupon = () => {
-    // console.log(formCoupon.coupon_code);
-    formCoupon.post(route('coupon.apply'), {
-        preserveScroll: true,
-        onSuccess: () => {
-            formCoupon.reset()
-        },
-    })
-}
 
 function removeFromCart(key) {
     formRemoveKey.cart_item_key = key;
