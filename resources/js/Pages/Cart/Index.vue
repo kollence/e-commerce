@@ -12,6 +12,13 @@ const props = defineProps({
 })
                     // use Lodash isEqual to compare objects
 const cartItems = ref(cloneDeep(props.cart_items));
+
+const cartTableWrapper = ref(null); // ref for cart table wrapper
+
+const couponCode = computed(() => props.order_summary.coupon.code)
+const discountWithCoupon = computed(() => props.order_summary.coupon.discount ?? 0)
+
+// set dynamic data based on couponCode if exist. Load coupon discounts or load default values
 const orderSummary = ref({
     cart_subtotal: Number(props.order_summary.cart_subtotal.toFixed(2)),
     cart_tax: props.order_summary.cart_tax,
