@@ -1,10 +1,10 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
 import { cloneDeep, isEqual } from 'lodash'; // Import lodash for deep comparison
 import Breadcrumbs from '@/Components/LayoutPartials/Breadcrumbs.vue';
 import breadcrumbs from '@/Components/LayoutPartials/store/breadcrumbs';
-import toast from '@/Components/Toast/store/toast';
+import OrderSummary from '@/Components/Cart/OrderSummary.vue';
 
 const props = defineProps({
     cart_items: Object,
@@ -25,19 +25,13 @@ const orderSummary = ref({
     tax_rate: props.order_summary.tax_rate,
     new_total: props.order_summary.new_total,
 });
-const cartTableWrapper = ref(null); // ref for cart table wrapper
-const page = usePage();
-const cartCounter = computed(() => page.props.cart_count)
-// console.log(cartItems.value);
-
-// Detect mouse leave outside the cart table
+// Detect mouse leave outside the cart table and then send request to update cart items
 const handleMouseOutside = () => {
     // If the mouseleave compare if object got changed and if it is then submit cart items
     if (!isEqual(cartItems.value, props.cart_items)) {
        submitCartItems();
     }
 };
-
 
 const form = useForm({
     cart_items: null,
@@ -109,7 +103,7 @@ const updateQuantity = (key) => {
     orderSummary.value.new_total = Number(new_total_format.toFixed(2));
 };
 
-const  submitCartItems = () => {
+const submitCartItems = () => {
         // Extract cart item properties and create a new object with the desired properties
         const extractCartItemProperties = Object.fromEntries(Object.entries(cartItems.value).map(([key, value]) => [key, { product_item_id: value.product_item.product_item_id, quantity: value.product_item.quantity, subtotal: value.subtotal, size_option_id: value.product_item.size_option.id}]));
         // console.log(extractCartItemProperties);
@@ -172,14 +166,14 @@ const  submitCartItems = () => {
                                         <div class="bg-red-300 rounded-full text-stone-400 h-10 w-10" :style="{'background-color': item.product_item.color.hex}"></div>
                                     </div>
                                 </td>
-                                <td class="px-4 py-2 text-center">
-                                    <div class="p-2 bg-stone-200 border-red-300 border-1" >{{ item.product_item.size_option.name }}</div>
+                                <td class="p-2 text-center">
+                                    <div class="p-2 bg-stone-200 border-red-300 rounded-xl border-1 text-stone-600" >{{ item.product_item.size_option.name }}</div>
                                 </td>
                                 <td class="px-4 py-2 text-center">
-                                    <div  class="flex text-black items-center justify-center">
-                                        <button class="decrement-button border-l border-gray-700 border-y px-3 bg-stone-200 rounded-l text-2xl" @click="decrementQuantity(key)">-</button>
-                                        <input v-model="item.product_item.quantity" @change="updateQuantity(key)" type="number" min="1" max="599" class="appearance-none-arrow border rounded-none px-4 py-1 w-17 text-center">
-                                        <button class="increment-button border-r border-gray-700 border-y px-3 bg-stone-200 rounded-r text-2xl" @click="incrementQuantity(key)">+</button>
+                                    <div  class="flex items-center justify-center">
+                                        <button class="decrement-button border-l border-gray-700 border-y px-3 bg-stone-200 rounded-l text-2xl text-stone-600" @click="decrementQuantity(key)">-</button>
+                                        <input v-model="item.product_item.quantity" @change="updateQuantity(key)" type="number" min="1" max="599" class="appearance-none-arrow border rounded-none px-4 py-1 w-17 text-center text-stone-600">
+                                        <button class="increment-button border-r border-gray-700 border-y px-3 bg-stone-200 rounded-r text-2xl text-stone-600" @click="incrementQuantity(key)">+</button>
                                     </div>
                                 </td>
                                 <td v-if="item.product_item.sale_price < item.product_item.original_price && item.product_item.sale_price > 0" class="px-4 py-2 text-center text-red-600 font-bold">
@@ -190,12 +184,12 @@ const  submitCartItems = () => {
                                 </td>
                                 <td v-else class="px-4 py-2 text-center">
                                     <div class="grid item-center">
-                                        <div class="text-black font-bold text-lg">{{ currencyFormat(item.product_item.original_price) }}</div>
+                                        <div class="font-bold text-lg">{{ currencyFormat(item.product_item.original_price) }}</div>
                                     </div>
                                 </td>
                                 <td class="px-4 py-2 text-center">
                                     <div class="grid item-center">
-                                        <div class="text-black font-bold text-lg">{{ currencyFormat(item.subtotal) }}</div>
+                                        <div class="font-bold text-lg">{{ currencyFormat(item.subtotal) }}</div>
                                     </div>
                                 </td>
                                 <td class="px-4 py-2 text-center">
