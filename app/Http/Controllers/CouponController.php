@@ -81,7 +81,7 @@ class CouponController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Coupon $coupon)
+    public function forget(Coupon $coupon)
     {
         //
     }
