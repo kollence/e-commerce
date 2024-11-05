@@ -17,6 +17,7 @@ Route::post('/cart/updateQuantity', [CartController::class, 'updateQuantity'])->
 Route::post('/cart/remove', [CartController::class, 'remove'])->name('cart.remove');
 
 Route::post('coupon', [CouponController::class, 'apply'])->name('coupon.apply');
+Route::delete('coupon', [CouponController::class, 'forget'])->name('coupon.forget');
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
