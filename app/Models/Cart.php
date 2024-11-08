@@ -114,6 +114,13 @@ class Cart
         } 
     }
     /**
+     * Get total of subtotal fields of cart items
+     */
+    public function totalSubtotal()
+    {
+        return array_sum(array_column($this->items, 'subtotal'));
+    }
+    /**
      * Update cart data in session
      */
     public function updateCart()
