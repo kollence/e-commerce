@@ -48,7 +48,6 @@ watch(couponCode, (newCode) => {
 // don't give values with discount to go in negative numbers when its FREE!
 const validateNumericValues = (obj) => {
     Object.keys(obj).forEach(key => { 
-        console.log(obj[key]);
         if (typeof obj[key] === 'number' && obj[key] < 0) { 
             obj[key] = 0;
         }
@@ -114,7 +113,7 @@ const submitCartItems = () => {
         const extractCartItemProperties = Object.fromEntries(Object.entries(cartItems.value).map(([key, value]) => [key, { product_item_id: value.product_item.product_item_id, quantity: value.product_item.quantity, subtotal: value.subtotal, size_option_id: value.product_item.size_option.id}]));
         // console.log(extractCartItemProperties);
         form.cart_items = extractCartItemProperties
-        form.post(route('cart.updateQuantity'), {
+        form.post(route('cart.update'), {
             preserveScroll: true,
             onSuccess: () => {},
         });
