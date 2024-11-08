@@ -60,11 +60,6 @@ class CartService
         ];
     }
 
-    public function buildCartData()
-    {
-        return $this->cart->getCartItems();
-    }
-
     public function updateCartItems($cartItems)
     {
         foreach ($cartItems as $key => $item) {
