@@ -2,22 +2,18 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Session;
 use App\Enums\CartTypeEnum;
 
-class Cart extends Model
+class Cart
 {
-    use HasFactory;
-
     protected $items = [];
-    protected $cartType; // CartType::DEFAULT_CART
+    protected $cartType;
 
     public function __construct(CartTypeEnum $cartType = CartTypeEnum::DEFAULT_CART)
     {
         $this->cartType = $cartType;
-        $this->items = $this->cartItems();
+        $this->items = $this->getCartItems();
     }
 
     /**
@@ -26,7 +22,7 @@ class Cart extends Model
     public function addItem($productItem, $quantity, $sizeOption, $price)
     {
         $key = $this->generateUniqueKey($productItem->id, $sizeOption->slug);
-        
+
         if (isset($this->items[$key])) {
             $this->items[$key]['product_item']['quantity'] += $quantity;
             $this->items[$key]['subtotal'] += $price * $quantity;
@@ -46,57 +42,6 @@ class Cart extends Model
 
         $this->updateCart();
     }
-    /**
-     * Get cart_items from session
-    */
-    public function cartItems()
-    {
-        $cart = json_decode(Session::get($this->cartType->value), true);
-        return $cart['cart_items'] ?? [];
-    }
-
-    public function getCartSummary()
-    {
-        $subtotal = array_reduce($this->items, function ($carry, $item) {
-            $productItem = ProductItem::findOrFail($item['product_item']['product_item_id']);
-            // $price = $productItem->sale_price ?? $productItem->original_price;
-            $price = $productItem->price;
-            return $carry + ($price * $item['product_item']['quantity']);
-        }, 0);
-        
-        $taxRate = config('cart.tax') * 100; // 0.2 to 20%
-        $cartTax = $this->taxedTotal($subtotal);
-        $newTotal = round($subtotal + $cartTax, 2);
-        $couponCode = Session::get('coupon')['code'] ?? null; 
-        $discountWithCoupon = Session::get('coupon')['discount'] ?? 0; 
-        $subtotalWithCoupon = max(0, $subtotal - $discountWithCoupon); 
-        $taxedTotalWithCoupon = $this->taxedTotal($subtotalWithCoupon, $taxRate); 
-        $newTotalWithCoupon = round($subtotalWithCoupon + $taxedTotalWithCoupon, 2); 
-        // if discount exists then apply it
-        $cart_subtotal = $couponCode ? $subtotalWithCoupon : $subtotal; 
-        $cart_tax = $couponCode ? $taxedTotalWithCoupon : $cartTax; 
-        $new_total = $couponCode ? $newTotalWithCoupon : $newTotal; 
-        return [ 
-            'tax_rate' => $taxRate, // To represent percentage 
-            'cart_subtotal' => $cart_subtotal, 
-            'cart_tax' => $cart_tax, 
-            'new_total' => $new_total, 
-            'coupon' => [ 
-                'code' => $couponCode, 'discount' => $discountWithCoupon,
-            ],
-        ];
-    }
-    // TESTING method. Maybe it need to calculate with items from DB and not from data builded from session
-    public function totalSubtotal()
-    {
-        return array_sum(array_column($this->items, 'subtotal'));
-    }
-
-    public function taxedTotal($subtotal)
-    {
-        $taxRate = config('cart.tax');
-        return round($subtotal * $taxRate, 2);
-    }
 
     /**
      * Get product item from cart
@@ -109,7 +54,7 @@ class Cart extends Model
         foreach ($cartItems as $key => $item) {
             $productItem = ProductItem::with(['product', 'images', 'color', 'sizeOptions'])
                                      ->find($item['product_item']['product_item_id']);
-            
+            $sizeOptionFields = $productItem->sizeOptions->where('id', $item['product_item']['size_option']['id'])->first();
             $detailedCartItems[$key] = [
                 'product' => [
                     'id' => $productItem->product->id,
@@ -139,8 +84,8 @@ class Cart extends Model
                     'quantity' => $item['product_item']['quantity'],
                     'size_option' => [
                         'id' => $item['product_item']['size_option']['id'],
-                        'name' => $productItem->sizeOptions->where('id', $item['product_item']['size_option']['id'])->first()->name,
-                        'slug' => $productItem->sizeOptions->where('id', $item['product_item']['size_option']['id'])->first()->slug,
+                        'name' => $sizeOptionFields->name,
+                        'slug' => $sizeOptionFields->slug,
                     ],
                 ],
                 'subtotal' => $item['subtotal'],
@@ -150,11 +95,31 @@ class Cart extends Model
         return $detailedCartItems;
     }
 
-    protected function updateCart()
+    /**
+     * Get cart items from session
+     */
+    public function cartItems()
+    {
+        $cart = json_decode(Session::get($this->cartType->value), true);
+        return $cart['cart_items'] ?? [];
+    }
+    /** 
+    * Update item in cart 
+    */ 
+    public function updateItem($key, $quantity, $price) 
+    { 
+        if (isset($this->items[$key])) { 
+            $this->items[$key]['product_item']['quantity'] = $quantity; 
+            $this->items[$key]['subtotal'] = $price * $quantity;
+        } 
+    }
+    /**
+     * Update cart data in session
+     */
+    public function updateCart()
     {
         Session::put($this->cartType->value, json_encode([
             'cart_items' => $this->items,
-            'order_summary' => $this->getCartSummary()
         ], JSON_UNESCAPED_UNICODE));
     }
 
@@ -171,22 +136,9 @@ class Cart extends Model
         return $productItemId . '_' . strtoupper($sizeOptionSlug);
     }
 
-    public function updateCartItems($cartItems)
-    {
-        foreach ($cartItems as $key => $item) {
-                if (isset($this->items[$key])) {
-                    $productItem = ProductItem::findOrFail($item['product_item_id']);
-                    // $price = $productItem->sale_price ?? $productItem->original_price;
-                    $price = $productItem->price;
-                    $this->items[$key]['product_item']['quantity'] = $item['quantity'];
-                    $this->items[$key]['subtotal'] = $price * $item['quantity'];
-                
-            }
-
-            $this->updateCart();
-        }
-    }
-
+    /**
+     * Remove an item from the cart
+     */
     public function removeCartItem($key)
     {
         if (isset($this->items[$key])) {
@@ -195,6 +147,9 @@ class Cart extends Model
         }
     }
 
+    /**
+     * Clear all items from the cart and the session
+     */
     public function clearCart()
     {
         $this->items = [];
