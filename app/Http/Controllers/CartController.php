@@ -34,7 +34,7 @@ class CartController extends Controller {
 
     public function index() 
     { 
-        $cartData = $this->cartService->buildCartData();
+        $cartData = $this->cartService->getCartItems();
         $orderSummary = $this->cartService->getCartSummary();
 
         return inertia('Cart/Index', [
