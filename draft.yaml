@@ -85,8 +85,8 @@ models:
     shipping_method: string nullable
     payment_method: string
     payment_status: enum:pending,paid,refunded,failed,cancelled default:pending
-    billing_address: text nullable
-    shipping_address: text
+    billing_address_id: unsignedBigInteger nullable
+    shipping_address_id: unsignedBigInteger nullable
     currency: string
     notes: text nullable
     relationships:
