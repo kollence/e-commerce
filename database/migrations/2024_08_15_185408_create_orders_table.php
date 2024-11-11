@@ -16,14 +16,15 @@ return new class extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained();
+            $table->string('order_number')->unique()->nullable();
             $table->enum('status', ["pending","processing","completed","cancelled"])->default('pending');
             $table->integer('total_price');
             $table->integer('shipping_price');
             $table->string('shipping_method');
             $table->string('payment_method');
             $table->enum('payment_status', ["pending","paid","refunded", "failed","cancelled"])->default('pending');
-            $table->text('billing_address');
-            $table->text('shipping_address');
+            $table->unsignedBigInteger('billing_address_id')->nullable();
+            $table->unsignedBigInteger('shipping_address_id')->nullable();
             $table->string('currency');
             $table->text('notes')->nullable();
             $table->timestamps();

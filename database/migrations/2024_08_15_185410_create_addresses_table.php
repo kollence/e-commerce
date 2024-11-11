@@ -16,11 +16,8 @@ return new class extends Migration
         Schema::create('addresses', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->nullable()->constrained();
-            $table->foreignId('order_id')->nullable()->constrained();
-            $table->string('address_line_1');
-            $table->string('address_line_2')->nullable();
+            $table->string('street_and_number')->nullable();
             $table->string('city');
-            $table->string('state_province')->nullable();
             $table->string('country');
             $table->string('zip_code');
             $table->string('phone_1')->nullable();

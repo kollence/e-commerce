@@ -24,8 +24,7 @@ class AddressFactory extends Factory
     {
         return [
             'user_id' => User::factory(),
-            'order_id' => Order::factory(),
-            'address_line_1' => fake()->streetAddress(),
+            'street_and_number' => fake()->streetAddress(),
             'city' => fake()->city(),
             'state_province' => fake()->word(),
             'country' => fake()->country(),

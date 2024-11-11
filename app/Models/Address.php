@@ -17,9 +17,7 @@ class Address extends Model
      */
     protected $fillable = [
         'user_id',
-        'order_id',
-        'address_line_1',
-        'address_line_2',
+        'street_and_number',
         'city',
         'state_province',
         'country',
@@ -42,10 +40,5 @@ class Address extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
-    }
-
-    public function order(): BelongsTo
-    {
-        return $this->belongsTo(Order::class);
     }
 }
