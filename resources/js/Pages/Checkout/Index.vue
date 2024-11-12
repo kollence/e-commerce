@@ -1,4 +1,5 @@
 <script setup>
+import {loadStripe} from '@stripe/stripe-js';
 import OrderSummary from '@/Components/Cart/OrderSummary.vue';
 import { Head } from '@inertiajs/vue3';
 import { ref } from 'vue';
