@@ -35,11 +35,14 @@ STRIPE_KEY=your-stripe-key
 STRIPE_SECRET=your-stripe-secret
 ```
 
-Add Stripe Keys in Cashier Config
+Add Stripe Keys in config/services.php
 
 ```php
-'stripe_key' => env('STRIPE_KEY'),
-'stripe_secret' => env('STRIPE_SECRET'),
+'stripe' => [
+    'key' => env('STRIPE_KEY'),
+    'secret' => env('STRIPE_SECRET'),
+    'webhook_secret' => env('STRIPE_WEBHOOK_SECRET'),
+]
 ```
 
 Go to site: 
@@ -48,7 +51,7 @@ Go to site:
 Paste Publishable key to STRIPE_KEY and Secret key to STRIPE_SECRET.
 
 Add MIX_STRIPE_KEY to .env so you could access key from frontend, but not directly.
-```php
+```bash
 MIX_STRIPE_KEY="${STRIPE_KEY}"
 ```
 
