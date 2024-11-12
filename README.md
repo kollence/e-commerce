@@ -1,24 +1,20 @@
 ## Laravel Cashier (Stripe)
 
 Implementing Laravel Cashier (Stripe) in your Laravel application is easy. First, install the package via Composer:
-
 ```bash
 sail composer require laravel/cashier
 ```
 
 Next, publish the Cashier configuration file:
-
 ```bash
 sail artisan vendor:publish --tag="cashier-migrations"
 ```
 
 Then, run the migration to create the necessary tables:
-
 ```bash
 sail artisan migrate
 ```
 Add trait in User Model
-
 ```php
 use Laravel\Cashier\Billable;
 
@@ -29,14 +25,12 @@ class User extends Authenticatable
 ```
 
 Add Stripe Keys in .env file
-
 ```bash
 STRIPE_KEY=your-stripe-key
 STRIPE_SECRET=your-stripe-secret
 ```
 
 Add Stripe Keys in config/services.php
-
 ```php
 'stripe' => [
     'key' => env('STRIPE_KEY'),
@@ -50,9 +44,9 @@ Go to site:
 
 Paste Publishable key to STRIPE_KEY and Secret key to STRIPE_SECRET.
 
-Add MIX_STRIPE_KEY to .env so you could access key from frontend, but not directly.
+Add VITE_STRIPE_KEY to .env so you could access key from frontend via import.meta.env.VITE_STRIPE_KEY.
 ```bash
-MIX_STRIPE_KEY="${STRIPE_KEY}"
+VITE_STRIPE_KEY="${STRIPE_KEY}"
 ```
 
 ### Stripe JS
@@ -62,7 +56,7 @@ But we are using Inertia and Vue 3, so we will skip this page and go to project 
 - [Stripe JS](https://docs.stripe.com/js)
 
 To install module go to GitHub stripe/stripe-js
-- [Project on GitHub](https://docs.stripe.com/js)
+- [Project on GitHub](https://github.com/stripe/stripe-js)
 
 Use npm to install the Stripe.js module:
 ```bash
@@ -73,6 +67,14 @@ After installation you can use it in your Vue 3 project.
 ```js
 import {loadStripe} from '@stripe/stripe-js';
 ```
+
+Accessing VITE_STRIPE_KEY in frontend
+```js
+const key = import.meta.env.VITE_STRIPE_KEY;
+const stripe = await loadStripe(key);
+```
+
+In this project loadStripe will be imported in Checkout/Index.vue
 
 You can now use the Cashier package to handle subscription billing and manage customer information in your Laravel application.
 
