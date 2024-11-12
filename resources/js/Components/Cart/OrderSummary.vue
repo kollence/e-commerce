@@ -1,5 +1,5 @@
 <script setup>
-import { useForm, usePage } from '@inertiajs/vue3';
+import { Link, useForm, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
 
 const props = defineProps({
@@ -39,7 +39,7 @@ const removeCoupon = () => {
 
 <template>
     <div class="md:col-span-3">
-        <div class="rounded-lg border border-green-700 border-2 shadow-md">
+        <div class="rounded-lg border border-green-700 shadow-md">
             <template v-if="couponCode">
                 <div class="flex justify-between items-center bg-lime-800 rounded-t-lg p-2">
                     <span>Coupon Code Discont:</span>
@@ -62,7 +62,7 @@ const removeCoupon = () => {
                 </div>
             </template>
             <div class=" px-2 py-4">
-                <h2 class="text-lg font-medium mb-4 ml-2"
+                <h2 class="text-2xl font-semibold mb-4 ml-2"
                     v-html="couponCode ? 'Order Summary With Discount' : 'Order Summary'">
                 </h2>
                 <div class="flex justify-between mb-2 px-2">
@@ -81,10 +81,10 @@ const removeCoupon = () => {
                     <span>Total:</span>
                     <span>{{ currencyFormat(cartTotal) }}</span>
                 </div>
-                <button class="border border-lime-600 rounded-md px-5 py-2 bg-lime-500 text-black font-semibold mx-auto  mt-2 w-full">Checkout</button>
+                <slot name="redirect-link"></slot>
             </div>
         </div>
-        <div v-if="!couponCode" class="flex flex-col item-center justify-center shadow-md rounded-lg border border-green-700 mt-3 py-2 border-2">
+        <div v-if="!couponCode" class="flex flex-col item-center justify-center shadow-md rounded-lg border border-green-700 mt-3 py-2">
             <span class="mx-auto">Coupon code:</span>
             <form class="mx-auto flex flex-col" @submit.prevent="applyCoupon">
                 <input type="text" v-model="formCoupon.coupon_code" class="text-black bg-green-100 border border-green-200 rounded-lg p-2" placeholder="Enter coupon code">

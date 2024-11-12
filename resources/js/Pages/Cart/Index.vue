@@ -217,7 +217,13 @@ const submitCartItems = () => {
                     :cartTotal="orderSummary.new_total"
                     :couponCode="couponCode"
                     :couponDiscount="discountWithCoupon"
-                />
+                >
+                <template  #redirect-link>
+                    <div class="flex justify-between mb-4 px-2">
+                        <Link :href="route('checkout.index')" class="border border-lime-600 rounded-md px-5 py-2 bg-lime-500 text-black text-center font-semibold mx-auto  mt-2 w-full">Checkout</Link>
+                    </div>
+                </template>   
+                </OrderSummary>
             </div>
             <div v-else class="pt-5 text-center">Cart is empty.</div>
         </div>
