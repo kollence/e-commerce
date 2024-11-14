@@ -27,7 +27,7 @@ class AddressFactory extends Factory
             'street_and_number' => fake()->streetAddress(),
             'city' => fake()->city(),
             'state_province' => fake()->word(),
-            'country' => fake()->country(),
+            'state' => fake()->country(),
             'zip_code' => fake()->postcode(),
             'phone_1' => fake()->phoneNumber(),
         ];
