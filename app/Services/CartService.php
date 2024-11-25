@@ -49,7 +49,7 @@ class CartService
         $new_total = $couponCode ? $newTotalWithCoupon : $newTotal;
 
         return [
-            'tax_rate' => $taxRate * 100, // To represent percentage
+            'tax_rate' => $taxRate, // To represent percentage
             'cart_subtotal' => $cart_subtotal,
             'cart_tax' => $cart_tax,
             'new_total' => $new_total,
