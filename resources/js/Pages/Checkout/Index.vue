@@ -1,13 +1,17 @@
 <script setup>
 import {loadStripe} from '@stripe/stripe-js';
-import OrderSummary from '@/Components/Cart/OrderSummary.vue';
+import OrderSummary from '@/Components/OrderSummary/OrderSummary.vue';
 import { Head, useForm } from '@inertiajs/vue3';
 import { onMounted, ref } from 'vue';
+import { useCartStore } from '@/Components/Cart/store';
 
+const cartStore = useCartStore();
 const props = defineProps({
     order_summary: Object,
 })
-// console.log(props.order_summary);
+// populate cart store with props
+cartStore.orderSummary = props.order_summary;
+
 const isSubmitting = ref(true);
 const cardError = ref('');
 const form = useForm({
@@ -32,6 +36,7 @@ const form = useForm({
     notes: '',
     shipping_method: 'standard',
     payment_method: 'card',
+    payment_method_id: null,
 })
 
 const stripe = ref({})
@@ -54,24 +59,49 @@ const initStripe = async () => {
         },
     });
     cardElement.value.mount('#card-element');
-    cardElement.value.addEventListener('change', (event) => {
+    cardElement.value.on('change', (event) => {
         isSubmitting.value = false    
         cardError.value = event.error ? event.error.message : '';
     })
 }
 
-// const submit = async () => {
-//     isSubmitting.value = true;
-//     const {error} = await stripe.value.confirmCardPayment(props.order_summary.payment_intent.client_secret, {
-//         payment_method: {
-//             card: cardElement.value,
-//             billing_details: {
-//                 name: form.name,
-//                 email: form.email,
-//             },
-//         },
-//     })
-// }
+const submitPayment = async () => {
+    isSubmitting.value = false;
+
+    const {paymentMethod, error} = await stripe.value.createPaymentMethod({
+        type: 'card',
+        card: cardElement.value,
+        billing_details: {
+            name: form.name,
+            email: form.email,
+            address: {
+                city: form.address.city,
+                country: form.address.country,
+                line1: form.address.street_and_number,
+                postal_code: form.address.zip,
+            },
+            phone: form.phone_1
+        },
+    })
+    if(error) {
+        cardError.value = error.message;
+        return;
+    }
+    form.payment_method_id = paymentMethod.id;
+    form.post(route('checkout.store'), {
+        preserveScroll: true,
+        onSuccess: () => {
+            console.log('success');
+            
+            //redirect
+            // window.location.href = route('checkout.success');
+        },
+        onError: (error) => {
+            cardError.value = error.message;
+        },
+    })
+
+}
 
 </script>
 <template>
@@ -80,7 +110,7 @@ const initStripe = async () => {
     <div class="relative py-3 w-full max-w-7xl mx-auto  shadow-lg rounded-lg"> 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-6"> <!-- Left column: Form --> 
             <div class="flex flex-col"> 
-                <form class="rounded-lg border border-green-700 p-4"> 
+                <form @submit.prevent="submitPayment" class="rounded-lg border border-green-700 p-4"> 
                     <h2 class="text-2xl font-semibold mb-4">Billing Details</h2> 
                     <div class="mb-4 text-slate-900 dark:text-white"> 
                         <label class="block text-slate-500 dark:text-slate-400 text-sm font-bold mb-2" for="name">Name</label> 
@@ -133,23 +163,23 @@ const initStripe = async () => {
                         </div> 
                         <div class="mb-4"> 
                             <label class="block text-gray-700 text-sm font-bold mb-2" for="billing_city">City</label> 
-                            <input v-model="form.billing_address.city" class="shadow  dark:bg-gray-800 appearance-none border rounded w-full py-2 px-3 text-slate-500 dark:text-slate-400 leading-tight focus:outline-none focus:shadow-outline" id="billing_country" type="text" placeholder="Country">
+                            <input v-model="form.billing_address.city" class="shadow  dark:bg-gray-800 appearance-none border rounded w-full py-2 px-3 text-slate-500 dark:text-slate-400 leading-tight focus:outline-none focus:shadow-outline" id="billing_city" type="text" placeholder="City">
                         </div> 
                         <div class="mb-4"> 
                             <label class="block text-gray-700 text-sm font-bold mb-2" for="billing_street_and_number">Street and Number</label> 
-                            <input v-model="form.billing_address.street_and_number" class="shadow  dark:bg-gray-800 appearance-none border rounded w-full py-2 px-3 text-slate-500 dark:text-slate-400 leading-tight focus:outline-none focus:shadow-outline" id="billing_country" type="text" placeholder="Country">
+                            <input v-model="form.billing_address.street_and_number" class="shadow  dark:bg-gray-800 appearance-none border rounded w-full py-2 px-3 text-slate-500 dark:text-slate-400 leading-tight focus:outline-none focus:shadow-outline" id="billing_street_and_number" type="text" placeholder="Street and Number">
                         </div>
                         <div class="mb-4"> 
                             <label class="block text-gray-700 text-sm font-bold mb-2" for="billing_zip_code">ZIP Code</label> 
-                            <input v-model="form.billing_address.zip_code" class="shadow  dark:bg-gray-800 appearance-none border rounded w-full py-2 px-3 text-slate-500 dark:text-slate-400 leading-tight focus:outline-none focus:shadow-outline" id="billing_country" type="text" placeholder="Country">
+                            <input v-model="form.billing_address.zip_code" class="shadow  dark:bg-gray-800 appearance-none border rounded w-full py-2 px-3 text-slate-500 dark:text-slate-400 leading-tight focus:outline-none focus:shadow-outline" id="billing_zip_code" type="text" placeholder="ZIP Code">
                         </div> 
                         <div class="mb-4"> 
                             <label class="block text-gray-700 text-sm font-bold mb-2" for="billing_phone_1">Phone 1</label> 
-                            <input v-model="form.billing_address.phone_1" class="shadow  dark:bg-gray-800 appearance-none border rounded w-full py-2 px-3 text-slate-500 dark:text-slate-400 leading-tight focus:outline-none focus:shadow-outline" id="billing_country" type="text" placeholder="Country">
+                            <input v-model="form.billing_address.phone_1" class="shadow  dark:bg-gray-800 appearance-none border rounded w-full py-2 px-3 text-slate-500 dark:text-slate-400 leading-tight focus:outline-none focus:shadow-outline" id="billing_phone_1" type="text" placeholder="Phone 1">
                         </div> 
                         <div class="mb-4"> 
                             <label class="block text-gray-700 text-sm font-bold mb-2" for="billing_phone_2">Phone 2 (optional)</label> 
-                            <input v-model="form.billing_address.phone_2" class="shadow  dark:bg-gray-800 appearance-none border rounded w-full py-2 px-3 text-slate-500 dark:text-slate-400 leading-tight focus:outline-none focus:shadow-outline" id="billing_country" type="text" placeholder="Country">
+                            <input v-model="form.billing_address.phone_2" class="shadow  dark:bg-gray-800 appearance-none border rounded w-full py-2 px-3 text-slate-500 dark:text-slate-400 leading-tight focus:outline-none focus:shadow-outline" id="billing_phone_2" type="text" placeholder="Phone 2">
                         </div>
                     </div>
                     <div class="mb-4 text-slate-900 dark:text-white">
@@ -182,14 +212,7 @@ const initStripe = async () => {
             </div> 
                 <!-- Right column: Order Summary --> 
             <div class="flex flex-col "> 
-                <OrderSummary
-                    :cartSubtotal="order_summary.cart_subtotal"
-                    :cartTax="order_summary.cart_tax"
-                    :taxRate="order_summary.tax_rate"
-                    :cartTotal="order_summary.new_total"
-                    :couponCode="order_summary.coupon.code"
-                    :couponDiscount="order_summary.coupon.discount"
-                />
+                <OrderSummary />
             </div> 
         </div> 
     </div> 
