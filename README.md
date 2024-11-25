@@ -76,5 +76,16 @@ const stripe = await loadStripe(key);
 
 In this project loadStripe will be imported in Checkout/Index.vue
 
+### confirmCardPayment()
+ - Purpose: Confirms a payment using a payment method that has already been created.
+ - Usage: Typically used when you have a payment method (e.g., a card) and you want to confirm a payment immediately.
+ - Parameters: Requires a client secret and payment method details.
+ - Returns: A confirmation of the payment, including any errors.
+### createPaymentMethod()
+ - Purpose: Creates a payment method without immediately confirming a payment.
+ - Usage: Useful when you want to store the payment method for future use or when you need to confirm the payment separately.
+ - Parameters: Requires payment method details (e.g., card information).
+ - Returns: A payment method object, which can be stored and used later.
+
 You can now use the Cashier package to handle subscription billing and manage customer information in your Laravel application.
 
