@@ -23,7 +23,7 @@ Route::get('/shop/{product:slug}/{productItem}', [ShopController::class, 'show']
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
 Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
 Route::post('/cart/update', [CartController::class, 'update'])->name('cart.update')->middleware('throttle:40,1');
-Route::post('/cart/remove', [CartController::class, 'remove'])->name('cart.remove');
+Route::delete('/cart/remove', [CartController::class, 'remove'])->name('cart.remove');
 
 Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
 Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
