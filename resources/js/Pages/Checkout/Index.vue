@@ -1,6 +1,6 @@
 <script setup>
 import {loadStripe} from '@stripe/stripe-js';
-import OrderSummary from '@/Components/OrderSummary/OrderSummary.vue';
+import OrderSummary from '@/Components/Cart/OrderSummary.vue';
 import { Head, useForm } from '@inertiajs/vue3';
 import { onMounted, ref } from 'vue';
 import { useCartStore } from '@/Components/Cart/store';
