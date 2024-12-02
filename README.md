@@ -1,66 +1,91 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+## Laravel Cashier (Stripe)
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Implementing Laravel Cashier (Stripe) in your Laravel application is easy. First, install the package via Composer:
+```bash
+sail composer require laravel/cashier
+```
 
-## About Laravel
+Next, publish the Cashier configuration file:
+```bash
+sail artisan vendor:publish --tag="cashier-migrations"
+```
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Then, run the migration to create the necessary tables:
+```bash
+sail artisan migrate
+```
+Add trait in User Model
+```php
+use Laravel\Cashier\Billable;
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+class User extends Authenticatable
+{
+    use Billable;
+}
+```
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Add Stripe Keys in .env file
+```bash
+STRIPE_KEY=your-stripe-key
+STRIPE_SECRET=your-stripe-secret
+```
 
-## Learning Laravel
+Add Stripe Keys in config/services.php
+```php
+'stripe' => [
+    'key' => env('STRIPE_KEY'),
+    'secret' => env('STRIPE_SECRET'),
+    'webhook_secret' => env('STRIPE_WEBHOOK_SECRET'),
+]
+```
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+Go to site: 
+- [In developers mode take APIkeys](https://dashboard.stripe.com/test/apikeys).
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+Paste Publishable key to STRIPE_KEY and Secret key to STRIPE_SECRET.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Add VITE_STRIPE_KEY to .env so you could access key from frontend via import.meta.env.VITE_STRIPE_KEY.
+```bash
+VITE_STRIPE_KEY="${STRIPE_KEY}"
+```
 
-## Laravel Sponsors
+### Stripe JS
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+From this page you can implement scripts and modules for payment on frontend.
+But we are using Inertia and Vue 3, so we will skip this page and go to project on GitHub.
+- [Stripe JS](https://docs.stripe.com/js)
 
-### Premium Partners
+To install module go to GitHub stripe/stripe-js
+- [Project on GitHub](https://github.com/stripe/stripe-js)
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+Use npm to install the Stripe.js module:
+```bash
+sail npm install @stripe/stripe-js
+```
 
-## Contributing
+After installation you can use it in your Vue 3 project.
+```js
+import {loadStripe} from '@stripe/stripe-js';
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Accessing VITE_STRIPE_KEY in frontend
+```js
+const key = import.meta.env.VITE_STRIPE_KEY;
+const stripe = await loadStripe(key);
+```
 
-## Code of Conduct
+In this project loadStripe will be imported in Checkout/Index.vue
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### confirmCardPayment()
+ - Purpose: Confirms a payment using a payment method that has already been created.
+ - Usage: Typically used when you have a payment method (e.g., a card) and you want to confirm a payment immediately.
+ - Parameters: Requires a client secret and payment method details.
+ - Returns: A confirmation of the payment, including any errors.
+### createPaymentMethod()
+ - Purpose: Creates a payment method without immediately confirming a payment.
+ - Usage: Useful when you want to store the payment method for future use or when you need to confirm the payment separately.
+ - Parameters: Requires payment method details (e.g., card information).
+ - Returns: A payment method object, which can be stored and used later.
 
-## Security Vulnerabilities
+You can now use the Cashier package to handle subscription billing and manage customer information in your Laravel application.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
