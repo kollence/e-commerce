@@ -13,7 +13,7 @@ class Cart
     public function __construct(CartTypeEnum $cartType = CartTypeEnum::DEFAULT_CART)
     {
         $this->cartType = $cartType;
-        $this->items = $this->getCartItems();
+        $this->items = $this->cartItems();
     }
 
     /**
@@ -48,7 +48,7 @@ class Cart
     */ 
     public function getCartItems()
     {
-        $cartItems = $this->cartItems();
+        $cartItems = $this->items;
         $detailedCartItems = [];
 
         foreach ($cartItems as $key => $item) {
