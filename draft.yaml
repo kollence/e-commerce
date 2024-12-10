@@ -78,7 +78,8 @@ models:
       hasMany: Product
   Order:
     user_id: id foreign:users
-    order_number: string unique
+    order_number: string unique nullable
+    session_id: string unique nullable
     status: enum:pending,processing,completed,cancelled default:pending
     total_price: integer
     shipping_price: integer nullable

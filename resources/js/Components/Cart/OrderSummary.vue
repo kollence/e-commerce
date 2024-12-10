@@ -25,9 +25,9 @@ const removeCoupon = () => {
     <div class="md:col-span-3">
         <div class="rounded-lg border border-green-700 shadow-md">
             <template v-if="cartStore.couponCode">
-                <div class="flex justify-between items-center bg-lime-800 rounded-t-lg p-2">
-                    <span>Coupon Code Discont:</span>
-                    <button @click="removeCoupon()" type="button" class="remove-button text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-small rounded-full text-xs p-1 text-center inline-flex items-center me-1 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800">
+                <div class="flex justify-between items-center bg-lime-700 rounded-t-lg p-2">
+                    <span>Coupon Code Discount:</span>
+                    <button @click="removeCoupon()" type="button" class="border-2 border-lime-400 remove-button text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-small rounded-full text-xs p-1 text-center inline-flex items-center me-1 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800">
                         <svg class="w-5 h-5 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 17.94 6M18 18 6.06 6" />
                         </svg>

@@ -17,6 +17,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained();
             $table->string('order_number')->unique()->nullable();
+            $table->string('session_id')->unique()->nullable();
             $table->enum('status', ["pending","processing","completed","cancelled"])->default('pending');
             $table->integer('total_price');
             $table->integer('shipping_price');
@@ -25,7 +26,7 @@ return new class extends Migration
             $table->enum('payment_status', ["pending","paid","refunded", "failed","cancelled"])->default('pending');
             $table->unsignedBigInteger('billing_address_id')->nullable();
             $table->unsignedBigInteger('shipping_address_id')->nullable();
-            $table->string('currency');
+            $table->string('currency')->default('USD');
             $table->text('notes')->nullable();
             $table->timestamps();
         });

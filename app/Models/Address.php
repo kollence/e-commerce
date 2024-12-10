@@ -19,7 +19,7 @@ class Address extends Model
         'user_id',
         'street_and_number',
         'city',
-        'state_province',
+        'state',
         'country',
         'zip_code',
         'phone_1',

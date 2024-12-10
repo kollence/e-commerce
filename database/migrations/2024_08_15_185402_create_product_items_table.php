@@ -18,8 +18,8 @@ return new class extends Migration
             $table->foreignId('product_id')->constrained();
             $table->foreignId('color_id')->nullable()->constrained();
             $table->string('product_code');
-            $table->integer('original_price');
             $table->boolean('is_active')->default(true);
+            $table->integer('original_price');
             $table->integer('sale_price')->nullable();
             $table->timestamps();
         });

@@ -19,10 +19,12 @@ return new class extends Migration
             $table->string('street_and_number');
             $table->string('city');
             $table->string('country')->nullable();
+            $table->string('state');
             $table->string('zip_code');
             $table->string('phone_1');
             $table->string('phone_2')->nullable();
             $table->boolean('default')->default(false);
+            $table->string('type')->nullable();
             $table->timestamps();
         });
 
