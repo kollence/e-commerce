@@ -81,6 +81,11 @@ class CartService
         $this->cart->clearCart();
     }
 
+    public function cartItems()
+    {
+        return $this->cart->cartItems();
+    }
+
     private function taxedTotal($subtotal, $taxRate)
     {
         return round($subtotal * $taxRate, 2);
