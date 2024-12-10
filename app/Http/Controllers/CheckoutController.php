@@ -52,12 +52,29 @@ class CheckoutController extends Controller
         ]);
         $paymentMethodId = $request->payment_method_id;
         $amount = $request->amount * 100;
-
+        $getCartItems = $this->cartService->getCartItems();
+        $cartItems = collect($getCartItems)->map(function($item){
+            return 'Product Code: '.$item['product_item']['product_code'].','.
+                'Product Name: '.$item['product']['name'].','.
+                'Product Quantity: '.$item['product_item']['quantity'];
+                'Product SKU: '.$item['product_item']['sku'];
+        })->values()->toJson();
         // DB::beginTransaction();
-
         try {
             // $user = new User;
-            (new User)->charge($amount, $paymentMethodId, ['return_url' => route('checkout.success')]);
+            $options = [
+                'return_url' => route('checkout.success'),
+                'statement_descriptor' => 'E-commerce Test site',
+                'receipt_email' => $request->email,
+                'description' => 'One time single charge',
+                'metadata' => [ // metadata will be shown in Stripe Transactions page
+                    'Confirmation #' => '1234567890',
+                    'cart_items' => $cartItems,
+                    'count_cart_items' => collect($this->cartService->cartItems())->count(),
+                ]
+            ];
+            // Simple Charge https://laravel.com/docs/11.x/billing#single-charges (Stripe doc says charge() is deprecated)
+            (new User)->charge($amount, $paymentMethodId, $options);
         //     // Charge the user 
         //     $options = ['return_url' => route('checkout.success')]; 
         //     $user->charge($amount, $paymentMethodId, $options);
