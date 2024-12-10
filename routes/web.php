@@ -26,6 +26,8 @@ Route::post('/cart/update', [CartController::class, 'update'])->name('cart.updat
 Route::delete('/cart/remove', [CartController::class, 'remove'])->name('cart.remove');
 
 Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
+Route::get('/checkout/success', [CheckoutController::class, 'success'])->name('checkout.success');
+Route::get('/checkout/canceled', [CheckoutController::class, 'canceled'])->name('checkout.canceled');
 Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
 /**
  * Coupon Routes
