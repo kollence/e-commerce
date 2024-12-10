@@ -63,6 +63,7 @@ class Cart
                 ],
                 'product_item' => [
                     'product_item_id' => $productItem->id,
+                    'product_code' => $productItem->product_code,
                     'original_price' => $productItem->original_price,
                     'sale_price' => $productItem->sale_price,
                     'images' => $productItem->images->map(function($image) {
@@ -87,6 +88,7 @@ class Cart
                         'name' => $sizeOptionFields->name,
                         'slug' => $sizeOptionFields->slug,
                     ],
+                    'sku' => $sizeOptionFields->pivot->sku,
                 ],
                 'subtotal' => $item['subtotal'],
             ];
