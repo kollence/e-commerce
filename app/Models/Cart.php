@@ -115,6 +115,15 @@ class Cart
             $this->items[$key]['subtotal'] = $price * $quantity;
         } 
     }
+
+    /**
+     * Count items in cart
+     */
+    public function countCartItems()
+    {
+        return count($this->items);
+    }
+
     /**
      * Get total of subtotal fields of cart items
      */
