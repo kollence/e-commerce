@@ -4,6 +4,7 @@ import OrderSummary from '@/Components/Cart/OrderSummary.vue';
 import { Head, useForm } from '@inertiajs/vue3';
 import { onMounted, ref } from 'vue';
 import { useCartStore } from '@/Components/Cart/store';
+import InputError from '@/Components/InputError.vue';
 
 const cartStore = useCartStore();
 const props = defineProps({
@@ -43,7 +44,7 @@ const form = useForm({
 // helper:
 const isAddressFilled = (addressType) => {
     const requiredAddressFields = ['country', 'city', 'street_and_number', 'zip_code', 'phone_1'];
-    const hasAllAddressFields = requiredAddressFields.every(field => form[addressType][field]);
+    const hasAllAddressFields = requiredAddressFields.every(field => form[addressType][field].trim() !== '');
     // // if not, set error message and scroll to section
     // if(!hasAllAddressFields){
     //     activeTab.value = addressType
@@ -118,13 +119,13 @@ const submitPayment = async () => {
     }
     form.payment_method_id = paymentMethod.id;
     form.amount = cartStore.orderSummary.new_total;
-    // Check if all billing address fields are empty
-    const isBillingAddressEmpty = Object.values(form.billing_address).every(value => value === '');
+    // // Check if all billing address fields are empty
+    // const isBillingAddressEmpty = Object.values(form.billing_address).every(value => value === '');
 
-    // Remove billing_address if empty
-    if (isBillingAddressEmpty) {
-        delete form.billing_address;
-    }
+    // // Remove billing_address if empty
+    // if (isBillingAddressEmpty) {
+    //     delete form.billing_address;
+    // }
 
     form.post(route('checkout.store'), {
         preserveScroll: true,
@@ -132,7 +133,9 @@ const submitPayment = async () => {
             console.log('success');
         },
         onError: (error) => {
-            cardError.value = error.message;
+            console.log(error);
+            
+            cardError.value = error.error;
         },
     })
 
@@ -151,10 +154,12 @@ const submitPayment = async () => {
                     <div class="mb-4 text-slate-900 dark:text-white"> 
                         <label class="block text-slate-500 dark:text-slate-400 text-sm font-bold mb-2" for="name">Name</label> 
                         <input v-model="form.name" class="shadow  dark:bg-gray-800 appearance-none border rounded w-full py-2 px-3 text-slate-500 dark:text-slate-400 leading-tight focus:outline-none focus:shadow-outline" id="name" type="text" placeholder="Full Name"> 
+                        <InputError class="mt-2" :message="form.errors.name" />
                     </div> 
                     <div class="mb-4 text-slate-900 dark:text-white"> 
                         <label class="block text-slate-500 dark:text-slate-400 text-sm font-bold mb-2" for="email">Email</label> 
                         <input  v-model="form.email" class="shadow  dark:bg-gray-800 appearance-none border rounded w-full py-2 px-3 text-slate-500 dark:text-slate-400 leading-tight focus:outline-none focus:shadow-outline" id="email" type="email" placeholder="Email"> 
+                        <InputError class="mt-2" :message="form.errors.email" />
                     </div>
                     <div class="grid gap-0 grid-cols-2"  id="address"> 
                         <button :class="{'border-t border-x rounded-tl-lg rounded-tr-lg': activeTab === 'shipping_address', 'text-slate-500  border-b': activeTab !== 'shipping_address'}" class="border-lime-600 px-4 py-2 focus:outline-none" type="button" @click="activeTab = 'shipping_address'">
@@ -173,26 +178,32 @@ const submitPayment = async () => {
                         <div class="mb-4"> 
                             <label class="block text-gray-700 text-sm font-bold mb-2" for="country">Country</label>
                             <input v-model="form.shipping_address.country" class="shadow  dark:bg-gray-800 appearance-none border rounded w-full py-2 px-3 text-slate-500 dark:text-slate-400 leading-tight focus:outline-none focus:shadow-outline" id="country" type="text" placeholder="Country"> 
+                            <InputError class="mt-2" :message="form.errors['shipping_address.country']" />
                         </div> 
                         <div class="mb-4"> 
                             <label class="block text-gray-700 text-sm font-bold mb-2" for="city">City</label> 
                             <input v-model="form.shipping_address.city" class="shadow  dark:bg-gray-800 appearance-none border rounded w-full py-2 px-3 text-slate-500 dark:text-slate-400 leading-tight focus:outline-none focus:shadow-outline" id="city" type="text" placeholder="City"> 
+                            <InputError class="mt-2" :message="form.errors['shipping_address.city']" />
                         </div> 
                         <div class="mb-4"> 
                             <label class="block text-gray-700 text-sm font-bold mb-2" for="street_and_number">Street and Number</label>
                             <input v-model="form.shipping_address.street_and_number" class="shadow  dark:bg-gray-800 appearance-none border rounded w-full py-2 px-3 text-slate-500 dark:text-slate-400 leading-tight focus:outline-none focus:shadow-outline" id="street_and_number" type="text" placeholder="Street and Number"> 
+                            <InputError class="mt-2" :message="form.errors['shipping_address.street_and_number']" />
                         </div> 
                         <div class="mb-4"> 
                             <label class="block text-gray-700 text-sm font-bold mb-2" for="zip_code">ZIP Code</label> 
                             <input v-model="form.shipping_address.zip_code" class="shadow  dark:bg-gray-800 appearance-none border rounded w-full py-2 px-3 text-slate-500 dark:text-slate-400 leading-tight focus:outline-none focus:shadow-outline" id="zip_code" type="text" placeholder="ZIP Code"> 
+                            <InputError class="mt-2" :message="form.errors['shipping_address.zip_code']" />
                         </div> 
                         <div class="mb-4"> 
                             <label class="block text-gray-700 text-sm font-bold mb-2" for="phone_1">Phone 1</label> 
                             <input v-model="form.shipping_address.phone_1" class="shadow  dark:bg-gray-800 appearance-none border rounded w-full py-2 px-3 text-slate-500 dark:text-slate-400 leading-tight focus:outline-none focus:shadow-outline" id="phone_1" type="text" placeholder="Phone 1"> 
+                            <InputError class="mt-2" :message="form.errors['shipping_address.phone_1']" />
                         </div> 
                         <div class="mb-4"> 
                             <label class="block text-gray-700 text-sm font-bold mb-2" for="phone_2">Phone 2 (optional)</label> 
                             <input v-model="form.shipping_address.phone_2" class="shadow  dark:bg-gray-800 appearance-none border rounded w-full py-2 px-3 text-slate-500 dark:text-slate-400 leading-tight focus:outline-none focus:shadow-outline" id="phone_2" type="text" placeholder="Phone 2"> 
+                            <InputError class="mt-2" :message="form.errors['shipping_address.phone_2']" />
                         </div>    
                     </div> 
                     <div v-if="activeTab === 'billing_address'" @focusout="isAddressFilled('billing_address')" class="px-3 border-b border-x  rounded-bl-lg rounded-br-lg border-lime-600"> 
@@ -204,31 +215,38 @@ const submitPayment = async () => {
                         <div class="mb-4"> 
                             <label class="block text-gray-700 text-sm font-bold mb-2" for="billing_country">Country</label> 
                             <input v-model="form.billing_address.country" class="shadow  dark:bg-gray-800 appearance-none border rounded w-full py-2 px-3 text-slate-500 dark:text-slate-400 leading-tight focus:outline-none focus:shadow-outline" id="billing_country" type="text" placeholder="Country"> 
+                            <InputError class="mt-2" :message="form.errors['billing_address.country']" />
                         </div> 
                         <div class="mb-4"> 
                             <label class="block text-gray-700 text-sm font-bold mb-2" for="billing_city">City</label> 
                             <input v-model="form.billing_address.city" class="shadow  dark:bg-gray-800 appearance-none border rounded w-full py-2 px-3 text-slate-500 dark:text-slate-400 leading-tight focus:outline-none focus:shadow-outline" id="billing_city" type="text" placeholder="City">
+                            <InputError class="mt-2" :message="form.errors['billing_address.city']" />
                         </div> 
                         <div class="mb-4"> 
                             <label class="block text-gray-700 text-sm font-bold mb-2" for="billing_street_and_number">Street and Number</label> 
                             <input v-model="form.billing_address.street_and_number" class="shadow  dark:bg-gray-800 appearance-none border rounded w-full py-2 px-3 text-slate-500 dark:text-slate-400 leading-tight focus:outline-none focus:shadow-outline" id="billing_street_and_number" type="text" placeholder="Street and Number">
+                            <InputError class="mt-2" :message="form.errors['billing_address.street_and_number']" />
                         </div>
                         <div class="mb-4"> 
                             <label class="block text-gray-700 text-sm font-bold mb-2" for="billing_zip_code">ZIP Code</label> 
                             <input v-model="form.billing_address.zip_code" class="shadow  dark:bg-gray-800 appearance-none border rounded w-full py-2 px-3 text-slate-500 dark:text-slate-400 leading-tight focus:outline-none focus:shadow-outline" id="billing_zip_code" type="text" placeholder="ZIP Code">
+                            <InputError class="mt-2" :message="form.errors['billing_address.zip_code']" />
                         </div> 
                         <div class="mb-4"> 
                             <label class="block text-gray-700 text-sm font-bold mb-2" for="billing_phone_1">Phone 1</label> 
                             <input v-model="form.billing_address.phone_1" class="shadow  dark:bg-gray-800 appearance-none border rounded w-full py-2 px-3 text-slate-500 dark:text-slate-400 leading-tight focus:outline-none focus:shadow-outline" id="billing_phone_1" type="text" placeholder="Phone 1">
+                            <InputError class="mt-2" :message="form.errors['billing_address.phone_1']" />
                         </div> 
                         <div class="mb-4"> 
                             <label class="block text-gray-700 text-sm font-bold mb-2" for="billing_phone_2">Phone 2 (optional)</label> 
                             <input v-model="form.billing_address.phone_2" class="shadow  dark:bg-gray-800 appearance-none border rounded w-full py-2 px-3 text-slate-500 dark:text-slate-400 leading-tight focus:outline-none focus:shadow-outline" id="billing_phone_2" type="text" placeholder="Phone 2">
+                            <InputError class="mt-2" :message="form.errors['billing_address.phone_2']" />
                         </div>
                     </div>
                     <div class="my-4 text-slate-900 dark:text-white">
                         <label class="block text-slate-500 dark:text-slate-400 text-sm font-bold mb-2" for="notes">Notes: (optional)</label>
-                        <textarea class="shadow  dark:bg-gray-800 appearance-none border rounded w-full py-2 px-3 text-slate-500 dark:text-slate-400 leading-tight focus:outline-none focus:shadow-outline" id="notes" type="text" placeholder="Add additional information. For example, entrance code or special instructions (flor, room number, etc)"></textarea>
+                        <textarea v-model="form.notes" class="shadow  dark:bg-gray-800 appearance-none border rounded w-full py-2 px-3 text-slate-500 dark:text-slate-400 leading-tight focus:outline-none focus:shadow-outline" id="notes" type="text" placeholder="Add additional information. For example, entrance code or special instructions (flor, room number, etc)"></textarea>
+                        <InputError class="mt-2" :message="form.errors.notes" />
                     </div>
                     <div class="mb-4 text-slate-900 dark:text-white">
                         <label for="shipping_method" class="block text-slate-500 dark:text-slate-400 text-sm font-bold mb-2">Shipping Method</label>
@@ -236,6 +254,7 @@ const submitPayment = async () => {
                             <option value="standard">Standard Shipping</option>
                             <option value="express">Express Shipping</option>
                         </select>
+                        <InputError class="mt-2" :message="form.errors.shipping_method" />
                     </div>
                     <div class="mb-4 text-slate-900 dark:text-white">
                         <label for="payment_method" class="block text-slate-500 dark:text-slate-400 text-sm font-bold mb-2">Payment Method</label>
@@ -244,6 +263,7 @@ const submitPayment = async () => {
                             <option value="paypal">PayPal</option>
                             <option value="bitcoin">Bitcoin</option>
                         </select>
+                        <InputError class="mt-2" :message="form.errors.payment_method" />
                     </div>
                     <div class="mb-4 text-slate-900 dark:text-white">
                         <div id="card-element"></div>

@@ -43,15 +43,33 @@ class CheckoutController extends Controller
     public function store(Request $request)
     {
         // $user = $request->user(); 
-        // // Validate the request 
+        // Validate the request 
         $request->validate([ 
             'payment_method_id' => 'required|string', 
             'amount' => 'required|numeric|min:1', 
-            // 'shipping_address.street_and_number' => 'required|string', 
-            // 'billing_address.street_and_number' => 'nullable|string' 
+            'name' => 'required|string|min:3|max:50', 
+            'email' => 'required|email', 
+            'shipping_address.street_and_number' => 'required|string', 
+            'shipping_address.city' => 'required|string', 
+            // 'shipping_address.state' => 'required|string', 
+            'shipping_address.country' => 'required|string', 
+            'shipping_address.zip_code' => 'required|string', 
+            'shipping_address.phone_1' => 'required|string', 
+            'shipping_address.phone_2' => 'nullable|string', 
+            'shipping_address.default' => 'nullable|boolean', 
+            'billing_address.street_and_number' => 'nullable|string', 
+            'billing_address.city' => 'nullable|string', 
+            // 'billing_address.state' => 'nullable|string', 
+            'billing_address.country' => 'nullable|string', 
+            'billing_address.zip_code' => 'nullable|string', 
+            'billing_address.phone_1' => 'nullable|string', 
+            'billing_address.phone_2' => 'nullable|string', 
+            'billing_address.default' => 'nullable|boolean',
         ]);
+
         $paymentMethodId = $request->payment_method_id;
         $amount = $request->amount * 100;
+
         $getCartItems = $this->cartService->getCartItems();
         $cartItems = collect($getCartItems)->map(function($item){
             return 'Product Code: '.$item['product_item']['product_code'].','.
@@ -61,7 +79,7 @@ class CheckoutController extends Controller
         })->values()->toJson();
         // DB::beginTransaction();
         try {
-            // $user = new User;
+        // Options for the charge that will use Stripe API
             $options = [
                 'return_url' => route('checkout.success'),
                 'statement_descriptor' => 'E-commerce Test site',
@@ -121,10 +139,18 @@ class CheckoutController extends Controller
         //     DB::commit(); 
         //     // Respond with an Inertia response 
             return inertia('Checkout/Success', ['message' => 'Payment successful']); 
-        } catch (\Exception $e) { 
+        } catch (\Stripe\Exception\CardException $e) { 
             // Rollback the transaction 
             // DB::rollBack(); 
-            return inertia('Checkout/Canceled', ['error' => $e->getMessage()]);
+            return back()->withErrors(['error' => $e->getMessage()]);
+            // return inertia('Checkout/Canceled', ['error' => $e->getMessage()]);
+        } 
+        catch (\Exception $e) { 
+        //     // Rollback the transaction 
+        //     // DB::rollBack(); 
+        //     // Return back with error message 
+            return back()->withErrors(['error' => $e->getMessage()]);
+        //     // return inertia('Checkout/Canceled', ['error' => $e->getMessage()]);
         }
     }
 
