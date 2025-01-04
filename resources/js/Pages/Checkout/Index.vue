@@ -170,7 +170,40 @@ const payWithStripe = async () => {
             cardError.value = error.error;
         },
     })
+}
 
+const payWithCashOnDelivery = async () => {
+    await alert('COD Needs to be builded!!')
+    // isSubmitting.value = false;
+    // form.amount = cartStore.orderSummary.new_total;
+    // form.post(route('checkout.store'), {
+    //     preserveScroll: true,
+    //     onSuccess: () => {
+    //         console.log('success');
+    //     },
+    //     onError: (error) => {
+    //         console.log(error);
+
+    //         cardError.value = error.error;
+    //     },
+    // })
+}
+
+const payWithPaypal = async () => {
+    await alert('PayPal Needs to be builded!!')
+    // isSubmitting.value = false;
+    // form.amount = cartStore.orderSummary.new_total;
+    // form.post(route('checkout.store'), {
+    //     preserveScroll: true,
+    //     onSuccess: () => {
+    //         console.log('success');
+    //     },
+    //     onError: (error) => {
+    //         console.log(error);
+
+    //         cardError.value = error.error;
+    //     },
+    // })
 }
 
 </script>
@@ -299,7 +332,7 @@ const payWithStripe = async () => {
                         </select>
                         <InputError class="mt-2" :message="form.errors.shipping_method" />
                     </div>
-                    <div class="mb-4 text-slate-900 dark:text-white">
+                    <div class="mb-4 text-slate-900 dark:text-white" v-show="form.payment_method === 'card'">
                         <div id="card-element"></div>
                         <div id="card-error" class="text-red-500 text-center text-sm mt-2" role="alert">
                             {{cardError}}
