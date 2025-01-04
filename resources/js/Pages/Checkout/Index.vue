@@ -80,6 +80,7 @@ const resetAddressFields = (addressType) => {
 }
 
 const initStripe = async () => {
+    initStripeOnce.value = true
     const key = import.meta.env.VITE_STRIPE_KEY;
     stripe.value = await loadStripe(key);
     elements.value = stripe.value.elements();
