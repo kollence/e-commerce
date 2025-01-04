@@ -45,8 +45,12 @@ const form = useForm({
 })
 
 const onPickedPaymentMethod = () => {
-    console.log(form.payment_method);
     CODasPaymentMethod.value = (form.payment_method === 'cod') ? true : false
+    // NEEDS BETTER SOLUTION
+    // form.payment_method === 'card' && initStripe() // init stripe but for now, just once on mounted
+    if(initStripeOnce.value === false){
+        form.payment_method === 'card' && initStripe()
+    }
 }
 // helper:
 const isAddressFilled = (addressType) => {
