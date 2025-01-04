@@ -44,9 +44,6 @@ const form = useForm({
     amount: null
 })
 
-onMounted(() => {
-    initStripe();
-})
 const onPickedPaymentMethod = () => {
     console.log(form.payment_method);
     CODasPaymentMethod.value = (form.payment_method === 'cod') ? true : false
