@@ -136,20 +136,13 @@ const payWithStripe = async () => {
         billing_details: {
             name: form.name,
             email: form.email,
-            address: isAddressFilled('billing_address')
-            ? {
-                city: form.billing_address.city,
-                country: form.billing_address.country,
-                line1: form.billing_address.street_and_number,
-                postal_code: form.billing_address.zip_code,
-            }
-            : {
+            address: {
                 city: form.shipping_address.city,
                 country: form.shipping_address.country,
                 line1: form.shipping_address.street_and_number,
                 postal_code: form.shipping_address.zip_code,
             },
-            phone: isAddressFilled('billing_address') ? form.billing_address.phone_1 : form.shipping_address.phone_1,
+            phone: form.shipping_address.phone_1,
         },
     })
     if(error) {
