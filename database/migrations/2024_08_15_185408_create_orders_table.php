@@ -22,7 +22,7 @@ return new class extends Migration
             $table->integer('total_price');
             $table->integer('shipping_price');
             $table->string('shipping_method');
-            $table->string('payment_method');
+            $table->string('payment_method'); // STRIPE, PAYPAL, CRYPTO, COD
             $table->enum('payment_status', ["pending","paid","refunded", "failed","cancelled"])->default('pending');
             $table->unsignedBigInteger('billing_address_id')->nullable();
             $table->unsignedBigInteger('shipping_address_id')->nullable();

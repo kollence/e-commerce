@@ -16,6 +16,7 @@ cartStore.orderSummary = props.order_summary;
 const isSubmitting = ref(false);
 const cardError = ref('');
 const addressError = ref('')
+const CODasPaymentMethod = ref(false)
 const form = useForm({
     name: '',
     email: '',
@@ -37,10 +38,18 @@ const form = useForm({
     },
     notes: '',
     shipping_method: 'standard',
-    payment_method: 'card',
+    payment_method: '',
     payment_method_id: null,
     amount: null
 })
+
+onMounted(() => {
+    initStripe();
+})
+const onPickedPaymentMethod = () => {
+    console.log(form.payment_method);
+    CODasPaymentMethod.value = (form.payment_method === 'cod') ? true : false
+}
 // helper:
 const isAddressFilled = (addressType) => {
     const requiredAddressFields = ['country', 'city', 'street_and_number', 'zip_code', 'phone_1'];
@@ -63,10 +72,6 @@ const activeTab = ref('shipping_address');
 // stripe card element
 const cardElement = ref(null);
 const elements = ref({});
-
-onMounted(() => {
-    initStripe();
-})
 
 const resetAddressFields = (addressType) => {
     form.reset(addressType)
@@ -161,15 +166,26 @@ const submitPayment = async () => {
                         <input  v-model="form.email" class="shadow  dark:bg-gray-800 appearance-none border rounded w-full py-2 px-3 text-slate-500 dark:text-slate-400 leading-tight focus:outline-none focus:shadow-outline" id="email" type="email" placeholder="Email"> 
                         <InputError class="mt-2" :message="form.errors.email" />
                     </div>
-                    <div class="grid gap-0 grid-cols-2"  id="address"> 
+                    <div class="mb-4 text-slate-900 dark:text-white">
+                        <label for="payment_method" class="block text-slate-500 dark:text-slate-400 text-sm font-bold mb-2">Payment Method</label>
+                        <select v-model="form.payment_method" @change="onPickedPaymentMethod" id="payment_method" class="shadow  dark:bg-gray-800 appearance-none border rounded w-full py-2 px-3 text-slate-500 dark:text-slate-400 leading-tight focus:outline-none focus:shadow-outline">
+                            <option value="">Select Payment Method</option>
+                            <option value="card">Credit Card</option>
+                            <option value="paypal">PayPal</option>
+                            <option value="crypto">Crypto</option>
+                            <option value="cod">Cash on Delivery</option>
+                        </select>
+                        <InputError class="mt-2" :message="form.errors.payment_method" />
+                    </div>
+                    <div class="grid gap-0 grid-cols-2" id="address"> 
                         <button :class="{'border-t border-x rounded-tl-lg rounded-tr-lg': activeTab === 'shipping_address', 'text-slate-500  border-b': activeTab !== 'shipping_address'}" class="border-lime-600 px-4 py-2 focus:outline-none" type="button" @click="activeTab = 'shipping_address'">
                             Address
                         </button> 
-                        <button :class="{'border-t border-x rounded-tl-lg rounded-tr-lg ': activeTab === 'billing_address', 'text-slate-500 border-b': activeTab !== 'billing_address'}" class="border-lime-600 px-4 py-2 focus:outline-none" type="button" @click="activeTab = 'billing_address'">
+                        <button v-if="CODasPaymentMethod" :class="{'border-t border-x rounded-tl-lg rounded-tr-lg ': activeTab === 'billing_address', 'text-slate-500 border-b': activeTab !== 'billing_address'}" class="border-lime-600 px-4 py-2 focus:outline-none" type="button" @click="activeTab = 'billing_address'">
                             Billing Address (optional)
                         </button> 
                     </div> 
-                    <div v-if="activeTab === 'shipping_address'" @focusout="isAddressFilled('shipping_address')" class="px-3 border-b border-x  rounded-bl-lg rounded-br-lg border-lime-600"> 
+                    <div v-if="activeTab === 'shipping_address'" @focusout="isAddressFilled('shipping_address')" :class="{'corner-border green': !CODasPaymentMethod}" class="px-3 border-b border-x  rounded-bl-lg rounded-br-lg border-lime-600"> 
                         <div class="pt-4 flex justify-between items-center">
                             <h3 class="text-sm text-center font-semibold">Main Address:</h3>
                             <button type="reset" @click="resetAddressFields('shipping_address')" class="rounded-full bg-orange-600 px-2 text-sm">Reset</button>
@@ -206,7 +222,7 @@ const submitPayment = async () => {
                             <InputError class="mt-2" :message="form.errors['shipping_address.phone_2']" />
                         </div>    
                     </div> 
-                    <div v-if="activeTab === 'billing_address'" @focusout="isAddressFilled('billing_address')" class="px-3 border-b border-x  rounded-bl-lg rounded-br-lg border-lime-600"> 
+                    <div v-if="activeTab === 'billing_address' && CODasPaymentMethod" @focusout="isAddressFilled('billing_address')" class="px-3 border-b border-x  rounded-bl-lg rounded-br-lg border-lime-600"> 
                         <div class="pt-4 flex justify-between items-center">
                             <h3 class="text-sm text-center font-semibold">If your billing address is at a different location.</h3>
                             <button type="reset" @click="resetAddressFields('billing_address')" class="rounded-full bg-orange-600 px-2 text-sm">Reset</button>
@@ -257,15 +273,6 @@ const submitPayment = async () => {
                         <InputError class="mt-2" :message="form.errors.shipping_method" />
                     </div>
                     <div class="mb-4 text-slate-900 dark:text-white">
-                        <label for="payment_method" class="block text-slate-500 dark:text-slate-400 text-sm font-bold mb-2">Payment Method</label>
-                        <select v-model="form.payment_method"  id="payment_method" class="shadow  dark:bg-gray-800 appearance-none border rounded w-full py-2 px-3 text-slate-500 dark:text-slate-400 leading-tight focus:outline-none focus:shadow-outline">
-                            <option value="card">Credit Card</option>
-                            <option value="paypal">PayPal</option>
-                            <option value="bitcoin">Bitcoin</option>
-                        </select>
-                        <InputError class="mt-2" :message="form.errors.payment_method" />
-                    </div>
-                    <div class="mb-4 text-slate-900 dark:text-white">
                         <div id="card-element"></div>
                         <div id="card-error" class="text-red-500 text-center text-sm mt-2" role="alert">
                             {{cardError}}
@@ -284,4 +291,21 @@ const submitPayment = async () => {
 </template>
 
 
-<style lang="scss" scoped></style>
+<style scoped>
+/* .half-colored {
+  background: linear-gradient(to top right, #15803D 50%, transparent 50%);
+} */
+.corner-border {
+  background-image:
+    linear-gradient(to right, transparent 50%, #65a30d 50%),
+    linear-gradient(to bottom, transparent, transparent);
+  background-position: top left, top right;
+  background-repeat: no-repeat;
+  background-size: 100% 1px, 0 0;
+}
+.corner-border.green{
+    background-image:
+    linear-gradient(to right, transparent 50%, #65a30d 50%),
+    linear-gradient(to bottom, transparent, transparent);
+}
+</style>
