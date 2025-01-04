@@ -97,6 +97,37 @@ const initStripe = async () => {
 }
 
 const submitPayment = async () => {
+
+    let error = ''
+  if (!form.payment_method) {
+    error = "Please select a payment method.";
+    alert(error)
+    return;
+  }else if(form.payment_method !== 'card'){
+    if(cardElement.value){
+        initStripeOnce.value = false
+        cardElement.value.destroy()
+    }
+  }
+
+  const paymentMethods = {
+    card: payWithStripe,
+    cod: payWithCashOnDelivery,
+    paypal: payWithPaypal,
+  };
+
+  const selectedPaymentMethod = paymentMethods[form.payment_method];
+
+  if (selectedPaymentMethod) {
+    await selectedPaymentMethod();
+  } else {
+    error = "Invalid payment method.";
+    alert(error)
+    console.error('Invalid payment method:', form.payment_method);
+  }
+}
+
+const payWithStripe = async () => {
     isSubmitting.value = false;
 
     const {paymentMethod, error} = await stripe.value.createPaymentMethod({
