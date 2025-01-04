@@ -129,7 +129,7 @@ const submitPayment = async () => {
 
 const payWithStripe = async () => {
     isSubmitting.value = false;
-
+    delete form.billing_address;
     const {paymentMethod, error} = await stripe.value.createPaymentMethod({
         type: 'card',
         card: cardElement.value,
