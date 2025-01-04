@@ -17,6 +17,7 @@ const isSubmitting = ref(false);
 const cardError = ref('');
 const addressError = ref('')
 const CODasPaymentMethod = ref(false)
+const initStripeOnce = ref(false)
 const form = useForm({
     name: '',
     email: '',
