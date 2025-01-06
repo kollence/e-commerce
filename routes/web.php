@@ -46,3 +46,7 @@ Route::middleware([
         return Inertia::render('Dashboard');
     })->name('dashboard');
 });
+Route::get('/clear-session', function() {
+    session()->flush();
+    return redirect()->back();
+});
