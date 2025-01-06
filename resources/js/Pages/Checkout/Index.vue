@@ -43,6 +43,30 @@ const form = useForm({
     payment_method_id: null,
     amount: null
 })
+// const CODasPaymentMethod = ref(false)
+const isShippingAndBillingAddr = ref(false)
+const addressInfoDynamicTxt = reactive({
+    shipping_address: {
+        tabText: 'Shipping and billing address',
+        info: 'We need your address to deliver your order and process your payment'
+    },
+    billing_address: {
+        tabText: 'Billing address',
+        info: 'We need your billing address to process your payment'
+    }
+})
+
+watch(() => isShippingAndBillingAddr.value, (newVal) => {
+    if(newVal){
+        addressInfoDynamicTxt.shipping_address.tabText = 'Shipping address'
+        addressInfoDynamicTxt.shipping_address.info = 'We need your shipping address to deliver your order'
+        
+    }else{
+        addressInfoDynamicTxt.shipping_address.tabText = 'Shipping and billing address'
+        addressInfoDynamicTxt.shipping_address.info = 'We need your address to deliver your order and process your payment'
+        activeTab.value = 'shipping_address'
+    }
+})
 
 const onPickedPaymentMethod = () => {
     CODasPaymentMethod.value = (form.payment_method === 'cod') ? true : false
@@ -97,52 +121,67 @@ const initStripe = async () => {
 }
 
 const submitPayment = async () => {
-
     let error = ''
-  if (!form.payment_method) {
-    error = "Please select a payment method.";
-    alert(error)
-    return;
-  }else if(form.payment_method !== 'card'){
-    if(cardElement.value){
+    if (!form.payment_method) {
+        error = "Please select a payment method.";
+        alert(error)
+        return;
+    }
+    if(form.payment_method !== 'card' && cardElement.value){ // destroy card element if not card
         initStripeOnce.value = false
         cardElement.value.destroy()
     }
-  }
 
-  const paymentMethods = {
-    card: payWithStripe,
-    cod: payWithCashOnDelivery,
-    paypal: payWithPaypal,
-  };
+    const paymentMethods = {
+        card: payWithStripe,
+        cod: payWithCashOnDelivery,
+        paypal: payWithPaypal,
+    };
 
-  const selectedPaymentMethod = paymentMethods[form.payment_method];
+    const selectedPaymentMethod = paymentMethods[form.payment_method];
 
-  if (selectedPaymentMethod) {
-    await selectedPaymentMethod();
-  } else {
-    error = "Invalid payment method.";
-    alert(error)
-    console.error('Invalid payment method:', form.payment_method);
-  }
+    if (selectedPaymentMethod) {
+        await selectedPaymentMethod();
+        form.post(route('checkout.store'), {
+            preserveScroll: true,
+            onSuccess: () => {
+                console.log('success post request (redirect from backend to success page)');
+            },
+            onError: (error) => {
+                console.log(error.error);
+                
+                cardError.value = "Check missing or incorrect input fields";
+            },
+        })
+    } else {
+        error = "Invalid payment method.";
+        alert(error)
+        console.error('Invalid payment method:', form.payment_method);
+    }
 }
 
 const payWithStripe = async () => {
     isSubmitting.value = false;
-    delete form.billing_address;
     const {paymentMethod, error} = await stripe.value.createPaymentMethod({
         type: 'card',
         card: cardElement.value,
         billing_details: {
             name: form.name,
             email: form.email,
-            address: {
+            address: isAddressFilled('billing_address')
+            ? {
+                city: form.billing_address.city,
+                country: form.billing_address.country,
+                line1: form.billing_address.street_and_number,
+                postal_code: form.billing_address.zip_code,
+            }
+            : {
                 city: form.shipping_address.city,
                 country: form.shipping_address.country,
                 line1: form.shipping_address.street_and_number,
                 postal_code: form.shipping_address.zip_code,
             },
-            phone: form.shipping_address.phone_1,
+            phone: isAddressFilled('billing_address') ? form.billing_address.phone_1 : form.shipping_address.phone_1,
         },
     })
     if(error) {
@@ -151,25 +190,6 @@ const payWithStripe = async () => {
     }
     form.payment_method_id = paymentMethod.id;
     form.amount = cartStore.orderSummary.new_total;
-    // // Check if all billing address fields are empty
-    // const isBillingAddressEmpty = Object.values(form.billing_address).every(value => value === '');
-
-    // // Remove billing_address if empty
-    // if (isBillingAddressEmpty) {
-    //     delete form.billing_address;
-    // }
-
-    form.post(route('checkout.store'), {
-        preserveScroll: true,
-        onSuccess: () => {
-            console.log('success');
-        },
-        onError: (error) => {
-            console.log(error);
-            
-            cardError.value = error.error;
-        },
-    })
 }
 
 const payWithCashOnDelivery = async () => {
@@ -214,7 +234,7 @@ const payWithPaypal = async () => {
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-6"> 
             <!-- Left column: Form --> 
             <div class="flex flex-col"> 
-                <form @submit.prevent="submitPayment" class="rounded-lg border border-green-700 p-4"> 
+                <form @submit.prevent="submitPayment" class="rounded-lg border border-green-700 p-4" novalidate> 
                     <h2 class="text-2xl font-semibold mb-4">Billing Details</h2>
                     <div class="mb-4 text-slate-900 dark:text-white"> 
                         <label class="block text-slate-500 dark:text-slate-400 text-sm font-bold mb-2" for="name">Name</label> 
@@ -237,18 +257,25 @@ const payWithPaypal = async () => {
                         </select>
                         <InputError class="mt-2" :message="form.errors.payment_method" />
                     </div>
+                    <div class="mb-4 text-slate-900 dark:text-white">
+                        <div class="block text-slate-500 dark:text-slate-400 text-sm font-bold mb-2">Are the shipping and billing addresses the same?</div> 
+                        <p class="shadow dark:bg-gray-800 appearance-none border rounded w-full py-2 px-3 text-slate-500 dark:text-slate-400 leading-tight focus:outline-none focus:shadow-outline">
+                            {{ isShippingAndBillingAddr ? 'No' : 'Yes'}} <button type="button" @click="() => isShippingAndBillingAddr = !isShippingAndBillingAddr" class="">{{isShippingAndBillingAddr ? '&#10060;' : '&#9989;' }}</button>
+                        </p>
+                        
+                    </div>
                     <div class="grid gap-0 grid-cols-2" id="address"> 
                         <button :class="{'border-t border-x rounded-tl-lg rounded-tr-lg': activeTab === 'shipping_address', 'text-slate-500  border-b': activeTab !== 'shipping_address'}" class="border-lime-600 px-4 py-2 focus:outline-none" type="button" @click="activeTab = 'shipping_address'">
-                            Address
+                        {{addressInfoDynamicTxt.shipping_address.tabText}}
                         </button> 
-                        <button v-if="CODasPaymentMethod" :class="{'border-t border-x rounded-tl-lg rounded-tr-lg ': activeTab === 'billing_address', 'text-slate-500 border-b': activeTab !== 'billing_address'}" class="border-lime-600 px-4 py-2 focus:outline-none" type="button" @click="activeTab = 'billing_address'">
-                            Billing Address (optional)
+                        <button v-if="isShippingAndBillingAddr" :class="{'border-t border-x rounded-tl-lg rounded-tr-lg ': activeTab === 'billing_address', 'text-slate-500 border-b': activeTab !== 'billing_address'}" class="border-lime-600 px-4 py-2 focus:outline-none" type="button" @click="activeTab = 'billing_address'">
+                            {{addressInfoDynamicTxt.billing_address.tabText}}
                         </button> 
                     </div> 
-                    <div v-if="activeTab === 'shipping_address'" @focusout="isAddressFilled('shipping_address')" :class="{'corner-border green': !CODasPaymentMethod}" class="px-3 border-b border-x  rounded-bl-lg rounded-br-lg border-lime-600"> 
+                    <div v-if="activeTab === 'shipping_address'" @focusout="isAddressFilled('shipping_address')" :class="{'corner-border green': !isShippingAndBillingAddr}" class="px-3 border-b border-x  rounded-bl-lg rounded-br-lg border-lime-600"> 
                         <div class="pt-4 flex justify-between items-center">
-                            <h3 class="text-sm text-center font-semibold">Main Address:</h3>
-                            <button type="reset" @click="resetAddressFields('shipping_address')" class="rounded-full bg-orange-600 px-2 text-sm">Reset</button>
+                            <h3 class="text-sm text-center font-semibold">{{addressInfoDynamicTxt.shipping_address.info}}</h3> 
+                            <button type="button" @click="resetAddressFields('shipping_address')" class="rounded-full bg-orange-600 px-2 text-sm">Reset</button>
                         </div>
                         <h4 v-if="addressError" class="text-red-500">{{ addressError }}</h4>
                         <div class="mb-4"> 
@@ -282,9 +309,9 @@ const payWithPaypal = async () => {
                             <InputError class="mt-2" :message="form.errors['shipping_address.phone_2']" />
                         </div>    
                     </div> 
-                    <div v-if="activeTab === 'billing_address' && CODasPaymentMethod" @focusout="isAddressFilled('billing_address')" class="px-3 border-b border-x  rounded-bl-lg rounded-br-lg border-lime-600"> 
+                    <div v-if="activeTab === 'billing_address'" @focusout="isAddressFilled('billing_address')" class="px-3 border-b border-x  rounded-bl-lg rounded-br-lg border-lime-600"> 
                         <div class="pt-4 flex justify-between items-center">
-                            <h3 class="text-sm text-center font-semibold">If your billing address is at a different location.</h3>
+                            <h3 class="text-sm text-center font-semibold">{{addressInfoDynamicTxt.billing_address.info}}</h3>
                             <button type="reset" @click="resetAddressFields('billing_address')" class="rounded-full bg-orange-600 px-2 text-sm">Reset</button>
                         </div>
                         <h4 v-if="addressError" class="text-red-500">{{ addressError }}</h4>
