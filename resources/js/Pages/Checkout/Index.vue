@@ -2,9 +2,10 @@
 import {loadStripe} from '@stripe/stripe-js';
 import OrderSummary from '@/Components/Cart/OrderSummary.vue';
 import { Head, useForm } from '@inertiajs/vue3';
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import { useCartStore } from '@/Components/Cart/store';
 import InputError from '@/Components/InputError.vue';
+import { computed, reactive } from '@vue/reactivity';
 
 const cartStore = useCartStore();
 const props = defineProps({
@@ -16,8 +17,13 @@ cartStore.orderSummary = props.order_summary;
 const isSubmitting = ref(false);
 const cardError = ref('');
 const addressError = ref('')
-const CODasPaymentMethod = ref(false)
+const stripe = ref({})
+const activeTab = ref('shipping_address');
+// stripe card element
+const cardElement = ref(null);
+const elements = ref({});
 const initStripeOnce = ref(false)
+
 const form = useForm({
     name: '',
     email: '',
@@ -69,11 +75,11 @@ watch(() => isShippingAndBillingAddr.value, (newVal) => {
 })
 
 const onPickedPaymentMethod = () => {
-    CODasPaymentMethod.value = (form.payment_method === 'cod') ? true : false
+    // CODasPaymentMethod.value = (form.payment_method === 'cod') ? true : false
     // NEEDS BETTER SOLUTION
     // form.payment_method === 'card' && initStripe() // init stripe but for now, just once on mounted
-    if(initStripeOnce.value === false){
-        form.payment_method === 'card' && initStripe()
+    if(initStripeOnce.value === false && form.payment_method === 'card'){
+        initStripe()
     }
 }
 // helper:
@@ -93,11 +99,6 @@ const isAddressFilled = (addressType) => {
     // }
     return hasAllAddressFields;
 }
-const stripe = ref({})
-const activeTab = ref('shipping_address');
-// stripe card element
-const cardElement = ref(null);
-const elements = ref({});
 
 const resetAddressFields = (addressType) => {
     form.reset(addressType)
@@ -194,8 +195,8 @@ const payWithStripe = async () => {
 
 const payWithCashOnDelivery = async () => {
     await alert('COD Needs to be builded!!')
-    // isSubmitting.value = false;
-    // form.amount = cartStore.orderSummary.new_total;
+    isSubmitting.value = false;
+    form.amount = cartStore.orderSummary.new_total;
     // form.post(route('checkout.store'), {
     //     preserveScroll: true,
     //     onSuccess: () => {
