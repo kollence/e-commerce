@@ -23,8 +23,7 @@ return new class extends Migration
             $table->string('zip_code');
             $table->string('phone_1');
             $table->string('phone_2')->nullable();
-            $table->boolean('default')->default(false);
-            $table->string('type')->nullable();
+            $table->string('type')->default('default'); // default, billing, shipping
             $table->timestamps();
         });
 

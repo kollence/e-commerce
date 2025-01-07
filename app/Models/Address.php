@@ -24,7 +24,7 @@ class Address extends Model
         'zip_code',
         'phone_1',
         'phone_2',
-        'default',
+        'type',
     ];
 
     /**
@@ -33,7 +33,6 @@ class Address extends Model
      * @var array
      */
     protected $casts = [
-        'default' => 'boolean',
         'created_at' => 'datetime',
     ];
 
