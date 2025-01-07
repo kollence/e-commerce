@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Address;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductItem;
@@ -18,7 +19,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        User::factory(10)->create();
+        User::factory(10)->has(Address::factory(1), 'addresses')->create();
 
         User::factory()->create([
             'name' => 'Test User',

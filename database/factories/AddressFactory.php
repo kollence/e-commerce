@@ -30,6 +30,7 @@ class AddressFactory extends Factory
             'country' => fake()->country(),
             'zip_code' => fake()->postcode(),
             'phone_1' => fake()->phoneNumber(),
+            // 'type' => fake()->randomElement(['billing', 'shipping'])
         ];
     }
 }
