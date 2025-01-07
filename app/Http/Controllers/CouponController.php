@@ -36,11 +36,11 @@ class CouponController extends Controller
      */
     public function apply(Request $request)
     {   // if request is received but coupon code is empty (NULL)
-        if(!$request->coupon_code) return redirect()->back()->withErrors("You need to enter coupon code first.", "error");
+        if(!$request->coupon_code) return back()->withErrors("You need to enter coupon code first.", "error");
 
         $couponCode = Coupon::findByCode($request->coupon_code);
         if (!$couponCode) {                           //VALUE                               // KEY
-            return redirect()->back()->withErrors("Coupon code is invalid. Try again.", "error");
+            return back()->withErrors("Coupon code is invalid. Try again.", "error");
         }
         $coupon = $couponCode->couponable;
         $cart = new Cart();
@@ -51,7 +51,7 @@ class CouponController extends Controller
             "code" => $couponCode->code,
             "discount" => $discount,
         ]);
-        return redirect()->back()->with("message", "Coupon applied successfully");
+        return back()->with("message", "Coupon applied successfully");
     }
 
     /**
