@@ -72,7 +72,7 @@ const removeCoupon = () => {
             <span class="mx-auto">Coupon code: {{cartStore.couponCode}}</span>
             <form class="mx-auto flex flex-col" @submit.prevent="applyCoupon">
                 <input type="text" v-model="cartStore.formCoupon.coupon_code" class="text-black bg-green-100 border border-green-200 rounded-lg p-2" placeholder="Enter coupon code">
-                <span v-if="page.props.errors.error" class="text-red-500 text-sm text-center">{{ page.props.errors.error[0] }}</span>
+                <span v-if="cartStore.errorMessage" class="text-red-500 text-sm text-center">{{ cartStore.errorMessage }}</span>
                 <button class="border border-lime-600 rounded-md px-5 py-2 bg-lime-500 text-black font-semibold mt-2">Apply</button>
             </form>
         </div>
