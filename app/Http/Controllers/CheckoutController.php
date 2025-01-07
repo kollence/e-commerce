@@ -75,7 +75,7 @@ class CheckoutController extends Controller
         $getCartItems = $this->cartService->getCartItems();
         $cartItems = collect($getCartItems)->map(function($item) use (&$countCartItems){ // Metadata values can have up to 500 characters
             $countCartItems++;
-            return '{ product_qty: '.$item['product_item']['quantity'].', '.'product_sku: '.$item['product_item']['sku'] .' }';
+            return '{ product_sku: '.$item['product_item']['sku'] .', '. 'product_qty: '.$item['product_item']['quantity'].'}';
         })->values()->toJson();
 
         try {
