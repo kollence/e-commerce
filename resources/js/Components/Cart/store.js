@@ -12,6 +12,7 @@ export const useCartStore = defineStore("cart", () => {
         new_total: 0, 
         coupon: { code: null, discount: 0 }
     })
+    const errorMessage = ref(null)
     const formCoupon = useForm({ coupon_code: null })
     const formRemoveKey = useForm({ cart_item_key: null })
     const formCartItems = useForm({ cart_items: null })
@@ -90,6 +91,11 @@ export const useCartStore = defineStore("cart", () => {
                 orderSummary.value = res.props.order_summary
                 
             },
+            onError: (res) => {
+                // console.log(res.error[0]);
+                
+                errorMessage.value = res.error[0]
+            }
         })
     }
     function removeCoupon (){
@@ -142,64 +148,7 @@ export const useCartStore = defineStore("cart", () => {
         incrementQuantity, decrementQuantity, updateSubtotal, updateOrderSummary, 
         applyCoupon, removeFromCart, removeCoupon, submitCartItems, handleMouseLeave,
         updateQuantity,
-        formCoupon,  cartItems, orderSummary, couponCode,  
+        formCoupon,  cartItems, orderSummary, couponCode, errorMessage, newTotal 
     }
 
 })
-
-// export const useCartStore = defineStore("cart", {
-//     state: () => ({
-//         cartItems: [],
-//         orderSummary: { 
-//             tax_rate: null, 
-//             cart_subtotal: null, 
-//             cart_tax: null, 
-//             new_total: null, 
-//             coupon: { code: null, discount: 0}
-//         },
-//         formCoupon: useForm({ coupon_code: null }),
-//         formRemoveKey: useForm({ cart_item_key: null }),
-//     }),
-//     getters: {
-//         price: (state) => (item) => {
-//             return (item.product_item.sale_price < item.product_item.original_price && item.product_item.sale_price > 0)
-//                 ? item.product_item.sale_price
-//                 : item.product_item.original_price
-//         },
-//         cartSubtotal: state => state.cartItems.reduce((sum, item) => sum + item.subtotal, 0), 
-//         cartTax: state => state.cartSubtotal * state.orderSummary.tax_rate, 
-//         newTotal: state => state.cartSubtotal + state.cartTax 
-//     }, 
-//     actions: {
-//         incrementQuantity(item) {
-//             item.product_item.quantity++; this.updateSubtotal(item); 
-//         }, 
-//         decrementQuantity(item) {
-//              if (item.product_item.quantity > 1) { 
-//                 item.product_item.quantity--; 
-//                 this.updateSubtotal(item); 
-//             } 
-//         },
-//         updateSubtotal(item) { 
-//             item.subtotal = this.price * item.product_item.quantity; 
-//             this.updateOrderSummary(); 
-//         }, 
-//         updateOrderSummary() { 
-//             this.orderSummary.cart_subtotal = this.cartSubtotal; 
-//             this.orderSummary.cart_tax = this.cartTax; 
-//             this.orderSummary.new_total = this.newTotal; 
-//         }, 
-//         applyCoupon(code) { 
-//             if (code === 'fixed_value') { 
-//                 const discount = 20; 
-//                 this.orderSummary.coupon = { code, discount }; 
-//                 const newSubtotal = this.orderSummary.cart_subtotal - discount; 
-//                 const newTax = newSubtotal * this.orderSummary.tax_rate; 
-//                 const newTotal = newSubtotal + newTax; 
-//                 this.orderSummary.cart_subtotal = newSubtotal; 
-//                 this.orderSummary.cart_tax = newTax; 
-//                 this.orderSummary.new_total = newTotal; 
-//             } 
-//         } 
-//     }
-// })
