@@ -9,6 +9,8 @@ use App\Services\CartService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Stripe\PaymentIntent;
+use Stripe\Stripe;
 
 class CheckoutController extends Controller
 {
@@ -66,64 +68,63 @@ class CheckoutController extends Controller
             'billing_address.phone_2' => 'nullable|string', 
             'billing_address.default' => 'nullable|boolean',
         ]);
-
+        // dd($request->all());
         $paymentMethodId = $request->payment_method_id;
         $amount = $request->amount * 100;
-
+        $countCartItems = 0;
         $getCartItems = $this->cartService->getCartItems();
-        $cartItems = collect($getCartItems)->map(function($item){
-            return 'Product Code: '.$item['product_item']['product_code'].','.
-                'Product Name: '.$item['product']['name'].','.
-                'Product Quantity: '.$item['product_item']['quantity'];
-                'Product SKU: '.$item['product_item']['sku'];
+        $cartItems = collect($getCartItems)->map(function($item) use (&$countCartItems){ // Metadata values can have up to 500 characters
+            $countCartItems++;
+            return '{ product_qty: '.$item['product_item']['quantity'].', '.'product_sku: '.$item['product_item']['sku'] .' }';
         })->values()->toJson();
-        // DB::beginTransaction();
+
         try {
-        // Options for the charge that will use Stripe API
-            $options = [
-                'return_url' => route('checkout.success'),
-                'statement_descriptor' => 'E-commerce Test site',
-                'receipt_email' => $request->email,
-                'description' => 'One time single charge',
-                'metadata' => [ // metadata will be shown in Stripe Transactions page
-                    'Confirmation #' => '1234567890',
-                    'cart_items' => $cartItems,
-                    'count_cart_items' => collect($this->cartService->cartItems())->count(),
-                ]
-            ];
-            // Simple Charge https://laravel.com/docs/11.x/billing#single-charges (Stripe doc says charge() is deprecated)
-            (new User)->charge($amount, $paymentMethodId, $options);
-        //     // Charge the user 
-        //     $options = ['return_url' => route('checkout.success')]; 
-        //     $user->charge($amount, $paymentMethodId, $options);
-        //     // Store or update shipping address 
-        //     $shippingAddress = Address::firstOrNew( [ 
-        //         'user_id' => $user->id, 
-        //         'street_and_number' => $request->shipping_address['street_and_number'], 
-        //     ], $request->shipping_address );
+            // 2. Initialize Stripe with your secret key
+            Stripe::setApiKey(config('services.stripe.secret'));
 
-        //     if (!$shippingAddress->exists || $shippingAddress->isDirty()) { 
-        //         $shippingAddress->type = 'shipping';
-        //         $shippingAddress->fill($request->shipping_address); 
-        //         $shippingAddress->save(); 
-        //     } 
-        //     // Store or update billing address if provided 
-        //     $billingAddressId = null; 
-        //     if ($request->has('billing_address')) { 
-        //         $billingAddress = Address::firstOrNew( [ 
-        //             'user_id' => $user->id, 
-        //             'type' => 'billing', 
-        //             'street_and_number' => $request->billing_address['street_and_number'], 
-        //         ], $request->billing_address );
+            // 3. Create a Payment Intent
+            $paymentIntent = PaymentIntent::create([
+                'payment_method' => $paymentMethodId,
+                'amount' => (int) $amount, // Convert to cents
+                'currency' => 'usd',
+                // 'description' => 'Payment for order #'.$order->id,
+                'confirmation_method' => 'manual',
+                'confirm' => true,
+                'return_url' => route('checkout.success'), // Add return URL for 3D Secure
+                'metadata' => [
+                    'customer_name' => $request['name'],
+                    'customer_email' => $request['email'],
+                    'cart_items' => $cartItems, // Metadata values can have up to 500 characters
+                    'count_cart_items' => $countCartItems,
+                ],
+                'shipping' => [
+                    'name' => $request['name'],
+                    'address' => [
+                        'line1' => $request['shipping_address']['street_and_number'],
+                        'city' => $request['shipping_address']['city'],
+                        'postal_code' => $request['shipping_address']['zip_code'],
+                        'country' => $request['shipping_address']['country'],
+                    ],
+                    'phone' => $request['shipping_address']['phone_1'],
+                ],
+            ]);
 
-        //         if (!$billingAddress->exists || $billingAddress->isDirty()) { 
-        //             $billingAddress->type = 'billing';
-        //             $billingAddress->fill($request->billing_address); 
-        //             $billingAddress->save(); 
-        //         } 
-        //         $billingAddressId = $billingAddress->id; 
-        //     } 
-        //     // Create the order 
+            // // 4. Begin database transaction
+            // DB::beginTransaction();
+
+            // // 5. Create order record
+            // $order = Order::create([
+            //     'order_number' => $paymentIntent->id,
+            //     'status' => $paymentIntent->status,
+            //     'total_price' => $amount,
+            //     'currency' => 'USD',
+            //     'customer_name' => $request->name,
+            //     'customer_email' => $request->email,
+            //     'payment_method' => $request->payment_method, 
+            //     'shipping_method' => $request->shipping_method,
+            //     'shipping_price' => 666,
+            //     'notes' => $request->notes ?? null,
+            // ]);
         //     Order::create([ 
         //         'user_id' => $user->id, 
         //         'total_price' => $amount, 
@@ -142,14 +143,14 @@ class CheckoutController extends Controller
         } catch (\Stripe\Exception\CardException $e) { 
             // Rollback the transaction 
             // DB::rollBack(); 
-            return back()->withErrors(['error' => $e->getMessage()]);
+            return back()->withErrors(['error' => $e->getMessage()])->withStatusCode(400); // card error with status code 400
             // return inertia('Checkout/Canceled', ['error' => $e->getMessage()]);
         } 
         catch (\Exception $e) { 
         //     // Rollback the transaction 
         //     // DB::rollBack(); 
         //     // Return back with error message 
-            return back()->withErrors(['error' => $e->getMessage()]);
+            return back()->withErrors(['error' => $e->getMessage()])->withStatusCode(500); // server error with status code 500
         //     // return inertia('Checkout/Canceled', ['error' => $e->getMessage()]);
         }
     }
