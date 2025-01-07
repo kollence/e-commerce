@@ -15,10 +15,13 @@ return new class extends Migration
 
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained();
+            $table->unsignedBigInteger('user_id')->nullable(); // if customer is not assigned to a user
+            $table->string('customer_name');
+            $table->string('customer_email');
             $table->string('order_number')->unique()->nullable();
             $table->string('session_id')->unique()->nullable();
-            $table->enum('status', ["pending","processing","completed","cancelled"])->default('pending');
+            // $table->enum('status', ["incomplete","processing","succeeded","cancelled"])->default('pending');
+            $table->string('status');
             $table->integer('total_price');
             $table->integer('shipping_price');
             $table->string('shipping_method');
