@@ -56,48 +56,19 @@ class StripePaymentService implements PaymentGatewayContract
                 ],
             ]);
 
-            // 4. Begin database transaction
-            DB::beginTransaction();
-
             // 5. Create order record
-            $order = Order::create([
-                'stripe_payment_intent_id' => $paymentIntent->id,
-                'status' => $paymentIntent->status,
-                'amount' => $validated['amount'],
-                'currency' => 'usd',
-                'customer_name' => $validated['name'],
-                'customer_email' => $validated['email'],
-                'shipping_address' => $validated['shipping_address'],
-                'shipping_method' => $validated['shipping_method'],
-                'notes' => $validated['notes'] ?? null,
-            ]);
+            // $order = Order::create([
+            //     'stripe_payment_intent_id' => $paymentIntent->id,
+            //     'status' => $paymentIntent->status,
+            //     'amount' => $request['amount'],
+            //     'currency' => 'usd',
+            //     'customer_name' => $request['name'],
+            //     'customer_email' => $request['email'],
+            //     'shipping_address' => $request['shipping_address'],
+            //     'shipping_method' => $request['shipping_method'],
+            //     'notes' => $request['notes'] ?? null,
+            // ]);
 
-            DB::commit();
-
-            // 6. Return success response
-            return response()->json([
-                'success' => true,
-                'order' => $order,
-                'client_secret' => $paymentIntent->client_secret,
-            ]);
-
-        } catch (\Stripe\Exception\CardException $e) {
-            DB::rollBack();
-            return response()->json([
-                'error' => [
-                    'message' => $e->getMessage(),
-                    'type' => 'card_error',
-                ]
-            ], 400);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json([
-                'error' => [
-                    'message' => 'An error occurred while processing your payment.',
-                    'type' => 'server_error',
-                ]
-            ], 500);
-        }
     }
 
     // /**
