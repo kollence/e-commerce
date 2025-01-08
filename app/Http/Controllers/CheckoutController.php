@@ -68,48 +68,20 @@ class CheckoutController extends Controller
             'billing_address.phone_2' => 'nullable|string', 
             'billing_address.default' => 'nullable|boolean',
         ]);
-        // dd($request->all());
-        $paymentMethodId = $request->payment_method_id;
-        $amount = $request->amount * 100;
-        $countCartItems = 0;
-        $getCartItems = $this->cartService->getCartItems();
-        $cartItems = collect($getCartItems)->map(function($item) use (&$countCartItems){ // Metadata values can have up to 500 characters
-            $countCartItems++;
-            return '{ product_sku: '.$item['product_item']['sku'] .', '. 'product_qty: '.$item['product_item']['quantity'].'}';
-        })->values()->toJson();
-
+        // dd($request->payment_method);
         try {
-            // 2. Initialize Stripe with your secret key
-            Stripe::setApiKey(config('services.stripe.secret'));
 
-            // 3. Create a Payment Intent
-            $paymentIntent = PaymentIntent::create([
-                'payment_method' => $paymentMethodId,
-                'amount' => (int) $amount, // Convert to cents
-                'currency' => 'usd',
-                // 'description' => 'Payment for order #'.$order->id,
-                'confirmation_method' => 'manual',
-                'confirm' => true,
-                'return_url' => route('checkout.success'), // Add return URL for 3D Secure
-                'metadata' => [
-                    'customer_name' => $request['name'],
-                    'customer_email' => $request['email'],
-                    'cart_items' => $cartItems, // Metadata values can have up to 500 characters
-                    'count_cart_items' => $countCartItems,
-                ],
-                'shipping' => [
-                    'name' => $request['name'],
-                    'address' => [
-                        'line1' => $request['shipping_address']['street_and_number'],
-                        'city' => $request['shipping_address']['city'],
-                        'postal_code' => $request['shipping_address']['zip_code'],
-                        'country' => $request['shipping_address']['country'],
-                    ],
-                    'phone' => $request['shipping_address']['phone_1'],
-                ],
-            ]);
+            $getCartItems = $this->cartService->getCartItems();
 
-            // // 4. Begin database transaction
+            $paymentService = match ($request->payment_method) {
+                'card' => new StripePaymentService($getCartItems),
+                'paypal' => new PaypalPaymentService($getCartItems),
+                'cod' => new CODPaymentService($getCartItems),
+                // 'crypto' => new CryptoPaymentService(),
+                default => throw new \Exception('Invalid payment method'),
+            };
+            $paymentService->charge($request);
+ 
             // DB::beginTransaction();
 
             // // 5. Create order record
