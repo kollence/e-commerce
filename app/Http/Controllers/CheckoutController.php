@@ -2,15 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Address;
-use App\Models\Order;
-use App\Models\User;
+use App\Contracts\PaymentGatewayContract;
 use App\Services\CartService;
+use App\Services\CODPaymentService;
+use App\Services\PaypalPaymentService;
+use App\Services\StripePaymentService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Stripe\PaymentIntent;
-use Stripe\Stripe;
 
 class CheckoutController extends Controller
 {
@@ -44,8 +41,7 @@ class CheckoutController extends Controller
      */
     public function store(Request $request)
     {
-        // $user = $request->user(); 
-        // Validate the request 
+
         $request->validate([ 
             'payment_method_id' => 'required|string', 
             'amount' => 'required|numeric|min:1', 
