@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Contracts\PaymentGatewayContract;
 use Stripe\Stripe;
 use Stripe\PaymentIntent;
 use Stripe\Checkout\Session;
@@ -10,51 +11,48 @@ use Illuminate\Http\Request;
 use App\Models\Order;
 use Illuminate\Support\Facades\DB;
 
-class StripePaymentService
+class StripePaymentService implements PaymentGatewayContract
 {
+
+    public function __construct(protected $getCartItems) 
+    {}
+
     public function charge(Request $request)
     {
-        // 1. Validate the incoming request
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email',
-            'shipping_address.country' => 'required|string|size:2',
-            'shipping_address.city' => 'required|string',
-            'shipping_address.street_and_number' => 'required|string',
-            'shipping_address.zip_code' => 'required|string',
-            'shipping_address.phone_1' => 'required|string',
-            'shipping_address.phone_2' => 'nullable|string',
-            'notes' => 'nullable|string',
-            'shipping_method' => 'required|string|in:express,standard',
-            'payment_method' => 'required|string|in:card',
-            'payment_method_id' => 'required|string|starts_with:pm_',
-            'amount' => 'required|numeric|min:0.50'
-        ]);
-
-        try {
+            $paymentMethodId = $request->payment_method_id;
+            $amount = $request->amount * 100;
+            $countCartItems = 0;
+            $cartItems = collect($this->getCartItems)->map(function($item) use (&$countCartItems){ // Metadata values can have up to 500 characters
+                $countCartItems++;
+                return '{ product_sku: '.$item['product_item']['sku'] .', '. 'product_qty: '.$item['product_item']['quantity'].'}';
+            })->values()->toJson();
             // 2. Initialize Stripe with your secret key
             Stripe::setApiKey(config('services.stripe.secret'));
-
+            
             // 3. Create a Payment Intent
             $paymentIntent = PaymentIntent::create([
-                'amount' => (int)($validated['amount'] * 100), // Convert to cents
+                'payment_method' => $paymentMethodId,
+                'amount' => (int) $amount, // Convert to cents
                 'currency' => 'usd',
-                'payment_method' => $validated['payment_method_id'],
+                // 'description' => 'Payment for order #'.$order->id,
                 'confirmation_method' => 'manual',
                 'confirm' => true,
+                'return_url' => route('checkout.success'), // Add return URL for 3D Secure
                 'metadata' => [
-                    'customer_name' => $validated['name'],
-                    'customer_email' => $validated['email'],
+                    'customer_name' => $request['name'],
+                    'customer_email' => $request['email'],
+                    'cart_items' => $cartItems, // Metadata values can have up to 500 characters
+                    'count_cart_items' => $countCartItems,
                 ],
                 'shipping' => [
-                    'name' => $validated['name'],
+                    'name' => $request['name'],
                     'address' => [
-                        'line1' => $validated['shipping_address']['street_and_number'],
-                        'city' => $validated['shipping_address']['city'],
-                        'postal_code' => $validated['shipping_address']['zip_code'],
-                        'country' => $validated['shipping_address']['country'],
+                        'line1' => $request['shipping_address']['street_and_number'],
+                        'city' => $request['shipping_address']['city'],
+                        'postal_code' => $request['shipping_address']['zip_code'],
+                        'country' => $request['shipping_address']['country'],
                     ],
-                    'phone' => $validated['shipping_address']['phone_1'],
+                    'phone' => $request['shipping_address']['phone_1'],
                 ],
             ]);
 
