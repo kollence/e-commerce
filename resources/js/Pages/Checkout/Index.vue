@@ -6,6 +6,7 @@ import { onMounted, ref, watch } from 'vue';
 import { useCartStore } from '@/Components/Cart/store';
 import InputError from '@/Components/InputError.vue';
 import { computed, reactive } from '@vue/reactivity';
+import countries from '@/functions/countries.json';
 
 const cartStore = useCartStore();
 const props = defineProps({
@@ -23,6 +24,7 @@ const activeTab = ref('shipping_address');
 const cardElement = ref(null);
 const elements = ref({});
 const initStripeOnce = ref(false)
+const countriesCode = countries;
 
 const form = useForm({
     name: '',
@@ -202,7 +204,17 @@ const payWithPaypal = async () => {
     form.payment_method_id = '666';
     form.amount = cartStore.orderSummary.new_total;
 }
-
+onMounted(() => {
+    fetch('http://ip-api.com/json/')
+    .then(response => response.json())
+    .then(data => {
+      form.shipping_address.country = data.countryCode;
+      form.billing_address.country = data.countryCode;
+    })
+    .catch(error => {
+      console.error('Error fetching user country:', error);
+    });
+})
 </script>
 <template>
 <Head title="Checkout" />
@@ -250,14 +262,17 @@ const payWithPaypal = async () => {
                         </button> 
                     </div> 
                     <div v-if="activeTab === 'shipping_address'" @focusout="isAddressFilled('shipping_address')" :class="{'corner-border green': !isShippingAndBillingAddr}" class="px-3 border-b border-x  rounded-bl-lg rounded-br-lg border-lime-600"> 
-                        <div class="pt-4 flex justify-between items-center">
+                        <div class="pt-4 flex justify-between items-center pt-4">
                             <h3 class="text-sm text-center font-semibold">{{addressInfoDynamicTxt.shipping_address.info}}</h3> 
                             <button type="button" @click="resetAddressFields('shipping_address')" class="rounded-full bg-orange-600 px-2 text-sm">Reset</button>
                         </div>
                         <h4 v-if="addressError" class="text-red-500">{{ addressError }}</h4>
-                        <div class="mb-4"> 
+                        <div class="mb-4 mt-3"> 
                             <label class="block text-gray-700 text-sm font-bold mb-2" for="country">Country</label>
-                            <input v-model="form.shipping_address.country" class="shadow  dark:bg-gray-800 appearance-none border rounded w-full py-2 px-3 text-slate-500 dark:text-slate-400 leading-tight focus:outline-none focus:shadow-outline" id="country" type="text" placeholder="Country"> 
+                            <select name="country" v-model="form.shipping_address.country" class="shadow  dark:bg-gray-800 appearance-none border rounded w-full py-2 px-3 text-slate-500 dark:text-slate-400 leading-tight focus:outline-none focus:shadow-outline" id="country">
+                                <option v-for="country in countriesCode" :key="country.id" :value="country.iso_code" :selected="country.iso_code === form.shipping_address.country">{{country.name}}</option>
+                            </select>
+                            <!-- <input v-model="form.shipping_address.country" class="shadow  dark:bg-gray-800 appearance-none border rounded w-full py-2 px-3 text-slate-500 dark:text-slate-400 leading-tight focus:outline-none focus:shadow-outline" id="country" type="text" placeholder="Country">  -->
                             <InputError class="mt-2" :message="form.errors['shipping_address.country']" />
                         </div> 
                         <div class="mb-4"> 
@@ -287,14 +302,16 @@ const payWithPaypal = async () => {
                         </div>    
                     </div> 
                     <div v-if="activeTab === 'billing_address'" @focusout="isAddressFilled('billing_address')" class="px-3 border-b border-x  rounded-bl-lg rounded-br-lg border-lime-600"> 
-                        <div class="pt-4 flex justify-between items-center">
+                        <div class="pt-4 flex justify-between items-center pt-4">
                             <h3 class="text-sm text-center font-semibold">{{addressInfoDynamicTxt.billing_address.info}}</h3>
                             <button type="reset" @click="resetAddressFields('billing_address')" class="rounded-full bg-orange-600 px-2 text-sm">Reset</button>
                         </div>
                         <h4 v-if="addressError" class="text-red-500">{{ addressError }}</h4>
-                        <div class="mb-4"> 
+                        <div class="mb-4 mt-3"> 
                             <label class="block text-gray-700 text-sm font-bold mb-2" for="billing_country">Country</label> 
-                            <input v-model="form.billing_address.country" class="shadow  dark:bg-gray-800 appearance-none border rounded w-full py-2 px-3 text-slate-500 dark:text-slate-400 leading-tight focus:outline-none focus:shadow-outline" id="billing_country" type="text" placeholder="Country"> 
+                            <select name="billing_country" v-model="form.billing_address.country" class="shadow  dark:bg-gray-800 appearance-none border rounded w-full py-2 px-3 text-slate-500 dark:text-slate-400 leading-tight focus:outline-none focus:shadow-outline" id="billing_country">
+                                <option v-for="country in countriesCode" :key="country.id" :value="country.iso_code" :selected="country.iso_code === form.billing_address.country">{{country.name}}</option>
+                            </select>
                             <InputError class="mt-2" :message="form.errors['billing_address.country']" />
                         </div> 
                         <div class="mb-4"> 
