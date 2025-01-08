@@ -8,7 +8,7 @@ import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { ZiggyVue } from '../../vendor/tightenco/ziggy';
 import AppLayout from './Layouts/AppLayout.vue';
 import Icon from './Components/Icons/Icon.vue';
-import formatCurrency from './utils/currencyFormatter';
+import formatCurrency from './functions/currencyFormatter';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 const pinia = createPinia()
