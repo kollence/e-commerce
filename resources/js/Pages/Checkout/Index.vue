@@ -194,37 +194,13 @@ const payWithStripe = async () => {
 }
 
 const payWithCashOnDelivery = async () => {
-    await alert('COD Needs to be builded!!')
-    isSubmitting.value = false;
+    form.payment_method_id = '666';
     form.amount = cartStore.orderSummary.new_total;
-    // form.post(route('checkout.store'), {
-    //     preserveScroll: true,
-    //     onSuccess: () => {
-    //         console.log('success');
-    //     },
-    //     onError: (error) => {
-    //         console.log(error);
-
-    //         cardError.value = error.error;
-    //     },
-    // })
 }
 
 const payWithPaypal = async () => {
-    await alert('PayPal Needs to be builded!!')
-    // isSubmitting.value = false;
-    // form.amount = cartStore.orderSummary.new_total;
-    // form.post(route('checkout.store'), {
-    //     preserveScroll: true,
-    //     onSuccess: () => {
-    //         console.log('success');
-    //     },
-    //     onError: (error) => {
-    //         console.log(error);
-
-    //         cardError.value = error.error;
-    //     },
-    // })
+    form.payment_method_id = '666';
+    form.amount = cartStore.orderSummary.new_total;
 }
 
 </script>
